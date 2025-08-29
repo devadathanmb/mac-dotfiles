@@ -1,0 +1,23 @@
+[user]
+	name = Devadathan M B
+	email = devadathanmb@gmail.com
+
+[alias]
+    graph = log --all --graph --decorate
+    cm = commit -m
+    pom = push origin main
+    po = push origin
+    squash-merge = "!f() { git merge --squash \"$1\" && git commit; }; f"
+    merge = "!f() { git merge --squash \"$@\"; }; f"
+
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+
+[pull]
+	rebase = true
+
+[push]
+  autoSetupRemote = true

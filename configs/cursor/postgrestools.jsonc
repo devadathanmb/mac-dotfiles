@@ -1,0 +1,26 @@
+{
+  "$schema": "https://pgtools.dev/schemas/0.7.0/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignore": []
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "db": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "dummy",
+    "connTimeoutSecs": 10,
+    "disableConnection": false
+  }
+}

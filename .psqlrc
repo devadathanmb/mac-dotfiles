@@ -1,0 +1,30 @@
+-- Quiet while loading configs
+
+\set QUIET 1
+-- Enable timing for all queries
+\timing on
+
+-- Display
+-- \pset linestyle unicode
+-- \pset format wrapped
+\x auto
+
+-- Error
+-- \set VERBOSITY verbose
+
+-- Timezone Asia/Kolkata
+\set timezone 'Asia/Kolkata'
+
+-- History
+\set HISTFILE ~/.psql_history
+\set HISTSIZE 10000
+\set HISTCONTROL ignoredups
+
+-- Suggest SQL keywords in uppercase
+\set COMP_KEYWORD_CASE upper
+
+-- Null
+-- \pset null '<null>'
+
+-- Back on after loading
+\set QUIET 0

@@ -1,0 +1,36 @@
+- defaults:
+    link:
+      relink: true # Removes old links even if they point to the correct target 
+      create: true # Create parent dirs if needed
+      force: true # Remove existing file and create with a symlink
+
+- clean: ['~']
+
+# Format like:
+# Actual path: your dotfiles repo reference
+- link:
+    ~/.tmux.conf: .tmux.conf
+    ~/.vimrc: .vimrc
+    ~/.curlrc: .curlrc
+    ~/.wgetrc: .wgetrc
+    ~/.p10k.zsh: .p10k.zsh
+    ~/.gitconfig: .gitconfig
+    ~/.zshrc: .zshrc
+    ~/.config/zsh: configs/zsh
+    ~/.config/cvim: configs/cvim
+    ~/.config/ghostty: configs/ghostty
+    ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
+
+    "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
+    "~/Library/Application Support/Code/User/keybindings.json": configs/vscode/keybindings.json
+
+    "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
+    "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
+
+
+- create:
+    - ~/downloads
+    - ~/.vim/undo-history
+
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]
