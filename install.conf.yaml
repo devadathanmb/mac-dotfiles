@@ -11,6 +11,7 @@
 - link:
     ~/.tmux.conf: .tmux.conf
     ~/.vimrc: .vimrc
+    ~/.ideavimrc: .ideavimrc
     ~/.curlrc: .curlrc
     ~/.wgetrc: .wgetrc
     ~/.p10k.zsh: .p10k.zsh
@@ -26,11 +27,6 @@
 
     "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
     "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
-
-
-- create:
-    - ~/downloads
-    - ~/.vim/undo-history
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

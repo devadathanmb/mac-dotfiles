@@ -10,15 +10,22 @@ prompt: enabled
 prefer_editor_prompt: disabled
 # A pager program to send command output to, e.g. "less". If blank, will refer to environment. Set the value to "cat" to disable the pager.
 pager:
+
 # Aliases allow you to create nicknames for gh commands
 aliases:
-    co: pr checkout
+  co: pr checkout           # checkout a PR
+  prs: pr list --state=open # list open PRs
+  prc: "!f() { gh pr create --title \"$(git log --reverse --format=%s | head -n1)\" --body \"$(git log --reverse --format=%b | head -n1)\"; }; f"
+  prd: "!f() { gh pr create --draft --title \"$(git log --reverse --format=%s | head -n1)\" --body \"$(git log --reverse --format=%b | head -n1)\"; }; f"
+  myissues: issue list --assignee @me --state=open
+  mergepr: pr merge $1 --squash --delete-branch
+
 # The path to a unix socket through which to send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
 http_unix_socket:
 # What web browser gh should use when opening URLs. If blank, will refer to environment.
 browser:
 # Whether to display labels using their RGB hex color codes in terminals that support truecolor. Supported values: enabled, disabled
-color_labels: disabled
+color_labels: enabled
 # Whether customizable, 4-bit accessible colors should be used. Supported values: enabled, disabled
 accessible_colors: disabled
 # Whether an accessible prompter should be used. Supported values: enabled, disabled

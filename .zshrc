@@ -31,6 +31,7 @@ plug "zsh-users/zsh-syntax-highlighting"
 plug "romkatv/powerlevel10k"
 plug "MichaelAquilina/zsh-you-should-use"
 plug "junegunn/fzf-git.sh"
+plug "thirteen37/fzf-brew"
 
 # Load custom configs
 source ~/.config/zsh/init.zsh
