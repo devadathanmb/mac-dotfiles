@@ -275,8 +275,6 @@
   "path-intellisense.autoSlashAfterDirectory": false,
   "path-intellisense.mappings": {
     "$HOME": "/Users/devadathanmb/",
-    "scripts": "/Users/devadathanmb/fyle/fyle-scripts",
-    "sr": "/Users/devadathanmb/fyle/service-requests",
     "~": "/Users/devadathanmb/"
   },
   "path-intellisense.showHiddenFiles": false,
@@ -1408,7 +1406,6 @@
   "githubPullRequests.pullBranch": "never",
 
   // Project manager
-  "projectManager.git.baseFolders": ["~/fyle/"],
   "projectManager.removeCurrentProjectFromList": true,
   "projectManager.git.maxDepthRecursion": 1,
   "[lua]": {
