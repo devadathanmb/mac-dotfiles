@@ -219,3 +219,4 @@ zeromq
 zimg
 zoxide
 zstd
+oven-sh/bun/bun

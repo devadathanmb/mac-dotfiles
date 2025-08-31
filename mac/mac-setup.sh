@@ -182,62 +182,6 @@ defaults write com.apple.dock mru-spaces -bool false
 echo "✅ Dock configuration complete"
 echo ""
 
-# Trackpad Settings
-# Enable tap to click
-defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-# Enable right-click with two fingers
-defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
-
-# Finder Settings
-# Show all filename extensions
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-# Show full POSIX path in Finder window title
-defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
-# Hide all desktop icons
-defaults write com.apple.finder CreateDesktop -bool false
-# Disable warning before changing a file extension
-defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-# Set default search scope in Finder to current folder
-defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-
-# Keyboard and Text Input
-# Disable automatic spelling correction
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-# Set fast key repeat rate
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 15
-# Disable press and hold for KeyRepeat
-defaults delete -g ApplePressAndHoldEnabled
-
-# Save Dialogs
-# Always expand save panel by default
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-
-# Dock Settings
-# Auto-hide Dock
-defaults write com.apple.dock autohide -bool true
-# Disable "click wallpaper to show desktop"
-defaults write com.apple.dock showDesktop -bool false
-# Change minimize/maximize window effect
-defaults write com.apple.dock mineffect -string "scale"
-# Minimize windows into their application’s icon
-defaults write com.apple.dock minimize-to-application -bool true
-# Show indicator lights for open applications in the Dock
-defaults write com.apple.dock show-process-indicators -bool true
-# Wipe all (default) app icons from the Dock
-# This is only really useful when setting up a new Mac, or if you don’t use
-# the Dock to launch apps.
-# defaults write com.apple.dock persistent-apps -array
-
-# Show only open applications in the Dock
-defaults write com.apple.dock static-only -bool true
-# Don’t animate opening applications from the Dock
-defaults write com.apple.dock launchanim -bool false
-
-
-
 # ==============================================================================
 # HOT CORNERS
 # ==============================================================================
@@ -295,6 +239,10 @@ defaults write com.apple.controlcenter.plist Sound -int 18
 
 # Use 24-hour time format
 defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
+
+# Reduce status item spacing
+defaults -currentHost write -globalDomain NSStatusItemSpacing -int 12
+defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 12
 
 echo "✅ System UI configuration complete"
 echo ""
@@ -421,70 +369,6 @@ defaults write com.apple.SoftwareUpdate AutomaticDownload -bool false
 
 echo "✅ App Store configuration complete"
 echo ""
-
-# Speed up Mission Control animations
-
-# Don’t automatically rearrange Spaces based on most recent use
-defaults write com.apple.dock mru-spaces -bool false
-
-
-# Hot corners
-# Possible values:
-#  0: no-op
-#  2: Mission Control
-#  3: Show application windows
-#  4: Desktop
-#  5: Start screen saver
-#  6: Disable screen saver
-#  7: Dashboard
-# 10: Put display to sleep
-# 11: Launchpad
-# 12: Notification Center
-# 13: Lock Screen
-# Top left screen corner → Mission Control
-# defaults write com.apple.dock wvous-tl-corner -int 2
-# defaults write com.apple.dock wvous-tl-modifier -int 0
-# Top right screen corner → Desktop
-defaults write com.apple.dock wvous-tr-corner -int 0
-defaults write com.apple.dock wvous-tr-modifier -int 0
-
-###############################################################################
-# Safari & WebKit                                                             #
-###############################################################################
-
-# Privacy: don’t send search queries to Apple
-defaults write com.apple.Safari UniversalSearchEnabled -bool false
-defaults write com.apple.Safari SuppressSearchSuggestions -bool true
-
-# Show the full URL in the address bar (note: this still hides the scheme)
-defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
-
-# Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
-
-# Warn about fraudulent websites
-defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
-
-# Update extensions automatically
-defaults write com.apple.Safari InstallExtensionUpdatesAutomatically -bool true
-
-
-
-
-# Activity Monitor Settings
-# Show all processes in Activity Monitor
-defaults write com.apple.ActivityMonitor ShowCategory -int 0
-# Sort Activity Monitor by CPU usage
-defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
-defaults write com.apple.ActivityMonitor SortDirection -int 0
-
-# Disable App Store automatic downloads
-defaults write com.apple.SoftwareUpdate AutomaticDownload -bool false
-
-# Save to disk (not iCloud) by default
-# defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
 # ==============================================================================
 # APPLY CHANGES
