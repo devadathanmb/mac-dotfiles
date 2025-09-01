@@ -17,10 +17,13 @@
     ~/.p10k.zsh: .p10k.zsh
     ~/.gitconfig: .gitconfig
     ~/.zshrc: .zshrc
+    ~/.zprofile: .zprofile
+    ~/.config/gh: configs/gh
     ~/.config/zsh: configs/zsh
     ~/.config/cvim: configs/cvim
     ~/.config/ghostty: configs/ghostty
-    ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
+    ~/.config/atuin: configs/atuin
+    # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
     "~/Library/Application Support/Code/User/keybindings.json": configs/vscode/keybindings.json
