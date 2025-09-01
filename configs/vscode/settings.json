@@ -5,9 +5,9 @@
   "custom-ui-style.font.sansSerif": "Maple Mono NF Medium",
   "custom-ui-style.font.monospace": "Maple Mono NF Medium",
   "custom-ui-style.stylesheet": {
-    "*": {
-      "font-feature-settings": "'liga', 'calt', 'cv01', 'cv02', 'cv34', 'cv61', 'cv62', 'ss05', 'ss07', 'ss08', 'ss09', 'ss10', 'ss11' !important;"
-    },
+    // "*": {
+    //   "font-feature-settings": "'liga', 'calt', 'cv01', 'cv02', 'cv34', 'cv61', 'cv62', 'ss05', 'ss07', 'ss08', 'ss09', 'ss10', 'ss11' !important;"
+    // },
     "body *:not(.monaco-editor *):not(.monaco-editor)": {
       "letter-spacing": "-0.80px !important"
     },
