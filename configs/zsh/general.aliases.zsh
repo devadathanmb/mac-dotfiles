@@ -10,4 +10,5 @@ alias mv="mv -i"
 
 # Vim Aliases
 alias vim="nvim -u ~/.config/cvim/init.lua"
+alias lvim="nvim -u ~/.config/nvim/init.lua"
 alias nvim="nvim -u ~/.config/cvim/init.lua"
