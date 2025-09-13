@@ -12,3 +12,7 @@ zstyle ':completion:*' format ''
 
 setopt complete_aliases
 unsetopt correctall
+
+# Load and initialise completion system
+autoload -Uz compinit
+compinit

@@ -47,11 +47,5 @@ if [[ $- != *i* ]]; then
     return
 fi
 
-# Load and initialise completion system
-autoload -Uz compinit
-compinit
-
 # eval "$(atuin init zsh)"
 . "/Users/devadathanmb/.deno/env"
-
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
