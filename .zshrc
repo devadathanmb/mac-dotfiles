@@ -34,7 +34,7 @@ plug "junegunn/fzf-git.sh"
 plug "thirteen37/fzf-brew"
 
 # Load custom configs
-source ~/.config/zsh/init.zsh
+plug ~/.config/zsh/init.zsh
 
 # Initialize Tools
 eval "$(zoxide init zsh)"
@@ -52,3 +52,6 @@ autoload -Uz compinit
 compinit
 
 # eval "$(atuin init zsh)"
+. "/Users/devadathanmb/.deno/env"
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
