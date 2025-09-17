@@ -20,7 +20,7 @@ font-size = 16.0
 font-thicken = true
 adjust-cell-width = "-15%"
 window-padding-x = 10
-window-padding-y = 0
+window-padding-y = 1
 
 cursor-style = bar
 cursor-style-blink = true
@@ -74,4 +74,4 @@ macos-option-as-alt = left
 keybind = alt+left=unbind
 keybind = alt+right=unbind
 
-theme=github-dark-default
+theme=GitHub Dark High Contrast

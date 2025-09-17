@@ -48,4 +48,4 @@ if [[ $- != *i* ]]; then
 fi
 
 # eval "$(atuin init zsh)"
-. "/Users/devadathanmb/.deno/env"
+source "/Users/devadathanmb/.deno/env"
