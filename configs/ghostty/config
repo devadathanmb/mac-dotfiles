@@ -75,3 +75,8 @@ keybind = alt+left=unbind
 keybind = alt+right=unbind
 
 theme=GitHub Dark High Contrast
+
+palette = 0=#000000
+
+# Boost contrast significantly for better visibility
+minimum-contrast = 1.5

@@ -47,5 +47,5 @@ if [[ $- != *i* ]]; then
     return
 fi
 
-# eval "$(atuin init zsh)"
+eval "$(atuin init zsh --disable-up-arrow)"
 source "/Users/devadathanmb/.deno/env"

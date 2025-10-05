@@ -13,6 +13,7 @@
     ~/.vimrc: .vimrc
     ~/.ideavimrc: .ideavimrc
     ~/.curlrc: .curlrc
+    ~/.psqlrc: .psqlrc
     ~/.wgetrc: .wgetrc
     ~/.p10k.zsh: .p10k.zsh
     ~/.gitconfig: .gitconfig
@@ -23,6 +24,7 @@
     ~/.config/cvim: configs/cvim
     ~/.config/ghostty: configs/ghostty
     ~/.config/atuin: configs/atuin
+    ~/.local/bin: scripts/*
     # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json

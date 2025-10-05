@@ -266,11 +266,11 @@
     "command": "search.action.focusSearchList",
     "when": "inSearchEditor && inputBoxFocus"
   },
-  {
-    "key": "ctrl+n",
-    "command": "search.action.focusNextSearchResult",
-    "when": "hasSearchResult || inSearchEditor"
-  },
+  // {
+  //   "key": "ctrl+n",
+  //   "command": "search.action.focusNextSearchResult",
+  //   "when": "hasSearchResult || inSearchEditor"
+  // },
   {
     "key": "ctrl+p",
     "command": "search.action.focusPreviousSearchResult",
