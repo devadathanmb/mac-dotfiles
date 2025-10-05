@@ -1348,7 +1348,7 @@
   // Show whitespae
   "editor.renderWhitespace": "boundary",
   "editor.insertSpaces": true,
-  "editor.tabSize": 2,
+  "editor.tabSize": 4,
   "editor.colorDecorators": true,
   // "editor.detectIndentation": false,
   // Indent rainbow stuff
