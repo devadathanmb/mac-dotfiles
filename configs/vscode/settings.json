@@ -38,7 +38,7 @@
     // split-view-view visible
     ".split-view-view *": {
       "letter-spacing": "-0.80px !important"
-    },
+    }
   },
   // "custom-ui-style.stylesheet": {
   //   ".ghost-text-decoration, .ghost-text-decoration-preview": "font-family: 'Maple Mono Medium Italic'; font-weight: 200;",
@@ -266,6 +266,8 @@
     "**/.settings": true,
     "**/.env": false
   },
+  // Stop showing old files for godsake
+  "search.quickOpen.includeHistory": false,
   "git.autofetch": true,
   "git.openRepositoryInParentFolders": "always",
   "go.toolsManagement.autoUpdate": true,
@@ -1346,7 +1348,7 @@
   // Show whitespae
   "editor.renderWhitespace": "boundary",
   "editor.insertSpaces": true,
-  "editor.tabSize": 4,
+  "editor.tabSize": 2,
   "editor.colorDecorators": true,
   // "editor.detectIndentation": false,
   // Indent rainbow stuff
@@ -1434,5 +1436,39 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "javascript.updateImportsOnFileMove.enabled": "always"
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "chat.tools.terminal.autoApprove": {
+    "npx": true,
+    "cd": true,
+    "ls": true,
+    "git": true,
+    "grep": true,
+    "find": true,
+    "npm install": true,
+    "mv": true,
+    "pnpm run -s typecheck": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "true": true,
+    "type": true
+  },
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative"
 }
