@@ -1367,7 +1367,8 @@
   // "indentRainbow.tabmixColor": "rgba(255,100,100,0.8)" // Changed to a brighter mixed color
   "errorLens.enabled": true,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -1433,7 +1434,8 @@
   "window.customTitleBarVisibility": "never",
   "github.copilot.nextEditSuggestions.enabled": true,
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
   },
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
