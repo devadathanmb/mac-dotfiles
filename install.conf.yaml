@@ -18,6 +18,7 @@
     ~/.p10k.zsh: .p10k.zsh
     ~/.gitconfig: .gitconfig
     ~/.zshrc: .zshrc
+    ~/.config/fish: .configs/fish
     ~/.zprofile: .zprofile
     ~/.config/gh: configs/gh
     ~/.config/zsh: configs/zsh

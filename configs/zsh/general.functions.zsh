@@ -3,16 +3,6 @@
 # Custom Functions
 __DOTFILES_PATH="$HOME/.mac-dots/"
 
-# FZF CD Widget
-fzf-cd-widget() {
-    local dir="$(find . -type d -print 2> /dev/null | fzf --preview 'ls {}' +m)"
-    if [ -n "$dir" ]; then
-        cd "$dir"
-        zle reset-prompt
-    fi
-}
-zle -N fzf-cd-widget
-
 # Alias listing function
 function _alias_ls(){
     alias_files=(

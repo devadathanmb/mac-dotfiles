@@ -11,24 +11,9 @@ export EDITOR="nvim"
 # PostgreSQL
 export PATH="$(brew --prefix postgresql@16)/bin:$PATH"
 
-# fnm (Node Version Manager)
-FNM_PATH="/Users/devadathanmb/Library/Application Support/fnm"
-if [ -d "$FNM_PATH" ]; then
-  export PATH="/Users/devadathanmb/Library/Application Support/fnm:$PATH"
-  eval "`fnm env`"
-  source ~/.fnm_completions.zsh
-fi
-eval "$(fnm env --use-on-cd)"
-
 # pnpm
 export PNPM_HOME="/Users/devadathanmb/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-
-# Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init - zsh)"
