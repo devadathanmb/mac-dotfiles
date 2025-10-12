@@ -40,7 +40,7 @@ function _fifc
             --reverse \
             --header '$header' \
             --preview '_fifc_action preview {} {q}' \
-            --bind='$fifc_open_keybinding:execute(_fifc_action open {} {q} &> /dev/tty)' \
+            --bind='tab:down,shift-tab:up,ctrl-s:toggle,$fifc_open_keybinding:execute(_fifc_action open {} {q} &> /dev/tty)'
             --query '$fifc_query' \
             $_fifc_custom_fzf_opts"
 
