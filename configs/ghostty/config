@@ -15,6 +15,9 @@
 # Additionally, each config option is also explained in detail
 # on Ghostty's website, at https://ghostty.org/docs/config.
 
+# Shell
+# command = /opt/homebrew/bin/fish --login --interactive
+
 font-family = "Maple Mono NF Medium"
 font-size = 16.0
 font-thicken = true
@@ -26,7 +29,7 @@ cursor-style = bar
 cursor-style-blink = true
 shell-integration-features = no-cursor
 
-shell-integration = zsh
+shell-integration = fish
 confirm-close-surface = false
 
 # Cursor

@@ -1453,7 +1453,11 @@
       "matchCommandLine": true
     },
     "true": true,
-    "type": true
+    "type": true,
+    "pnpm build": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   },
   "[dockercompose]": {
     "editor.insertSpaces": true,

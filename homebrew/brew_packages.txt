@@ -220,3 +220,5 @@ zimg
 zoxide
 zstd
 oven-sh/bun/bun
+asdf
+atuin
