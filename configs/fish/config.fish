@@ -26,10 +26,10 @@ set -U fish_color_command green
 set -U fish_color_error red
 
 # Source stuff
+source ~/.config/fish/custom/options_overrides.fish
 source ~/.config/fish/custom/aliases.fish
 source ~/.config/fish/custom/exports.fish
 source ~/.config/fish/custom/functions_git_helpers.fish
-source ~/.config/fish/custom/options_overrides.fish
 # source ~/.config/fish/custom/tide_overrides.fish
 
 # Init zoxide
