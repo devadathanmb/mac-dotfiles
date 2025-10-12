@@ -28,7 +28,6 @@ eza
 fd
 ffmpeg
 flac
-fnm
 fontconfig
 freetype
 frei0r
@@ -169,7 +168,6 @@ pkgconf
 poppler
 popt
 postgresql@16
-pyenv
 python-packaging
 python@3.13
 rav1e
@@ -222,3 +220,6 @@ zstd
 oven-sh/bun/bun
 asdf
 atuin
+procs
+broot
+chafa
