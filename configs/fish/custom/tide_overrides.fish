@@ -27,8 +27,8 @@ set --global tide_git_color_operation normal
 # Character (Prompt Symbol) Colors - matching Pure
 set --global tide_character_color 00FF00 # Magenta for success
 set --global tide_character_color_failure FF0000 # Red for failure
-set --global tide_character_icon ❯
-set --global tide_character_vi_icon_default ❮
+# set --global tide_character_icon ❯
+# set --global tide_character_vi_icon_default ❮
 
 # Command Duration - matching Pure's yellow
 set --global tide_cmd_duration_bg_color normal
