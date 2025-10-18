@@ -1421,7 +1421,6 @@
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
-  "workbench.colorTheme": "GitHub Dark Default",
   "json.schemaDownload.enable": true,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

@@ -16,7 +16,7 @@
 # on Ghostty's website, at https://ghostty.org/docs/config.
 
 # Shell
-# command = /opt/homebrew/bin/fish --login --interactive
+command = /opt/homebrew/bin/fish --login --interactive
 
 font-family = "Maple Mono NF Medium"
 font-size = 16.0
