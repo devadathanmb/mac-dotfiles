@@ -16,6 +16,17 @@ if status is-interactive
             atuin init fish 2>/dev/null | source
         end
     end
+    # this fixes the "sparse" layout of the tide prompt
+    set first_line true
+    function sparse_prompt --on-event fish_prompt
+        if test "$first_line" = true
+            set first_line false
+            return
+        end
+
+        # print newline for sparse layout
+        echo
+    end
 end
 
 # Enable vim mode
