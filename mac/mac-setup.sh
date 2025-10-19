@@ -237,6 +237,9 @@ defaults -currentHost write com.apple.controlcenter.plist BatteryShowPercentage 
 # Show volume icon in menu bar
 defaults write com.apple.controlcenter.plist Sound -int 18
 
+# Beep on moving the slider
+defaults write -g com.apple.sound.beep.feedback -int 1
+
 # Use 24-hour time format
 defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
 
@@ -390,3 +393,4 @@ echo ""
 # ==============================================================================
 
 echo "🎉 macOS system configuration complete!"
+
