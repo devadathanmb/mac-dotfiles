@@ -60,6 +60,7 @@ if set -q _fifc_launched_by_fzf
         -e '^\\h*([0-9]+)'
 end
 
+
 # Fisher
 function _fifc_uninstall --on-event fifc_uninstall
 end
