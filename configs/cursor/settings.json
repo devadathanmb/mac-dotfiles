@@ -1312,6 +1312,7 @@
   "window.zoomLevel": 1.0,
   "workbench.activityBar.location": "hidden",
   "workbench.colorCustomizations": {
+    "[Catppuccin Mocha]": {},
     "[GitHub Dark Default]": {
       "editor.foreground": "#d7d8da",
       "breadcrumb.activeSelectionForeground": "#61DAFB",
