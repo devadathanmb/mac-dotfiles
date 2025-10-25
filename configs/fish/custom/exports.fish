@@ -17,3 +17,9 @@ set -x PNPM_HOME /Users/devadathanmb/Library/pnpm
 if not contains $PNPM_HOME $PATH
     set -x PATH $PNPM_HOME $PATH
 end
+
+# Local bin
+set -x LOCAL_BIN_PATH ~/.local/bin
+if not contains $LOCAL_BIN_PATH $PATH
+    set -x PATH $LOCAL_BIN_PATH $PATH
+end
