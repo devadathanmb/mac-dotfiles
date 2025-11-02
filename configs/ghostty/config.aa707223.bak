@@ -83,4 +83,3 @@ palette = 0=#000000
 
 # Boost contrast significantly for better visibility
 minimum-contrast = 1.5
-keybind = shift+enter=text:\x1b\r

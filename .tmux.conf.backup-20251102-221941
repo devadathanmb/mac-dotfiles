@@ -1,0 +1,232 @@
+# Set terminal colors
+# set -g default-terminal "xterm-256color"
+# set-option -ga terminal-overrides ",xterm-256color:Tc"
+# set-option -a terminal-features 'alacritty:RGB'
+set-option -g status-position bottom
+
+# Bump the limits
+set-option -g history-limit 50000000
+
+# Terminal color fixes
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+set-option -a terminal-features 'alacritty:RGB'
+
+# Repeat timeout
+set -g repeat-time 2000
+
+
+# Display configs:
+setw -g automatic-rename on   # rename window to reflect current program
+set -g renumber-windows on    # renumber windows when a window is closed
+
+# set -g set-titles on          # set terminal title
+
+# clear both screen and history
+bind -n C-l send-keys C-l \; run 'sleep 0.2' \; clear-history
+
+# Status interval
+set-option -g status-interval 5
+
+
+# Default shell
+# set-option -g default-shell /bin/zsh
+set-option -g default-shell /opt/homebrew/bin/fish
+
+# Change tmux prefix keybinding
+set -g prefix C-space
+set-option -g prefix2 C-b
+# unbind C-b
+bind-key C-space send-prefix
+
+# find sesssion
+bind C-f command-prompt -p find-session 'switch-client -t %%'
+
+# Close windows
+unbind x
+bind-key x kill-pane
+
+# Split window vertically
+unbind %
+bind | split-window -h
+
+# Split window horizontally
+unbind '"'
+bind - split-window -v
+
+# Last window
+bind TAB last-window
+
+# Reload tmux.conf
+unbind r
+bind r source-file ~/.tmux.conf \; display-message "Tmux config reloaded"
+
+# Resize tmux panes : prefix + h, j, k, l
+# bind -r j resize-pane -D 5
+# bind -r k resize-pane -U 5
+# bind -r l resize-pane -R 5
+# bind -r h resize-pane -L 5
+
+# bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+# bind -r L resize-pane -R 5
+
+bind -r m resize-pane -Z # Maximize minimize pane : prefix + m
+
+# Resize panes with arrow keys : prefix + arrows
+bind -r Left resize-pane -L 5
+bind -r Down resize-pane -D 5
+bind -r Up resize-pane -U 5
+bind -r Right resize-pane -R 5
+
+# Move windows to left or right : ctrl + shift + h, l
+bind-key -n C-S-Left swap-window -t -1\; select-window -t -1
+bind-key -n C-S-Right swap-window -t +1\; select-window -t +1
+
+bind-key -n M-H swap-window -t -1\; select-window -t -1
+bind-key -n M-L swap-window -t +1\; select-window -t +1
+
+
+
+# Mavigate between panes : alt + h, j, k, l
+bind -n M-H select-pane -L
+bind -n M-L select-pane -R
+bind -n M-J select-pane -U
+bind -n M-K select-pane -D
+
+
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Navigate between windows : prefix + u, i
+bind -r H previous-window
+bind -r L next-window
+
+
+# Swap around
+bind -n M-u  run 'tmux swap-window -d -t #{e|-|:#I,1}'
+bind -n M-i run 'tmux swap-window -d -t #{e|+|:#I,1}'
+
+bind -r u  run 'tmux swap-window -d -t #{e|-|:#I,1}'
+bind -r i run 'tmux swap-window -d -t #{e|+|:#I,1}'
+
+
+# Clear history and buffer
+# bind -n C-k clear-history \; send-keys C-l \; display-message "Buffer and screen cleared"
+# bind -n C-K send-keys -R \; clear-history \; display-message "Buffer and screen cleared"
+# bind -n M-K send-keys -R \; clear-history \;
+bind -n M-k send-keys -R \; clear-history \;
+bind -n M-';' send-keys -R \; clear-history \;
+
+
+# Vim keybindings : prefix + [
+set-window-option -g mode-keys vi
+
+bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
+bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+# bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "y"
+# bind-key -T copy-mode-vi y send -X copy-selection-no-clear \; display-message "Yanked!"
+bind-key -T copy-mode-vi y send -X copy-selection \;
+
+# Make it more vim-like
+bind-key -T copy-mode-vi Escape send -X cancel
+
+#
+# bind-key -T copy-mode-vi y run-shell '
+#   tmux send -X copy-selection-no-clear;
+#   tmux display-message "Yanked!";
+#   sleep 0.2;
+#   tmux send -X clear-selection;
+#   tmux send -X cancel
+# '
+
+# don't exit copy mode when dragging with mouse
+unbind -T copy-mode-vi MouseDragEnd1Pane
+
+# / to search
+unbind "/"
+bind "/" copy-mode \; send-keys '?'
+
+# Enable mouse
+set -g mouse on
+unbind -n WheelUpStatus
+unbind -n WheelDownStatus
+# bind -n WheelUpPane if -F '#{alternate_on}' 'send-keys Up' 'if -F "#{mouse_any_flag}" "send -M" "copy-mode -e; send-keys -M"'
+# bind -n WheelDownPane if -F '#{alternate_on}' 'send-keys Down' 'send-keys -M'
+
+
+# Enable passthrough of OSC52 from remote sessions
+set -g set-clipboard on
+set -as terminal-overrides ',xterm-ghostty:Ms=\E]52;%p1%s;%p2%s\007'
+set -as terminal-overrides ',screen*:Ms=\E]52;%p1%s;%p2%s\007'
+set -as terminal-overrides ',tmux*:Ms=\E]52;%p1%s;%p2%s\007'
+set -g allow-passthrough on
+
+# Fix weird lag while hitting escape in tmux sessions
+set -s escape-time 0
+# set-option -g escape-time 2500
+
+# tpm plugin - Plugin manager
+set -g @plugin 'tmux-plugins/tpm'
+
+# Tmux fzf
+set -g @plugin 'sainnhe/tmux-fzf'
+set -g @plugin 'wfxr/tmux-fzf-url'
+set -g @fzf-url-bind 'o'
+
+set -g @plugin 'tmux-plugins/tmux-copycat'
+
+# Tokyo-night-tmux configs
+# set -g @plugin "devadathanmb/tokyo-night-tmux"
+# set -g @tokyo-night-tmux_window_id_style digital
+# set -g @tokyo-night-tmux_pane_id_style hsquare
+# set -g @tokyo-night-tmux_zoom_id_style dsquare
+# set -g @tokyo-night-tmux_show_path 1
+# set -g @tokyo-night-tmux_path_format relative # 'relative' or 'full'
+set -g @plugin 'devadathanmb/tmux'
+
+# Configure the catppuccin plugin
+set -g @catppuccin_flavor "github_dark"
+set -g @catppuccin_window_status_style "rounded"
+set -g @catppuccin_window_text " #W"
+set -g @catppuccin_window_current_text " #W"
+set -g @catppuccin_application_icon "  "
+set -g @catppuccin_date_time_icon "󱛡  "
+set -g @catppuccin_session_icon "  "
+set -g @catppuccin_application_color "#{@thm_peach}"
+set -g @catppuccin_session_color "#{?client_prefix,#{@thm_yellow},#{@thm_blue}}"
+set -g @catppuccin_window_current_number_color "#{@thm_green}"
+set -g @catppuccin_pane_border_style "fg=#{@thm_overlay_0}"
+set -g @catppuccin_pane_active_border_style "fg=#{@thm_yellow}"
+# Load catppuccin
+run ~/.tmux/plugins/tmux/catppuccin.tmux
+
+# Make the status line pretty and add some modules
+set -g status-right-length 100
+set -g status-left-length 100
+
+set -g status-left "#{E:@catppuccin_status_session}"
+set -ag status-left "#[bg=#0A0C10]  "
+
+set -g status-right "#{E:@catppuccin_status_application}"
+set -ag status-right "#[bg=#0A0C10]  "
+set -ag status-right "#{E:@catppuccin_status_date_time}"
+
+# Initalize TMUX plugin manager (Shoudld stay at bottom)
+run '~/.tmux/plugins/tpm/tpm'
+
+# Add spacing above status bar
+if -F '#{!=:#{status},2}' {
+    set -Fg 'status-format[1]' '#{status-format[0]}'
+    set -g 'status-format[0]' ''
+    set -g status 2
+}
+# Force override catppuccin status background for spacing line
+set -g status-style "bg=#0A0C10,fg=#{@thm_fg}"
+
+
+# Dark grey 238 background with light text
+set -g mode-style "bg=colour238,fg=colour255"
