@@ -49,3 +49,6 @@ fi
 
 eval "$(atuin init zsh --disable-up-arrow)"
 source "/Users/devadathanmb/.deno/env"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+export PATH=$PATH:/Users/devadathanmb/.spicetify

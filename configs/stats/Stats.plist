@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Battery_notifications_high</key>
+	<string></string>
+	<key>Battery_notifications_low</key>
+	<string>low</string>
+	<key>Battery_state</key>
+	<false/>
+	<key>CPU_mini_alignment</key>
+	<string>left</string>
+	<key>CombinedModules</key>
+	<true/>
+	<key>Disk_state</key>
+	<false/>
+	<key>LaunchAtLoginNext</key>
+	<true/>
+	<key>NSNavPanelExpandedSizeForSaveMode</key>
+	<string>{800, 448}</string>
+	<key>NSStatusItem Preferred Position CPU</key>
+	<real>348</real>
+	<key>NSStatusItem Preferred Position CombinedModules</key>
+	<real>301</real>
+	<key>NSStatusItem Preferred Position Network</key>
+	<real>273</real>
+	<key>NSStatusItem Preferred Position RAM</key>
+	<real>399</real>
+	<key>NSStatusItem Restore Position CPU_mini</key>
+	<integer>384</integer>
+	<key>NSStatusItem Restore Position Disk</key>
+	<integer>626</integer>
+	<key>NSStatusItem Restore Position Disk_mini</key>
+	<integer>544</integer>
+	<key>NSStatusItem Restore Position Network_speed</key>
+	<integer>313</integer>
+	<key>NSStatusItem Restore Position RAM_mini</key>
+	<integer>431</integer>
+	<key>NSToolbar Configuration eu.exelban.Stats.Settings.Toolbar</key>
+	<dict>
+		<key>TB Display Mode</key>
+		<integer>1</integer>
+		<key>TB Icon Size Mode</key>
+		<integer>1</integer>
+		<key>TB Is Shown</key>
+		<true/>
+		<key>TB Size Mode</key>
+		<integer>1</integer>
+	</dict>
+	<key>NSWindow Frame NSNavPanelAutosaveName</key>
+	<string>356 375 800 448 0 0 1512 948 </string>
+	<key>Network_label_position</key>
+	<integer>1</integer>
+	<key>Network_networkChart_position</key>
+	<integer>2</integer>
+	<key>Network_speed_iconAlignment</key>
+	<string>left</string>
+	<key>Network_speed_iconColor</key>
+	<string>default</string>
+	<key>Network_speed_mode</key>
+	<string>twoRows</string>
+	<key>Network_speed_monochrome</key>
+	<true/>
+	<key>Network_speed_position</key>
+	<integer>0</integer>
+	<key>Network_speed_valueAlignment</key>
+	<string>right</string>
+	<key>Network_state_position</key>
+	<integer>3</integer>
+	<key>Network_text_position</key>
+	<integer>4</integer>
+	<key>Network_widget</key>
+	<string>speed</string>
+	<key>RAM_combinedProcesses</key>
+	<false/>
+	<key>RAM_mini_alignment</key>
+	<string>center</string>
+	<key>RAM_mini_label</key>
+	<true/>
+	<key>runAtLoginInitialized</key>
+	<true/>
+	<key>setupProcess</key>
+	<true/>
+	<key>support_ts</key>
+	<integer>1759245090</integer>
+	<key>telemetry</key>
+	<false/>
+	<key>updater_check_ts</key>
+	<integer>1762008650</integer>
+	<key>version</key>
+	<string>2.11.58</string>
+</dict>
+</plist>

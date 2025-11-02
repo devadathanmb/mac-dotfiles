@@ -1324,7 +1324,7 @@
       "breadcrumb.focusForeground": "#FFFFFF",
       "breadcrumb.foreground": "#d6dadf",
       // "editor.background": "#11161c",
-      "editor.background": "#11161C",
+      // "editor.background": "#11161C",
       "editorGutter.addedBackground": "#4AE04A",
       "editorGutter.deletedBackground": "#FF6B6B",
       "editorGutter.modifiedBackground": "#E2C08D",
@@ -1477,5 +1477,6 @@
     "editor.defaultFormatter": "yzhang.markdown-all-in-one"
   },
   "typescript.preferences.importModuleSpecifier": "relative",
-  "terminal.integrated.defaultProfile.osx": "fish"
+  "terminal.integrated.defaultProfile.osx": "fish",
+  "python.defaultInterpreterPath": "/Users/devadathanmb/.pyenv/versions/3.13.7/bin/python"
 }
