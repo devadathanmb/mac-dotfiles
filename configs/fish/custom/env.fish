@@ -6,8 +6,6 @@ set -gx LANG 'en_US.UTF-8'
 set -gx KEYTIMEOUT 50
 set -gx EDITOR nvim
 
-# FZF
-set -x FZF_DEFAULT_OPTS "--bind=tab:down,shift-tab:up,ctrl-space:toggle"
 
 # PostgreSQL
 set -gx PATH "/opt/homebrew/opt/postgresql@17/bin" $PATH
