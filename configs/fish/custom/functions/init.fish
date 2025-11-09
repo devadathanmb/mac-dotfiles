@@ -1,0 +1,1 @@
+source ~/.config/fish/custom/functions/git.fish
