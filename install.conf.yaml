@@ -25,6 +25,11 @@
     ~/.config/cvim: configs/cvim
     ~/.config/ghostty: configs/ghostty
     ~/.config/atuin: configs/atuin
+    ~/.config/pgcli: configs/pgcli
+    ~/.config/htop: configs/htop
+    ~/.config/btop: configs/btop
+    ~/.config/mpv: configs/mpv
+    ~/.config/zed: configs/zed
     ~/.local/bin: scripts/*
     # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
