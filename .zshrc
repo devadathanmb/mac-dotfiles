@@ -52,3 +52,9 @@ source "/Users/devadathanmb/.deno/env"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 export PATH=$PATH:/Users/devadathanmb/.spicetify
+
+# Added by Antigravity
+export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
+
+# Added by Antigravity
+export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
