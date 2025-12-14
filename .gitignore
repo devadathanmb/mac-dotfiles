@@ -1,2 +1,8 @@
 .DS_Store
 untracked/*
+*env*
+**/logs
+**/logs/
+**/log
+**/log/
+**/history
