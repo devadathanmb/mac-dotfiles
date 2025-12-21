@@ -21,5 +21,9 @@
 
 [push]
   autoSetupRemote = true
+
 [rebase]
 	autostash = true
+
+[core]
+	ignorecase = false
