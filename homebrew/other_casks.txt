@@ -1,9 +1,0 @@
-localsend
-discord
-telegram
-balenaetcher
-mpv
-http-toolkit
-tailscale-app
-burp-suite
-protonvpn
