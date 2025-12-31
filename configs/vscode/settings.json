@@ -1478,5 +1478,14 @@
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "terminal.integrated.defaultProfile.osx": "fish",
-  "python.defaultInterpreterPath": "/Users/devadathanmb/.pyenv/versions/3.13.7/bin/python"
+  "python.defaultInterpreterPath": "/Users/devadathanmb/.pyenv/versions/3.13.7/bin/python",
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "chat.tools.urls.autoApprove": {
+    "https://github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    }
+  }
 }
