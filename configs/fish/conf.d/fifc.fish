@@ -16,12 +16,13 @@ if status is-interactive
         bind --mode $mode $fifc_keybinding _fifc
     end
 
-    # Ensure fifc tab binding persists even when other plugins (like autopair) rebind keys
+    # Fix: autopair.fish event handler overrides Tab binding (2025-12-31)
+    # This event handler ensures fifc reclaims Tab whenever fish_key_bindings changes.
+    # Without this, autopair's --on-variable handler runs and binds Tab to _autopair_tab,
+    # breaking fzf tab completion. Both plugins now coexist.
     function _fifc_rebind_tab --on-variable fish_key_bindings
-        # Only rebind if in interactive mode
         status is-interactive || return
 
-        # Rebind tab to fifc in both modes
         for mode in default insert
             bind --mode $mode \t _fifc
             bind --mode $mode $fifc_keybinding _fifc
