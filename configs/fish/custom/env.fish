@@ -6,7 +6,6 @@ set -gx LANG 'en_US.UTF-8'
 set -gx KEYTIMEOUT 50
 set -gx EDITOR nvim
 
-
 # PostgreSQL
 set -gx PATH "/opt/homebrew/opt/postgresql@17/bin" $PATH
 
@@ -27,3 +26,9 @@ set -x _SPICETIFY_PATH ~/.spicetify
 if not contains $_SPICETIFY_PATH $PATH
     set -x PATH $_SPICETIFY_PATH $PATH
 end
+
+# AMP
+set -gx PATH ~/.amp/bin $PATH
+
+# Antigravity
+set -gx PATH ~/.antigravity/antigravity/bin $PATH

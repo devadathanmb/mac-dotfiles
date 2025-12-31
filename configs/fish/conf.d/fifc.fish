@@ -16,6 +16,18 @@ if status is-interactive
         bind --mode $mode $fifc_keybinding _fifc
     end
 
+    # Ensure fifc tab binding persists even when other plugins (like autopair) rebind keys
+    function _fifc_rebind_tab --on-variable fish_key_bindings
+        # Only rebind if in interactive mode
+        status is-interactive || return
+
+        # Rebind tab to fifc in both modes
+        for mode in default insert
+            bind --mode $mode \t _fifc
+            bind --mode $mode $fifc_keybinding _fifc
+        end
+    end
+
     # Set sources rules
     fifc \
         -n 'test "$fifc_group" = "directories"' \
