@@ -1397,7 +1397,7 @@
   // },
   "cursor.composer.shouldAllowCustomModes": true,
   "[astro]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "astro-build.astro-vscode"
   },
   "cursor.cpp.enablePartialAccepts": true,
   "python.languageServer": "Default",
@@ -1487,5 +1487,6 @@
       "approveRequest": false,
       "approveResponse": true
     }
-  }
+  },
+  "chat.viewSessions.orientation": "stacked"
 }
