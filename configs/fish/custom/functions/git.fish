@@ -79,10 +79,16 @@ function gc
 end
 
 function gcm
-    git checkout master ^/dev/null; and git pull origin master
-    or begin
+    # Check if master or main branch exists
+    if git show-ref --verify --quiet refs/heads/master
+        git checkout master
+        git pull origin master
+    else if git show-ref --verify --quiet refs/heads/main
         git checkout main
-        and git pull origin main
+        git pull origin main
+    else
+        echo "Neither master nor main branch found"
+        return 1
     end
     git submodule update
 end
