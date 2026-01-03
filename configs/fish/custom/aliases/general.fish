@@ -15,7 +15,7 @@ alias python="python3"
 alias down="cd ~/Downloads"
 alias mv="mv -i"
 alias brewup="echo 'Brewing...' && brew update && brew upgrade && brew cleanup && clear && echo 'Brew complete'"
-abbr dotsup 'cd ~/.mac-dots/; git add . && git commit -m "Update dotfiles"; git push origin; echo "Dotfiles updated and pushed"'
+
 
 # Vim Aliases
 alias vim="nvim -u ~/.config/cvim/init.lua"
