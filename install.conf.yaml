@@ -1,10 +1,10 @@
 - defaults:
     link:
-      relink: true # Removes old links even if they point to the correct target 
+      relink: true # Removes old links even if they point to the correct target
       create: true # Create parent dirs if needed
       force: true # Remove existing file and create with a symlink
 
-- clean: ['~']
+- clean: ["~"]
 
 # Format like:
 # Actual path: your dotfiles repo reference
@@ -40,4 +40,4 @@
     "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
 
 - shell:
-  - [git submodule update --init --recursive, Installing submodules]
+    - [git submodule update --init --recursive, Installing submodules]
