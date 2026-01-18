@@ -130,13 +130,13 @@ table_format = psql
 # Syntax Style. Possible values: manni, igor, xcode, vim, autumn, vs, rrt,
 # native, perldoc, borland, tango, emacs, friendly, monokai, paraiso-dark,
 # colorful, murphy, bw, pastie, paraiso-light, trac, default, fruity
-syntax_style = default
+syntax_style = vim
 
 # Keybindings:
 # When Vi mode is enabled you can use modal editing features offered by Vi in the REPL.
 # When Vi mode is disabled emacs keybindings such as Ctrl-A for home and Ctrl-E
 # for end are available in the REPL.
-vi = False
+vi = True
 
 # Error handling
 # When one of multiple SQL statements causes an error, choose to either
@@ -197,26 +197,26 @@ use_local_timezone = True
 
 # Custom colors for the completion menu, toolbar, etc.
 [colors]
-completion-menu.completion.current = 'bg:#ffffff #000000'
-completion-menu.completion = 'bg:#008888 #ffffff'
-completion-menu.meta.completion.current = 'bg:#44aaaa #000000'
-completion-menu.meta.completion = 'bg:#448888 #ffffff'
-completion-menu.multi-column-meta = 'bg:#aaffff #000000'
-scrollbar.arrow = 'bg:#003333'
-scrollbar = 'bg:#00aaaa'
-selected = '#ffffff bg:#6666aa'
-search = '#ffffff bg:#4444aa'
-search.current = '#ffffff bg:#44aa44'
-bottom-toolbar = 'bg:#222222 #aaaaaa'
-bottom-toolbar.off = 'bg:#222222 #888888'
-bottom-toolbar.on = 'bg:#222222 #ffffff'
+completion-menu.completion.current = 'bg:#4a4a4a #ffffff'
+completion-menu.completion = 'bg:#1e1e1e #e5e5e5'
+completion-menu.meta.completion.current = 'bg:#5a5a5a #ffffff'
+completion-menu.meta.completion = 'bg:#2d2d2d #d1d5db'
+completion-menu.multi-column-meta = 'bg:#2a2a2a #ffffff'
+scrollbar.arrow = 'bg:#1e1e1e'
+scrollbar = 'bg:#3c3c3c'
+selected = '#ffffff bg:#5a5a6a'
+search = '#ffffff bg:#2d2d3a'
+search.current = '#ffffff bg:#4a5568'
+bottom-toolbar = 'bg:#1e1e1e #aaaaaa'
+bottom-toolbar.off = 'bg:#1e1e1e #888888'
+bottom-toolbar.on = 'bg:#1e1e1e #ffffff'
 search-toolbar = 'noinherit bold'
 search-toolbar.text = 'nobold'
 system-toolbar = 'noinherit bold'
 arg-toolbar = 'noinherit bold'
 arg-toolbar.text = 'nobold'
-bottom-toolbar.transaction.valid = 'bg:#222222 #00ff5f bold'
-bottom-toolbar.transaction.failed = 'bg:#222222 #ff005f bold'
+bottom-toolbar.transaction.valid = 'bg:#1e1e1e #00ff5f bold'
+bottom-toolbar.transaction.failed = 'bg:#1e1e1e #ff005f bold'
 # These three values can be used to further refine the syntax highlighting.
 # They are commented out by default, since they have priority over the theme set
 # with the `syntax_style` setting and overriding its behavior can be confusing.

@@ -60,7 +60,7 @@
   "editor.fontVariations": true,
   "editor.letterSpacing": -0.8,
   "editor.bracketPairColorization.enabled": true,
-  "editor.fontSize": 13.0,
+  "editor.fontSize": 13.6,
   "editor.minimap.enabled": false,
   "editor.quickSuggestionsDelay": 10,
   "editor.scrollbar.horizontal": "hidden",
@@ -1478,7 +1478,7 @@
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "terminal.integrated.defaultProfile.osx": "fish",
-  "python.defaultInterpreterPath": "/Users/devadathanmb/.pyenv/versions/3.13.7/bin/python",
+  "python.defaultInterpreterPath": "/Users/devadathanmb/.local/bin/python3.9",
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -1488,5 +1488,11 @@
       "approveResponse": true
     }
   },
-  "chat.viewSessions.orientation": "stacked"
+  "chat.viewSessions.orientation": "stacked",
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "scminput": false
+  }
 }
