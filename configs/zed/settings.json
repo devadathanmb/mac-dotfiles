@@ -7,43 +7,43 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "terminal": {
-    "font_size": 13.0,
-    "font_family": "Maple Mono NF"
-  },
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false
-  },
-  "base_keymap": "VSCode",
-  "tab_bar": {
-    "show": true
-  },
-  "relative_line_numbers": true,
-  "gutter": {
-    "line_numbers": true
-  },
-  "minimap": {
-    "show": "never"
-  },
-  "scrollbar": {
-    "axes": {
-      "horizontal": true
+    "terminal": {
+        "font_size": 13.0,
+        "font_family": "Maple Mono NF"
+    },
+    "telemetry": {
+        "diagnostics": false,
+        "metrics": false
+    },
+    "base_keymap": "VSCode",
+    "tab_bar": {
+        "show": true
+    },
+    "relative_line_numbers": true,
+    "gutter": {
+        "line_numbers": true
+    },
+    "minimap": {
+        "show": "never"
+    },
+    "scrollbar": {
+        "axes": {
+            "horizontal": true
+        }
+    },
+    "cursor_blink": true,
+    "buffer_font_family": "JetBrains Mono",
+    "file_types": {},
+    "show_whitespaces": "boundary",
+    "soft_wrap": "editor_width",
+    "hard_tabs": false,
+    "tab_size": 4,
+    "vim_mode": true,
+    "ui_font_size": 16,
+    "buffer_font_size": 14.600000381469727,
+    "theme": {
+        "mode": "system",
+        "light": "One Light",
+        "dark": "GitHub Dark Default"
     }
-  },
-  "cursor_blink": true,
-  "buffer_font_family": "JetBrains Mono",
-  "file_types": {},
-  "show_whitespaces": "boundary",
-  "soft_wrap": "editor_width",
-  "hard_tabs": false,
-  "tab_size": 4,
-  "vim_mode": true,
-  "ui_font_size": 16,
-  "buffer_font_size": 14.600000381469727,
-  "theme": {
-    "mode": "system",
-    "light": "One Light",
-    "dark": "One Dark"
-  }
 }

@@ -10,7 +10,7 @@ set -gx EDITOR nvim
 set -gx PATH "/opt/homebrew/opt/postgresql@17/bin" $PATH
 
 # Pnpm
-set -x _PNPM_HOME /Users/devadathanmb/Library/pnpm
+set -x _PNPM_HOME ~/Library/pnpm
 if not contains $_PNPM_HOME $PATH
     set -x PATH $_PNPM_HOME $PATH
 end
@@ -32,3 +32,6 @@ set -gx PATH ~/.amp/bin $PATH
 
 # Antigravity
 set -gx PATH ~/.antigravity/antigravity/bin $PATH
+
+# Bun
+set -gx PATH ~/.bun/bin $PATH
