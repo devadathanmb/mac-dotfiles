@@ -7,6 +7,7 @@
 # ==============================================================================
 
 - name: Trackpad | Enable tap to click
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: Clicking
@@ -14,6 +15,7 @@
     value: true
 
 - name: Trackpad | Enable tap behavior globally
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: com.apple.mouse.tapBehavior
@@ -22,6 +24,7 @@
     host: currentHost
 
 - name: Trackpad | Enable right-click with two fingers
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadRightClick
@@ -29,6 +32,7 @@
     value: true
 
 - name: Trackpad | Enable three-finger drag
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadThreeFingerDrag
@@ -40,6 +44,7 @@
 # ==============================================================================
 
 - name: Finder | Show all filename extensions
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleShowAllExtensions
@@ -47,6 +52,7 @@
     value: true
 
 - name: Finder | Show full POSIX path in window title
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: _FXShowPosixPathInTitle
@@ -54,6 +60,7 @@
     value: true
 
 - name: Finder | Hide all desktop icons
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: CreateDesktop
@@ -61,6 +68,7 @@
     value: false
 
 - name: Finder | Disable warning before changing file extension
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXEnableExtensionChangeWarning
@@ -68,6 +76,7 @@
     value: false
 
 - name: Finder | Set default search scope to current folder
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXDefaultSearchScope
@@ -75,6 +84,7 @@
     value: SCcf
 
 - name: Finder | Show status bar
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowStatusBar
@@ -82,6 +92,7 @@
     value: true
 
 - name: Finder | Show path bar
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowPathbar
@@ -89,6 +100,7 @@
     value: true
 
 - name: Finder | Use list view as default
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXPreferredViewStyle
@@ -96,6 +108,7 @@
     value: Nlsv
 
 - name: Finder | Disable warning before emptying Trash
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: WarnOnEmptyTrash
@@ -103,6 +116,7 @@
     value: false
 
 - name: Finder | Show ~/Library folder
+  tags: [macos]
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/Library"
     state: directory
@@ -110,6 +124,7 @@
   register: library_folder
 
 - name: Finder | Remove hidden flag from ~/Library
+  tags: [macos]
   ansible.builtin.command:
     cmd: "chflags nohidden {{ ansible_env.HOME }}/Library"
   changed_when: false
@@ -119,6 +134,7 @@
 # ==============================================================================
 
 - name: Keyboard | Disable automatic spelling correction
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticSpellingCorrectionEnabled
@@ -126,6 +142,7 @@
     value: false
 
 - name: Keyboard | Set fast key repeat rate
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: KeyRepeat
@@ -133,6 +150,7 @@
     value: 1
 
 - name: Keyboard | Set fast initial key repeat
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: InitialKeyRepeat
@@ -140,6 +158,7 @@
     value: 15
 
 - name: Keyboard | Disable press and hold for key repeat
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: ApplePressAndHoldEnabled
@@ -147,6 +166,7 @@
     value: false
 
 - name: Keyboard | Disable automatic capitalization
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticCapitalizationEnabled
@@ -154,6 +174,7 @@
     value: false
 
 - name: Keyboard | Disable automatic period substitution
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticPeriodSubstitutionEnabled
@@ -161,6 +182,7 @@
     value: false
 
 - name: Keyboard | Disable smart quotes
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticQuoteSubstitutionEnabled
@@ -168,6 +190,7 @@
     value: false
 
 - name: Keyboard | Disable smart dashes
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticDashSubstitutionEnabled
@@ -175,6 +198,7 @@
     value: false
 
 - name: Keyboard | Enable full keyboard access for all controls
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleKeyboardUIMode
@@ -186,6 +210,7 @@
 # ==============================================================================
 
 - name: Save Dialogs | Always expand save panel by default
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSNavPanelExpandedStateForSaveMode
@@ -193,6 +218,7 @@
     value: true
 
 - name: Save Dialogs | Always expand save panel (variant 2)
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSNavPanelExpandedStateForSaveMode2
@@ -204,6 +230,7 @@
 # ==============================================================================
 
 - name: Dock | Auto-hide Dock
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: autohide
@@ -212,6 +239,7 @@
   notify: Restart Dock
 
 - name: Dock | Disable click wallpaper to show desktop
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: showDesktop
@@ -220,6 +248,7 @@
   notify: Restart Dock
 
 - name: Dock | Change minimize/maximize window effect to scale
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: mineffect
@@ -228,6 +257,7 @@
   notify: Restart Dock
 
 - name: Dock | Minimize windows into their application icon
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: minimize-to-application
@@ -236,6 +266,7 @@
   notify: Restart Dock
 
 - name: Dock | Show indicator lights for open applications
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: show-process-indicators
@@ -244,6 +275,7 @@
   notify: Restart Dock
 
 - name: Dock | Show only open applications
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: static-only
@@ -252,6 +284,7 @@
   notify: Restart Dock
 
 - name: Dock | Don't animate opening applications
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: launchanim
@@ -260,6 +293,7 @@
   notify: Restart Dock
 
 - name: Dock | Don't show recently used applications
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: show-recents
@@ -268,6 +302,7 @@
   notify: Restart Dock
 
 - name: Dock | Speed up Mission Control animations
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: expose-animation-duration
@@ -276,6 +311,7 @@
   notify: Restart Dock
 
 - name: Dock | Don't automatically rearrange Spaces
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: mru-spaces
@@ -288,6 +324,7 @@
 # ==============================================================================
 
 - name: Hot Corners | Top right screen corner - Disabled
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: wvous-tr-corner
@@ -296,6 +333,7 @@
   notify: Restart Dock
 
 - name: Hot Corners | Top right screen corner modifier
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: wvous-tr-modifier
@@ -308,6 +346,7 @@
 # ==============================================================================
 
 - name: Terminal | Use UTF-8 encoding
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.terminal
     key: StringEncodings
@@ -320,6 +359,7 @@
 # ==============================================================================
 
 - name: System UI | Show battery percentage in menu bar
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter.plist
     key: BatteryShowPercentage
@@ -329,6 +369,7 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show volume icon in menu bar
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter.plist
     key: Sound
@@ -337,6 +378,7 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Beep on moving the slider
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: com.apple.sound.beep.feedback
@@ -344,6 +386,7 @@
     value: 1
 
 - name: System UI | Use 24-hour time format
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleICUForce24HourTime
@@ -352,6 +395,7 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Reduce status item spacing
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSStatusItemSpacing
@@ -361,6 +405,7 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Reduce status item selection padding
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSStatusItemSelectionPadding
@@ -374,12 +419,14 @@
 # ==============================================================================
 
 - name: Screenshots | Create Screenshots directory
+  tags: [macos]
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/Pictures/Screenshots"
     state: directory
     mode: '0755'
 
 - name: Screenshots | Save screenshots to Screenshots folder
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.screencapture
     key: location
@@ -387,6 +434,7 @@
     value: "{{ ansible_env.HOME }}/Pictures/Screenshots"
 
 - name: Screenshots | Save screenshots in PNG format
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.screencapture
     key: type
@@ -394,6 +442,7 @@
     value: png
 
 - name: Screenshots | Disable shadow in screenshots
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.screencapture
     key: disable-shadow
@@ -405,6 +454,7 @@
 # ==============================================================================
 
 - name: Security | Require password immediately after sleep
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.screensaver
     key: askForPassword
@@ -412,6 +462,7 @@
     value: 1
 
 - name: Security | Set password delay to 0 seconds
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.screensaver
     key: askForPasswordDelay
@@ -423,6 +474,7 @@
 # ==============================================================================
 
 - name: Performance | Disable automatic termination of inactive apps
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSDisableAutomaticTermination
@@ -434,6 +486,7 @@
 # ==============================================================================
 
 - name: Safari | Disable universal search
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: UniversalSearchEnabled
@@ -441,6 +494,7 @@
     value: false
 
 - name: Safari | Suppress search suggestions
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: SuppressSearchSuggestions
@@ -448,6 +502,7 @@
     value: true
 
 - name: Safari | Show full URL in address bar
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: ShowFullURLInSmartSearchField
@@ -455,6 +510,7 @@
     value: true
 
 - name: Safari | Enable Debug Menu
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
@@ -462,6 +518,7 @@
     value: true
 
 - name: Safari | Enable Develop menu
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: IncludeDevelopMenu
@@ -469,6 +526,7 @@
     value: true
 
 - name: Safari | Enable Web Inspector
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: WebKitDeveloperExtrasEnabledPreferenceKey
@@ -476,6 +534,7 @@
     value: true
 
 - name: Safari | Enable Web Inspector (variant 2)
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled
@@ -483,6 +542,7 @@
     value: true
 
 - name: WebKit | Enable developer extras globally
+  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: WebKitDeveloperExtras
@@ -490,6 +550,7 @@
     value: true
 
 - name: Safari | Warn about fraudulent websites
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: WarnAboutFraudulentWebsites
@@ -497,6 +558,7 @@
     value: true
 
 - name: Safari | Update extensions automatically
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Safari
     key: InstallExtensionUpdatesAutomatically
@@ -508,6 +570,7 @@
 # ==============================================================================
 
 - name: TextEdit | Use plain text mode for new documents
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: RichText
@@ -515,6 +578,7 @@
     value: 0
 
 - name: TextEdit | Use UTF-8 encoding
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: PlainTextEncoding
@@ -522,6 +586,7 @@
     value: 4
 
 - name: TextEdit | Use UTF-8 encoding for write
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: PlainTextEncodingForWrite
@@ -533,6 +598,7 @@
 # ==============================================================================
 
 - name: Activity Monitor | Show all processes
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: ShowCategory
@@ -540,6 +606,7 @@
     value: 0
 
 - name: Activity Monitor | Sort by CPU usage
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: SortColumn
@@ -547,6 +614,7 @@
     value: CPUUsage
 
 - name: Activity Monitor | Set sort direction
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: SortDirection
@@ -558,6 +626,7 @@
 # ==============================================================================
 
 - name: App Store | Disable automatic downloads
+  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.SoftwareUpdate
     key: AutomaticDownload
