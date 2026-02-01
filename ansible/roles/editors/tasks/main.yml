@@ -8,7 +8,7 @@
 
 - name: Read VSCode extensions from file
   ansible.builtin.set_fact:
-    vscode_extensions: "{{ lookup('file', dotfiles_repo + '/configs/vscode/extensions.txt').splitlines() | reject | list }}"
+    vscode_extensions: "{{ lookup('file', dotfiles_repo + '/configs/vscode/extensions.txt').splitlines() | reject('==', '') | list }}"
   when: code_check.rc == 0
 
 - name: Install VSCode extensions
@@ -28,7 +28,7 @@
 
 - name: Read Cursor extensions from file
   ansible.builtin.set_fact:
-    cursor_extensions: "{{ lookup('file', dotfiles_repo + '/configs/cursor/extensions.txt').splitlines() | reject | list }}"
+    cursor_extensions: "{{ lookup('file', dotfiles_repo + '/configs/cursor/extensions.txt').splitlines() | reject('==', '') | list }}"
   when: cursor_check.rc == 0
 
 - name: Install Cursor extensions

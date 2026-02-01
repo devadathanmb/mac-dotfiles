@@ -3,25 +3,26 @@
 # Installs ASDF, Python, and Node.js with latest stable versions
 
 # ASDF Installation
-- name: Check if ASDF is installed
-  ansible.builtin.stat:
-    path: ~/.asdf/asdf.sh
+- name: Check if ASDF is installed via Homebrew
+  ansible.builtin.command: brew --prefix asdf
   register: asdf_check
+  failed_when: false
+  changed_when: false
 
 - name: Install ASDF (via Homebrew)
   community.general.homebrew:
     name: asdf
     state: present
   become: false
-  when: not asdf_check.stat.exists
+  when: asdf_check.rc != 0
 
 - name: Add ASDF to shell configuration
   ansible.builtin.lineinfile:
     path: ~/.zshrc
-    line: '. ~/.asdf/asdf.sh'
+    line: '. "$(brew --prefix asdf)"/libexec/asdf.sh'
     insertafter: EOF
     state: present
-  when: not asdf_check.stat.exists
+  when: asdf_check.rc != 0
 
 # Python Plugin
 - name: Check if Python plugin is installed

@@ -126,7 +126,7 @@
 - name: Finder | Check if ~/Library folder is hidden
   tags: [macos]
   ansible.builtin.command:
-    cmd: "chflags {{ ansible_env.HOME }}/Library"
+    cmd: "ls -ldO {{ ansible_env.HOME }}/Library"
   register: library_chflags
   changed_when: false
 
