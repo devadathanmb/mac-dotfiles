@@ -17,12 +17,6 @@
     state: present
   become: false
   ignore_errors: true
-  register: brew_formulae_result
-
-- name: Display formulae installation results
-  ansible.builtin.debug:
-    msg: "Some formulae may have failed to install. Check output above."
-  when: brew_formulae_result.failed | length > 0
 
 - name: Install Homebrew casks
   community.general.homebrew_cask:
@@ -30,9 +24,3 @@
     state: present
   become: false
   ignore_errors: true
-  register: brew_casks_result
-
-- name: Display casks installation results
-  ansible.builtin.debug:
-    msg: "Some casks may have failed to install. Check output above."
-  when: brew_casks_result.failed | length > 0
