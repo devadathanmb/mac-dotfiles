@@ -57,6 +57,28 @@ ansible-playbook playbooks/main.yml --check --diff
    ./install
    ```
 
+## Backup
+
+After installing packages or extensions, back them up to your dotfiles:
+
+```bash
+cd ~/.dotfiles/ansible
+ansible-playbook playbooks/backup.yml
+```
+
+This will update:
+- `homebrew/brew_packages.txt` - Installed formulae
+- `homebrew/brew_casks.txt` - Installed casks
+- `configs/vscode/extensions.txt` - VSCode extensions
+- `configs/cursor/extensions.txt` - Cursor extensions
+
+Then commit the changes:
+```bash
+git diff
+git add .
+git commit -m "chore: backup packages and extensions"
+```
+
 ## Structure
 
 ```
@@ -74,7 +96,8 @@ ansible/
 │   ├── packages.yml        # Homebrew packages only
 │   ├── macos.yml           # macOS defaults only
 │   ├── shell.yml           # Shell setup only
-│   └── editors.yml         # Editor extensions only
+│   ├── editors.yml         # Editor extensions only
+│   └── backup.yml          # Backup packages/extensions to txt files
 └── roles/
     ├── dotbot/             # Orchestrates ./install
     ├── homebrew/           # Homebrew packages (286 formulae, 41 casks)
