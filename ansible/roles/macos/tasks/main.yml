@@ -1,6 +1,6 @@
 ---
 # macOS System Configuration Role
-# Converts all defaults write commands from mac/mac-setup.sh to Ansible tasks
+# Manages system defaults via community.general.osx_defaults
 
 # ==============================================================================
 # TRACKPAD SETTINGS
