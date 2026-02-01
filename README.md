@@ -2,81 +2,40 @@
 
 > Hello, welcome $HOME
 
-
-Personal dotfiles repository for macOS, managed with [Dotbot](https://github.com/anishathalye/dotbot) and Ansible.
+Personal dotfiles repository for macOS, managed with Ansible (orchestrating Dotbot for symlinks).
 
 ## Quick Start
 
-### Option 1: Ansible (Recommended)
-
 **Full setup:**
 ```bash
-git clone https://github.com/devadathanmb/mac-dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
+git clone https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
+cd ~/.mac-dots
 ./ansible/bootstrap.sh
 ```
 
 **Selective execution with tags:**
 ```bash
-cd ~/.dotfiles/ansible
+cd ~/.mac-dots/ansible
 
-# Run only dotfiles symlinks
-ansible-playbook playbooks/main.yml --tags dotbot
+# Run all roles
+ansible-playbook playbooks/main.yml
 
-# Run only Homebrew packages
-ansible-playbook playbooks/main.yml --tags homebrew
-
-# Run only macOS defaults
-ansible-playbook playbooks/main.yml --tags macos
-
-# Run only shell setup (Zap ZSH)
-ansible-playbook playbooks/main.yml --tags shell
-
-# Run only editor extensions
-ansible-playbook playbooks/main.yml --tags editors
+# Run specific roles
+ansible-playbook playbooks/main.yml --tags dotbot        # Symlinks
+ansible-playbook playbooks/main.yml --tags homebrew      # Packages
+ansible-playbook playbooks/main.yml --tags macos         # Defaults
+ansible-playbook playbooks/main.yml --tags shell         # Shell
+ansible-playbook playbooks/main.yml --tags editors       # Extensions
+ansible-playbook playbooks/asdf.yml                      # ASDF (Python + Node.js)
 
 # Check what would change (dry-run)
 ansible-playbook playbooks/main.yml --check --diff
 ```
 
-### Option 2: Dotbot (Original)
-
-1. **Fresh machine setup**: Clone and bootstrap for complete setup
-   ```bash
-   git clone https://github.com/devadathanmb/mac-dotfiles.git ~/.dotfiles
-   cd ~/.dotfiles
-   ./bootstrap-mac.sh
-   ```
-
-2. **Symlink dotfiles**: After setup, symlink your configs
-   ```bash
-   # Dry run first
-   ./install --dry-run
-
-   # Once confirmed, run
-   ./install
-   ```
-
-## Backup
-
-After installing packages or extensions, back them up to your dotfiles:
-
+**Backup installed packages/extensions:**
 ```bash
-cd ~/.dotfiles/ansible
+cd ~/.mac-dots/ansible
 ansible-playbook playbooks/backup.yml
-```
-
-This will update:
-- `homebrew/brew_packages.txt` - Installed formulae
-- `homebrew/brew_casks.txt` - Installed casks
-- `configs/vscode/extensions.txt` - VSCode extensions
-- `configs/cursor/extensions.txt` - Cursor extensions
-
-Then commit the changes:
-```bash
-git diff
-git add .
-git commit -m "chore: backup packages and extensions"
 ```
 
 ## Structure
@@ -92,18 +51,20 @@ ansible/
 │   └── all.yml             # Shared variables
 ├── playbooks/
 │   ├── main.yml            # Orchestrates all roles
-│   ├── dotbot.yml          # Dotbot symlinks only
-│   ├── packages.yml        # Homebrew packages only
-│   ├── macos.yml           # macOS defaults only
-│   ├── shell.yml           # Shell setup only
-│   ├── editors.yml         # Editor extensions only
-│   └── backup.yml          # Backup packages/extensions to txt files
+│   ├── dotbot.yml          # Dotbot symlinks
+│   ├── packages.yml        # Homebrew packages
+│   ├── macos.yml           # macOS defaults
+│   ├── shell.yml           # Shell setup
+│   ├── editors.yml         # Editor extensions
+│   ├── asdf.yml            # ASDF (Python + Node.js)
+│   └── backup.yml          # Backup packages/extensions
 └── roles/
     ├── dotbot/             # Orchestrates ./install
-    ├── homebrew/           # Homebrew packages (286 formulae, 41 casks)
-    ├── macos/              # System defaults (66 settings)
-    ├── shell/              # Zap ZSH setup
-    └── editors/            # VSCode + Cursor extensions (94 total)
+    ├── homebrew/           # Homebrew packages
+    ├── macos/              # System defaults
+    ├── shell/              # Zap ZSH
+    ├── editors/            # VSCode + Cursor extensions
+    └── asdf/               # ASDF version manager
 ```
 
 ## License
