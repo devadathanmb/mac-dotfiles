@@ -1,0 +1,114 @@
+---
+- name: Backup Installed Packages and Extensions
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  vars:
+    dotfiles_repo: /Users/devadathanmb/.mac-dots
+
+  tasks:
+    # Homebrew Formulae Backup
+    - name: Get installed Homebrew formulae
+      ansible.builtin.command:
+        cmd: brew list --formula
+      register: installed_formulae
+      changed_when: false
+
+    - name: Write installed formulae to file
+      ansible.builtin.copy:
+        content: "{{ installed_formulae.stdout | trim }}"
+        dest: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
+        mode: '0644'
+      when: installed_formulae.stdout | trim | length > 0
+
+    - name: Display formulae backup result
+      ansible.builtin.debug:
+        msg: "Backed up {{ installed_formulae.stdout_lines | length }} Homebrew formulae to brew_packages.txt"
+
+    # Homebrew Casks Backup
+    - name: Get installed Homebrew casks
+      ansible.builtin.command:
+        cmd: brew list --cask
+      register: installed_casks
+      changed_when: false
+
+    - name: Write installed casks to file
+      ansible.builtin.copy:
+        content: "{{ installed_casks.stdout | trim }}"
+        dest: "{{ dotfiles_repo }}/homebrew/brew_casks.txt"
+        mode: '0644'
+      when: installed_casks.stdout | trim | length > 0
+
+    - name: Display casks backup result
+      ansible.builtin.debug:
+        msg: "Backed up {{ installed_casks.stdout_lines | length }} Homebrew casks to brew_casks.txt"
+
+    # VSCode Extensions Backup
+    - name: Check if VSCode is installed
+      ansible.builtin.command:
+        cmd: which code
+      register: code_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Get installed VSCode extensions
+      ansible.builtin.command:
+        cmd: code --list-extensions
+      register: vscode_extensions
+      changed_when: false
+      when: code_check.rc == 0
+
+    - name: Write VSCode extensions to file
+      ansible.builtin.copy:
+        content: "{{ vscode_extensions.stdout | trim }}"
+        dest: "{{ dotfiles_repo }}/configs/vscode/extensions.txt"
+        mode: '0644'
+      when: code_check.rc == 0 and vscode_extensions.stdout | trim | length > 0
+
+    - name: Display VSCode extensions backup result
+      ansible.builtin.debug:
+        msg: "Backed up {{ vscode_extensions.stdout_lines | length }} VSCode extensions to extensions.txt"
+      when: code_check.rc == 0
+
+    # Cursor Extensions Backup
+    - name: Check if Cursor is installed
+      ansible.builtin.command:
+        cmd: which cursor
+      register: cursor_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Get installed Cursor extensions
+      ansible.builtin.command:
+        cmd: cursor --list-extensions
+      register: cursor_extensions
+      changed_when: false
+      when: cursor_check.rc == 0
+
+    - name: Write Cursor extensions to file
+      ansible.builtin.copy:
+        content: "{{ cursor_extensions.stdout | trim }}"
+        dest: "{{ dotfiles_repo }}/configs/cursor/extensions.txt"
+        mode: '0644'
+      when: cursor_check.rc == 0 and cursor_extensions.stdout | trim | length > 0
+
+    - name: Display Cursor extensions backup result
+      ansible.builtin.debug:
+        msg: "Backed up {{ cursor_extensions.stdout_lines | length }} Cursor extensions to extensions.txt"
+      when: cursor_check.rc == 0
+
+    # Summary
+    - name: Display backup summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Backup Complete!
+          ========================================
+          Homebrew formulae: {{ installed_formulae.stdout_lines | default([]) | length }}
+          Homebrew casks: {{ installed_casks.stdout_lines | default([]) | length }}
+          VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
+          Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}
+          ========================================
+          Run `git diff` to see changes, then `git add` and `git commit` to save.

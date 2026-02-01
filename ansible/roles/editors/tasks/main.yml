@@ -5,6 +5,11 @@
   register: code_check
   ignore_errors: true
 
+- name: Read VSCode extensions from file
+  ansible.builtin.set_fact:
+    vscode_extensions: "{{ lookup('file', dotfiles_repo + '/configs/vscode/extensions.txt').splitlines() | select('string') | list }}"
+  when: code_check.rc == 0
+
 - name: Install VSCode extensions
   ansible.builtin.command:
     cmd: "code --install-extension {{ item }}"
@@ -19,6 +24,11 @@
     cmd: which cursor
   register: cursor_check
   ignore_errors: true
+
+- name: Read Cursor extensions from file
+  ansible.builtin.set_fact:
+    cursor_extensions: "{{ lookup('file', dotfiles_repo + '/configs/cursor/extensions.txt').splitlines() | select('string') | list }}"
+  when: cursor_check.rc == 0
 
 - name: Install Cursor extensions
   ansible.builtin.command:

@@ -11,6 +11,14 @@
     update_homebrew: true
   become: false
 
+- name: Read Homebrew formulae from file
+  ansible.builtin.set_fact:
+    brew_formulae: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_packages.txt').splitlines() | select('string') | list }}"
+
+- name: Read Homebrew casks from file
+  ansible.builtin.set_fact:
+    brew_casks: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_casks.txt').splitlines() | select('string') | list }}"
+
 - name: Install Homebrew formulae
   community.general.homebrew:
     name: "{{ brew_formulae }}"
