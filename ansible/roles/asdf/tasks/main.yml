@@ -46,7 +46,7 @@
   ansible.builtin.command:
     cmd: "asdf install python {{ python_latest_version.stdout | trim }}"
   register: python_install_result
-  changed_when: "'is already installed' not in python_install_result.stdout"
+  changed_when: python_install_result.rc == 0
 
 - name: Set Python as global default (using .tool-versions)
   ansible.builtin.command:
@@ -76,7 +76,7 @@
   ansible.builtin.command:
     cmd: "asdf install nodejs {{ nodejs_latest_version.stdout | trim }}"
   register: nodejs_install_result
-  changed_when: "'is already installed' not in nodejs_install_result.stdout"
+  changed_when: nodejs_install_result.rc == 0
 
 - name: Set Node.js as global default (using .tool-versions)
   ansible.builtin.command:

@@ -54,7 +54,7 @@ ansible/
 │   ├── dotbot.yml          # Dotbot symlinks
 │   ├── packages.yml        # Homebrew packages
 │   ├── macos.yml           # macOS defaults
-│   ├── shell.yml           # Shell setup
+│   ├── zsh.yml             # Shell setup
 │   ├── editors.yml         # Editor extensions
 │   ├── asdf.yml            # ASDF (Python + Node.js)
 │   └── backup.yml          # Backup packages/extensions

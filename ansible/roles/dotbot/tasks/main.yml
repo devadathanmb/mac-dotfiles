@@ -4,11 +4,11 @@
     cmd: git submodule update --init --recursive
     chdir: "{{ dotfiles_repo }}"
   register: submodule_result
-  changed_when: "'Submodule' in submodule_result.stdout or 'Submodule' in submodule_result.stderr"
+  changed_when: submodule_result.rc == 0
 
 - name: Run Dotbot to create symlinks
   ansible.builtin.command:
     cmd: ./install
     chdir: "{{ dotfiles_repo }}"
   register: dotbot_result
-  changed_when: "'Link exists' not in dotbot_result.stdout"
+  changed_when: dotbot_result.rc == 0
