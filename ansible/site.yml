@@ -1,0 +1,47 @@
+---
+# Main playbook for setting up macOS development environment
+# Run with: ansible-playbook site.yml
+
+- name: Configure macOS development environment
+  hosts: localhost
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display system information
+      ansible.builtin.debug:
+        msg: |
+          Setting up {{ ansible_os_family }} environment
+          User: {{ ansible_user_id }}
+          Home: {{ ansible_env.HOME }}
+
+  roles:
+    - role: homebrew
+      when: install_homebrew | default(true)
+      tags: [homebrew, packages]
+
+    - role: dotfiles
+      when: install_dotfiles | default(true)
+      tags: [dotfiles, symlinks]
+
+    - role: macos
+      when:
+        - configure_macos | default(true)
+        - ansible_os_family == "Darwin"
+      tags: [macos, defaults]
+
+    - role: shell
+      when: setup_shell | default(true)
+      tags: [shell, zsh]
+
+    - role: vscode
+      when: install_vscode_extensions | default(true) or install_cursor_extensions | default(true)
+      tags: [vscode, cursor, extensions]
+
+  post_tasks:
+    - name: Setup complete
+      ansible.builtin.debug:
+        msg: |
+          Setup complete! You may need to:
+          1. Restart your terminal
+          2. Log out and back in for macOS changes to take effect
+          3. Restart specific applications

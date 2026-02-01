@@ -1,0 +1,183 @@
+---
+# Homebrew packages (CLI tools)
+homebrew_packages:
+  # Version managers and build tools
+  - asdf
+  - ansible
+  - ansible-lint
+
+  # Shell and terminal
+  - bash
+  - fish
+  - tmux
+  - atuin
+  - zoxide
+
+  # Core CLI utilities
+  - coreutils
+  - gnu-sed
+  - gawk
+  - tree
+  - watch
+  - parallel
+  - bc
+  - m4
+
+  # File management and search
+  - eza
+  - fd
+  - fzf
+  - ripgrep
+  - ripgrep-all
+  - broot
+  - lf
+  - fselect
+
+  # Git tools
+  - git
+  - git-delta
+  - git-filter-repo
+  - gitleaks
+  - lazygit
+  - gh
+  - glab
+
+  # Editors
+  - neovim
+  - vim
+
+  # Development languages and runtimes
+  - go
+  - node
+  - bun
+  - deno
+  - ruby
+  - python@3.13
+  - python@3.14
+  - uv
+  - ipython
+
+  # JSON/YAML processing
+  - jq
+  - yq
+
+  # Network and HTTP tools
+  - curl
+  - wget
+  - httpie
+  - nmap
+  - shuffledns
+
+  # Containers and orchestration
+  - docker
+  - docker-completion
+  - docker-compose
+  - lazydocker
+  - kubernetes-cli
+  - k9s
+  - kustomize
+  - minikube
+
+  # Database tools
+  - postgresql@17
+  - redis
+
+  # Media tools
+  - ffmpeg
+  - mpv
+  - yt-dlp
+  - imagemagick
+  - chafa
+
+  # System monitoring
+  - btop
+  - htop
+  - procs
+  - neofetch
+  - nerdfetch
+
+  # Document processing
+  - pandoc
+  - csvkit
+  - poppler
+
+  # Security tools
+  - gnupg
+  - trufflehog
+
+  # Misc utilities
+  - bat
+  - hyperfine
+  - qrencode
+  - cmatrix
+  - rsync
+  - duti
+  - screenresolution
+
+  # Cloud and services
+  - awscli
+  - aiven-client
+  - tailscale
+  - k6
+  - gemini-cli
+
+# Homebrew casks (GUI applications)
+homebrew_casks:
+  # Development
+  - cursor
+  - visual-studio-code
+  - zed
+  - ghostty
+  - iterm2
+  - postman
+  - http-toolkit
+  - ngrok
+
+  # Productivity
+  - claude
+  - raycast
+  - obsidian
+  - onlyoffice
+
+  # Communication
+  - discord
+  - slack
+  - telegram
+
+  # Browsers
+  - google-chrome
+  - arc
+  - zen
+
+  # System utilities
+  - alt-tab
+  - jordanbaird-ice
+  - stats
+  - pearcleaner
+  - balenaetcher
+
+  # Media
+  - spotify
+  - gimp
+  - calibre
+
+  # Security
+  - burp-suite
+  - protonvpn
+  - tailscale-app
+
+  # Misc
+  - superwhisper
+  - localsend
+  - antigravity
+  - paper
+
+  # Fonts
+  - font-jetbrains-mono
+  - font-jetbrains-mono-nerd-font
+  - font-maple-mono
+  - font-maple-mono-nf
+  - font-fira-code
+  - font-ibm-plex-mono
+  - font-commit-mono-nerd-font
+  - font-symbols-only-nerd-font

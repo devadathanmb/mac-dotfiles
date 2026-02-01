@@ -1,0 +1,11 @@
+---
+# Symlink dotfiles
+# Run with: ansible-playbook playbooks/dotfiles.yml
+
+- name: Symlink dotfiles
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - role: dotfiles
+      tags: [dotfiles, symlinks]

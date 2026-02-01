@@ -1,0 +1,70 @@
+---
+- name: Ensure ~/.config directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Ensure VS Code User directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/Library/Application Support/Code/User"
+    state: directory
+    mode: "0755"
+  when: ansible_os_family == "Darwin"
+
+- name: Ensure Cursor User directory exists
+  ansible.builtin.file:
+    path: "{{ user_home }}/Library/Application Support/Cursor/User"
+    state: directory
+    mode: "0755"
+  when: ansible_os_family == "Darwin"
+
+- name: Create dotfile symlinks
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ item.dest | replace('~', user_home) }}"
+    state: link
+    force: true
+  loop: "{{ dotfile_links }}"
+  ignore_errors: true
+
+- name: Create config directory symlinks
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ item.dest | replace('~', user_home) }}"
+    state: link
+    force: true
+  loop: "{{ config_dir_links }}"
+  ignore_errors: true
+
+- name: Create application config symlinks (macOS)
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ item.dest | replace('~', user_home) }}"
+    state: link
+    force: true
+  loop: "{{ app_config_links }}"
+  when: ansible_os_family == "Darwin"
+  ignore_errors: true
+
+- name: Find scripts to link
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/{{ scripts_dir }}"
+    file_type: file
+  register: script_files
+
+- name: Create script symlinks
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ scripts_dest | replace('~', user_home) }}/{{ item.path | basename }}"
+    state: link
+    force: true
+    mode: "0755"
+  loop: "{{ script_files.files }}"
+  when: script_files.files | length > 0

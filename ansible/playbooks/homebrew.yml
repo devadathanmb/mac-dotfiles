@@ -1,0 +1,11 @@
+---
+# Install/update Homebrew packages
+# Run with: ansible-playbook playbooks/homebrew.yml
+
+- name: Install Homebrew packages
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - role: homebrew
+      tags: [homebrew, packages]

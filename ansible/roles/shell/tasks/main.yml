@@ -1,0 +1,36 @@
+---
+- name: Check if Zap is installed
+  ansible.builtin.stat:
+    path: "{{ zap_dir }}"
+  register: zap_check
+
+- name: Install Zap Zsh plugin manager
+  ansible.builtin.shell: |
+    zsh <(curl -s {{ zap_install_url }}) --branch {{ zap_branch }}
+  args:
+    creates: "{{ zap_dir }}"
+  when: not zap_check.stat.exists
+
+- name: Check current default shell
+  ansible.builtin.command: "dscl . -read /Users/{{ user_name }} UserShell"
+  register: current_shell
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Darwin"
+
+- name: Set Zsh as default shell (macOS)
+  ansible.builtin.command: "chsh -s {{ default_shell }}"
+  when:
+    - ansible_os_family == "Darwin"
+    - current_shell.stdout is defined
+    - default_shell not in current_shell.stdout
+  changed_when: true
+
+- name: Ensure zsh is in /etc/shells (Linux)
+  ansible.builtin.lineinfile:
+    path: /etc/shells
+    line: "{{ default_shell }}"
+    state: present
+  become: true
+  when: ansible_os_family != "Darwin"
+  failed_when: false

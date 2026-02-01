@@ -1,0 +1,51 @@
+---
+# Dotfile symlinks mapping
+# Format: destination: source (relative to dotfiles_dir)
+dotfile_links:
+  # Shell configuration
+  - { dest: "~/.zshrc", src: ".zshrc" }
+  - { dest: "~/.zprofile", src: ".zprofile" }
+  - { dest: "~/.p10k.zsh", src: ".p10k.zsh" }
+
+  # Editor configuration
+  - { dest: "~/.vimrc", src: ".vimrc" }
+  - { dest: "~/.ideavimrc", src: ".ideavimrc" }
+
+  # Terminal configuration
+  - { dest: "~/.tmux.conf", src: ".tmux.conf" }
+
+  # Git configuration
+  - { dest: "~/.gitconfig", src: ".gitconfig" }
+
+  # CLI tool configuration
+  - { dest: "~/.curlrc", src: ".curlrc" }
+  - { dest: "~/.psqlrc", src: ".psqlrc" }
+  - { dest: "~/.wgetrc", src: ".wgetrc" }
+
+# Config directory symlinks (symlinked to ~/.config/)
+config_dir_links:
+  - { dest: "~/.config/zsh", src: "configs/zsh" }
+  - { dest: "~/.config/fish", src: "configs/fish" }
+  - { dest: "~/.config/gh", src: "configs/gh" }
+  - { dest: "~/.config/ghostty", src: "configs/ghostty" }
+  - { dest: "~/.config/atuin", src: "configs/atuin" }
+  - { dest: "~/.config/pgcli", src: "configs/pgcli" }
+  - { dest: "~/.config/htop", src: "configs/htop" }
+  - { dest: "~/.config/btop", src: "configs/btop" }
+  - { dest: "~/.config/mpv", src: "configs/mpv" }
+  - { dest: "~/.config/zed", src: "configs/zed" }
+  - { dest: "~/.config/cvim", src: "configs/cvim" }
+
+# Application-specific symlinks (macOS)
+app_config_links:
+  # VS Code
+  - { dest: "~/Library/Application Support/Code/User/settings.json", src: "configs/vscode/settings.json" }
+  - { dest: "~/Library/Application Support/Code/User/keybindings.json", src: "configs/vscode/keybindings.json" }
+
+  # Cursor
+  - { dest: "~/Library/Application Support/Cursor/User/settings.json", src: "configs/cursor/settings.json" }
+  - { dest: "~/Library/Application Support/Cursor/User/keybindings.json", src: "configs/cursor/keybindings.json" }
+
+# Scripts to link to ~/.local/bin
+scripts_dir: "scripts"
+scripts_dest: "~/.local/bin"

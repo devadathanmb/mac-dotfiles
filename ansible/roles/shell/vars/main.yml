@@ -1,0 +1,8 @@
+---
+# Zap Zsh configuration
+zap_install_url: "https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh"
+zap_branch: "release-v1"
+zap_dir: "{{ user_home }}/.local/share/zap"
+
+# Default shell
+default_shell: /bin/zsh

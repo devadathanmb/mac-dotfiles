@@ -1,0 +1,44 @@
+---
+- name: Check if VS Code is installed
+  ansible.builtin.stat:
+    path: /Applications/Visual Studio Code.app
+  register: vscode_app
+  when: ansible_os_family == "Darwin"
+
+- name: Check if code command is available
+  ansible.builtin.command: which code
+  register: vscode_cli
+  changed_when: false
+  failed_when: false
+
+- name: Install VS Code extensions
+  ansible.builtin.command: "code --install-extension {{ item }} --force"
+  loop: "{{ vscode_extensions }}"
+  when:
+    - install_vscode_extensions | default(true)
+    - vscode_cli.rc == 0
+  register: vscode_ext_result
+  changed_when: "'was successfully installed' in vscode_ext_result.stdout"
+  failed_when: false
+
+- name: Check if Cursor is installed
+  ansible.builtin.stat:
+    path: /Applications/Cursor.app
+  register: cursor_app
+  when: ansible_os_family == "Darwin"
+
+- name: Check if cursor command is available
+  ansible.builtin.command: which cursor
+  register: cursor_cli
+  changed_when: false
+  failed_when: false
+
+- name: Install Cursor extensions
+  ansible.builtin.command: "cursor --install-extension {{ item }} --force"
+  loop: "{{ cursor_extensions }}"
+  when:
+    - install_cursor_extensions | default(true)
+    - cursor_cli.rc == 0
+  register: cursor_ext_result
+  changed_when: "'was successfully installed' in cursor_ext_result.stdout"
+  failed_when: false

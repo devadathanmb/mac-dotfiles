@@ -1,0 +1,13 @@
+---
+# User configuration
+user_name: "{{ ansible_user_id }}"
+user_home: "{{ ansible_env.HOME }}"
+dotfiles_dir: "{{ playbook_dir | dirname }}"
+
+# Feature flags - enable/disable roles
+install_homebrew: true
+install_dotfiles: true
+configure_macos: true
+install_vscode_extensions: true
+install_cursor_extensions: true
+setup_shell: true

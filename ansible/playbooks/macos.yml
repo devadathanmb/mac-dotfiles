@@ -1,0 +1,12 @@
+---
+# Configure macOS system preferences
+# Run with: ansible-playbook playbooks/macos.yml
+
+- name: Configure macOS
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - role: macos
+      when: ansible_os_family == "Darwin"
+      tags: [macos, defaults]

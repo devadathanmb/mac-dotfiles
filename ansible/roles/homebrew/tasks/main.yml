@@ -1,0 +1,38 @@
+---
+- name: Check if Homebrew is installed
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+  changed_when: false
+
+- name: Install Homebrew
+  ansible.builtin.shell: |
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not homebrew_check.stat.exists
+  args:
+    creates: /opt/homebrew/bin/brew
+
+- name: Update Homebrew
+  community.general.homebrew:
+    update_homebrew: true
+  when: homebrew_upgrade_all
+
+- name: Add Homebrew taps
+  community.general.homebrew_tap:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_taps }}"
+
+- name: Install Homebrew packages
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: "{{ homebrew_installed_state }}"
+  loop: "{{ homebrew_packages }}"
+  ignore_errors: true
+
+- name: Install Homebrew casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: "{{ homebrew_installed_state }}"
+  loop: "{{ homebrew_casks }}"
+  ignore_errors: true

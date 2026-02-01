@@ -1,0 +1,8 @@
+---
+# Homebrew configuration
+homebrew_upgrade_all: false
+homebrew_installed_state: present
+
+# Homebrew taps
+homebrew_taps:
+  - homebrew/cask-fonts

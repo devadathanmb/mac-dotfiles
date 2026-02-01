@@ -1,0 +1,282 @@
+---
+- name: Close System Preferences to prevent overriding settings
+  ansible.builtin.command: osascript -e 'tell application "System Preferences" to quit'
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Darwin"
+
+# Trackpad settings
+- name: Configure trackpad settings
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    # Enable tap to click
+    - { domain: "com.apple.AppleMultitouchTrackpad", key: "Clicking", type: bool, value: true }
+    # Enable right-click with two fingers
+    - { domain: "com.apple.AppleMultitouchTrackpad", key: "TrackpadRightClick", type: bool, value: true }
+    # Enable three-finger drag
+    - { domain: "com.apple.AppleMultitouchTrackpad", key: "TrackpadThreeFingerDrag", type: bool, value: true }
+  when: ansible_os_family == "Darwin"
+
+- name: Enable tap to click (NSGlobalDomain)
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    host: currentHost
+  when: ansible_os_family == "Darwin"
+
+# Finder settings
+- name: Configure Finder settings
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    # Show all filename extensions
+    - { domain: "NSGlobalDomain", key: "AppleShowAllExtensions", type: bool, value: true }
+    # Show full POSIX path in Finder window title
+    - { domain: "com.apple.finder", key: "_FXShowPosixPathInTitle", type: bool, value: true }
+    # Hide all desktop icons
+    - { domain: "com.apple.finder", key: "CreateDesktop", type: bool, value: false }
+    # Disable warning before changing a file extension
+    - { domain: "com.apple.finder", key: "FXEnableExtensionChangeWarning", type: bool, value: false }
+    # Set default search scope in Finder to current folder
+    - { domain: "com.apple.finder", key: "FXDefaultSearchScope", type: string, value: "SCcf" }
+    # Show status bar
+    - { domain: "com.apple.finder", key: "ShowStatusBar", type: bool, value: true }
+    # Show path bar
+    - { domain: "com.apple.finder", key: "ShowPathbar", type: bool, value: true }
+    # Use list view as default
+    - { domain: "com.apple.finder", key: "FXPreferredViewStyle", type: string, value: "Nlsv" }
+    # Disable warning before emptying Trash
+    - { domain: "com.apple.finder", key: "WarnOnEmptyTrash", type: bool, value: false }
+  when: ansible_os_family == "Darwin"
+
+- name: Show ~/Library folder
+  ansible.builtin.command: chflags nohidden ~/Library
+  changed_when: false
+  when: ansible_os_family == "Darwin"
+
+# Keyboard and text input settings
+- name: Configure keyboard and text input settings
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    # Disable automatic spelling correction
+    - { key: "NSAutomaticSpellingCorrectionEnabled", type: bool, value: false }
+    # Set fast key repeat rate
+    - { key: "KeyRepeat", type: int, value: 1 }
+    - { key: "InitialKeyRepeat", type: int, value: 15 }
+    # Disable automatic capitalization
+    - { key: "NSAutomaticCapitalizationEnabled", type: bool, value: false }
+    # Disable automatic period substitution
+    - { key: "NSAutomaticPeriodSubstitutionEnabled", type: bool, value: false }
+    # Disable smart quotes
+    - { key: "NSAutomaticQuoteSubstitutionEnabled", type: bool, value: false }
+    # Disable smart dashes
+    - { key: "NSAutomaticDashSubstitutionEnabled", type: bool, value: false }
+    # Enable full keyboard access for all controls
+    - { key: "AppleKeyboardUIMode", type: int, value: 3 }
+    # Always expand save panel by default
+    - { key: "NSNavPanelExpandedStateForSaveMode", type: bool, value: true }
+    - { key: "NSNavPanelExpandedStateForSaveMode2", type: bool, value: true }
+    # Disable automatic termination of inactive apps
+    - { key: "NSDisableAutomaticTermination", type: bool, value: true }
+    # Add Web Inspector context menu
+    - { key: "WebKitDeveloperExtras", type: bool, value: true }
+    # Use 24-hour time format
+    - { key: "AppleICUForce24HourTime", type: bool, value: true }
+  when: ansible_os_family == "Darwin"
+
+# Dock settings
+- name: Configure Dock settings
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    # Auto-hide Dock
+    - { key: "autohide", type: bool, value: true }
+    # Disable "click wallpaper to show desktop"
+    - { key: "showDesktop", type: bool, value: false }
+    # Change minimize/maximize window effect
+    - { key: "mineffect", type: string, value: "scale" }
+    # Minimize windows into their application's icon
+    - { key: "minimize-to-application", type: bool, value: true }
+    # Show indicator lights for open applications in the Dock
+    - { key: "show-process-indicators", type: bool, value: true }
+    # Show only open applications in the Dock
+    - { key: "static-only", type: bool, value: true }
+    # Don't animate opening applications from the Dock
+    - { key: "launchanim", type: bool, value: false }
+    # Don't show recently used applications in Dock
+    - { key: "show-recents", type: bool, value: false }
+    # Speed up Mission Control animations
+    - { key: "expose-animation-duration", type: float, value: 0.1 }
+    # Don't automatically rearrange Spaces based on most recent use
+    - { key: "mru-spaces", type: bool, value: false }
+    # Disable top right hot corner
+    - { key: "wvous-tr-corner", type: int, value: 0 }
+    - { key: "wvous-tr-modifier", type: int, value: 0 }
+  when: ansible_os_family == "Darwin"
+
+# Terminal settings
+- name: Configure Terminal to use UTF-8
+  community.general.osx_defaults:
+    domain: com.apple.terminal
+    key: StringEncodings
+    type: array
+    value:
+      - 4
+    state: present
+  when: ansible_os_family == "Darwin"
+
+# System UI settings
+- name: Configure battery percentage in menu bar
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter.plist
+    key: BatteryShowPercentage
+    type: bool
+    value: true
+    host: currentHost
+  when: ansible_os_family == "Darwin"
+
+- name: Configure volume icon in menu bar
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter.plist
+    key: Sound
+    type: int
+    value: 18
+  when: ansible_os_family == "Darwin"
+
+- name: Enable beep on volume slider
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.sound.beep.feedback
+    type: int
+    value: 1
+  when: ansible_os_family == "Darwin"
+
+# Screenshot settings
+- name: Create Screenshots directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/Pictures/Screenshots"
+    state: directory
+    mode: "0755"
+  when: ansible_os_family == "Darwin"
+
+- name: Configure screenshot settings
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: "location", type: string, value: "{{ user_home }}/Pictures/Screenshots" }
+    - { key: "type", type: string, value: "png" }
+    - { key: "disable-shadow", type: bool, value: true }
+  when: ansible_os_family == "Darwin"
+
+# Security settings
+- name: Configure screensaver security
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    key: "{{ item.key }}"
+    type: int
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: "askForPassword", value: 1 }
+    - { key: "askForPasswordDelay", value: 0 }
+  when: ansible_os_family == "Darwin"
+
+# Safari settings
+- name: Configure Safari settings
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: "UniversalSearchEnabled", type: bool, value: false }
+    - { key: "SuppressSearchSuggestions", type: bool, value: true }
+    - { key: "ShowFullURLInSmartSearchField", type: bool, value: true }
+    - { key: "IncludeInternalDebugMenu", type: bool, value: true }
+    - { key: "IncludeDevelopMenu", type: bool, value: true }
+    - { key: "WebKitDeveloperExtrasEnabledPreferenceKey", type: bool, value: true }
+    - { key: "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled", type: bool, value: true }
+    - { key: "WarnAboutFraudulentWebsites", type: bool, value: true }
+    - { key: "InstallExtensionUpdatesAutomatically", type: bool, value: true }
+  when: ansible_os_family == "Darwin"
+
+# TextEdit settings
+- name: Configure TextEdit settings
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: "{{ item.key }}"
+    type: int
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: "RichText", value: 0 }
+    - { key: "PlainTextEncoding", value: 4 }
+    - { key: "PlainTextEncodingForWrite", value: 4 }
+  when: ansible_os_family == "Darwin"
+
+# Activity Monitor settings
+- name: Configure Activity Monitor settings
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: "ShowCategory", type: int, value: 0 }
+    - { key: "SortColumn", type: string, value: "CPUUsage" }
+    - { key: "SortDirection", type: int, value: 0 }
+  when: ansible_os_family == "Darwin"
+
+# App Store settings
+- name: Disable App Store automatic downloads
+  community.general.osx_defaults:
+    domain: com.apple.SoftwareUpdate
+    key: AutomaticDownload
+    type: bool
+    value: false
+  when: ansible_os_family == "Darwin"
+
+# Apply changes by restarting affected apps
+- name: Restart Finder
+  ansible.builtin.command: killall Finder
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Darwin"
+
+- name: Restart Dock
+  ansible.builtin.command: killall Dock
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Darwin"
+
+- name: Restart SystemUIServer
+  ansible.builtin.command: killall SystemUIServer
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Darwin"

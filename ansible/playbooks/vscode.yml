@@ -1,0 +1,11 @@
+---
+# Install VS Code and Cursor extensions
+# Run with: ansible-playbook playbooks/vscode.yml
+
+- name: Install editor extensions
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - role: vscode
+      tags: [vscode, cursor, extensions]

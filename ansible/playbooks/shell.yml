@@ -1,0 +1,11 @@
+---
+# Setup shell environment
+# Run with: ansible-playbook playbooks/shell.yml
+
+- name: Setup shell
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - role: shell
+      tags: [shell, zsh]
