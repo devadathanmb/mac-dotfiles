@@ -45,6 +45,7 @@ pkief.material-icon-theme
 redhat.ansible
 redhat.vscode-yaml
 saminamanat.grep-search
+saoudrizwan.claude-dev
 sleistner.vscode-fileutils
 sst-dev.opencode
 subframe7536.custom-ui-style
