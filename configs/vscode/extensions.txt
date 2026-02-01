@@ -5,6 +5,7 @@ anthropic.claude-code
 astro-build.astro-vscode
 bierner.emojisense
 bierner.markdown-mermaid
+charliermarsh.ruff
 christian-kohler.path-intellisense
 cstrap.python-snippets
 dbaeumer.vscode-eslint
@@ -23,6 +24,7 @@ inferrinizzard.prettier-sql-vscode
 ipedrazas.kubernetes-snippets
 johnnymorganz.stylua
 kevinrose.vsc-python-indent
+kilocode.kilo-code
 mads-hartmann.bash-ide-vscode
 malmaud.tmux
 mechatroner.rainbow-csv
@@ -30,9 +32,7 @@ mgesbert.python-path
 ms-azuretools.vscode-containers
 ms-azuretools.vscode-docker
 ms-kubernetes-tools.vscode-kubernetes-tools
-ms-python.black-formatter
 ms-python.debugpy
-ms-python.flake8
 ms-python.isort
 ms-python.python
 ms-python.vscode-pylance
@@ -44,7 +44,9 @@ oderwat.indent-rainbow
 pkief.material-icon-theme
 redhat.ansible
 redhat.vscode-yaml
+saminamanat.grep-search
 sleistner.vscode-fileutils
+sst-dev.opencode
 subframe7536.custom-ui-style
 sumneko.lua
 uniquevision.vscode-plpgsql-lsp
