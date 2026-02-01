@@ -4,6 +4,7 @@
     cmd: which code
   register: code_check
   ignore_errors: true
+  changed_when: false
 
 - name: Read VSCode extensions from file
   ansible.builtin.set_fact:
@@ -16,14 +17,14 @@
   loop: "{{ vscode_extensions }}"
   when: code_check.rc == 0
   ignore_errors: true
-  register: vscode_extensions_result
-  changed_when: "'Extension' not in vscode_extensions_result.stdout"
+  changed_when: false
 
 - name: Check if Cursor is installed
   ansible.builtin.command:
     cmd: which cursor
   register: cursor_check
   ignore_errors: true
+  changed_when: false
 
 - name: Read Cursor extensions from file
   ansible.builtin.set_fact:
@@ -36,8 +37,7 @@
   loop: "{{ cursor_extensions }}"
   when: cursor_check.rc == 0
   ignore_errors: true
-  register: cursor_extensions_result
-  changed_when: "'Extension' not in cursor_extensions_result.stdout"
+  changed_when: false
 
 - name: Display extension installation summary
   ansible.builtin.debug:

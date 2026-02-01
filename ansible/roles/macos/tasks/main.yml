@@ -123,11 +123,18 @@
     mode: '0755'
   register: library_folder
 
+- name: Finder | Check if ~/Library folder is hidden
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: "chflags -p {{ ansible_env.HOME }}/Library"
+  register: library_chflags
+  changed_when: false
+
 - name: Finder | Remove hidden flag from ~/Library
   tags: [macos]
   ansible.builtin.command:
     cmd: "chflags nohidden {{ ansible_env.HOME }}/Library"
-  changed_when: false
+  when: "'hidden' in library_chflags.stdout"
 
 # ==============================================================================
 # KEYBOARD AND TEXT INPUT SETTINGS

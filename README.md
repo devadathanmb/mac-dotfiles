@@ -62,7 +62,7 @@ ansible/
     ├── dotbot/             # Orchestrates ./install
     ├── homebrew/           # Homebrew packages
     ├── macos/              # System defaults
-    ├── shell/              # Zap ZSH
+    ├── zsh/                # Zap ZSH
     ├── editors/            # VSCode + Cursor extensions
     └── asdf/               # ASDF version manager
 ```

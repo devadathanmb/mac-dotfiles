@@ -4,8 +4,15 @@
     path: "{{ ansible_facts['user_dir'] }}/.local/share/zap"
   register: zap_installed
 
+- name: Download Zap ZSH installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh
+    dest: "{{ ansible_facts['user_dir'] }}/.local/share/zap/install.zsh"
+    mode: '0755'
+  when: not zap_installed.stat.exists
+
 - name: Install Zap ZSH
   ansible.builtin.command:
-    cmd: zsh -c 'curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh | zsh -s -- --branch release-v1'
+    cmd: zsh "{{ ansible_facts['user_dir'] }}/.local/share/zap/install.zsh" --branch release-v1
   when: not zap_installed.stat.exists
   changed_when: true

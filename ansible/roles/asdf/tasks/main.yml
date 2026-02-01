@@ -21,7 +21,7 @@
     line: '. ~/.asdf/asdf.sh'
     insertafter: EOF
     state: present
-  when: asdf_check.stat.exists
+  when: not asdf_check.stat.exists
 
 # Python Plugin
 - name: Check if Python plugin is installed
@@ -34,6 +34,7 @@
   ansible.builtin.command:
     cmd: asdf plugin add python
   when: python_plugin_check.stdout == "not installed"
+  changed_when: true
 
 - name: Get latest stable Python version
   ansible.builtin.command:
@@ -63,6 +64,7 @@
   ansible.builtin.command:
     cmd: asdf plugin add nodejs
   when: nodejs_plugin_check.stdout == "not installed"
+  changed_when: true
 
 - name: Get latest stable Node.js version
   ansible.builtin.command:

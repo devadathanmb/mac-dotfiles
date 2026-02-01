@@ -8,6 +8,13 @@ echo "=============================="
 if ! command -v brew &>/dev/null; then
     echo "📦 Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Initialize Homebrew environment for this shell session
+    if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
 fi
 
 # Check for Ansible

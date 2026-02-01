@@ -1,2 +1,4 @@
 ---
-dotfiles_repo: /Users/devadathanmb/.mac-dots
+# Path to the dotfiles repository
+# Can be overridden via DOTFILES_REPO environment variable
+dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(ansible_env.HOME + '/.mac-dots', true) }}"
