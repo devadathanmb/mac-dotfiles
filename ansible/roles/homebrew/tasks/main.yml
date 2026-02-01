@@ -5,7 +5,7 @@
     creates: /opt/homebrew/bin/brew
   when:
     - ansible_facts['os_family'] == "Darwin"
-    - ansible_architecture == "arm64"
+    - ansible_facts['architecture'] == "arm64"
   become: false
 
 - name: Ensure Homebrew is installed (Intel)
@@ -14,7 +14,7 @@
     creates: /usr/local/bin/brew
   when:
     - ansible_facts['os_family'] == "Darwin"
-    - ansible_architecture != "arm64"
+    - ansible_facts['architecture'] != "arm64"
   become: false
 
 - name: Update Homebrew

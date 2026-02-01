@@ -1,2 +1,2 @@
 ---
-dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(ansible_env.HOME ~ '/.mac-dots', true) }}"
+dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
