@@ -7,7 +7,12 @@ function _fifc
     set -gx fifc_extracted
     set -gx fifc_commandline
     set -gx fifc_token (commandline --current-token)
-    set -gx fifc_query "$fifc_token"
+    # Clear query when token ends with / to allow fuzzy finding within that directory
+    if string match --quiet -- '*/' "$fifc_token"
+        set -gx fifc_query ""
+    else
+        set -gx fifc_query "$fifc_token"
+    end
 
     # Get commandline buffer
     if test "$argv" = ""
