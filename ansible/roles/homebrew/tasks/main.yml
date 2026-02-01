@@ -32,26 +32,28 @@
 
 - name: Install Homebrew formulae
   community.general.homebrew:
-    name: "{{ brew_formulae }}"
+    name: "{{ item }}"
     state: present
+  loop: "{{ brew_formulae }}"
   become: false
   ignore_errors: true
   register: brew_formulae_result
 
 - name: Report failed Homebrew formulae
   ansible.builtin.debug:
-    msg: "Some Homebrew formulae failed to install. Check output above."
-  when: brew_formulae_result.failed is defined and brew_formulae_result.failed | length > 0
+    msg: "Some Homebrew formulae failed to install: {{ brew_formulae_result.results | selectattr('failed', 'true') | map(attribute='item') | list }}"
+  when: brew_formulae_result.results is defined and (brew_formulae_result.results | selectattr('failed', 'true') | list | length) > 0
 
 - name: Install Homebrew casks
   community.general.homebrew_cask:
-    name: "{{ brew_casks }}"
+    name: "{{ item }}"
     state: present
+  loop: "{{ brew_casks }}"
   become: false
   ignore_errors: true
   register: brew_casks_result
 
 - name: Report failed Homebrew casks
   ansible.builtin.debug:
-    msg: "Some Homebrew casks failed to install. Check output above."
-  when: brew_casks_result.failed is defined and brew_casks_result.failed | length > 0
+    msg: "Some Homebrew casks failed to install: {{ brew_casks_result.results | selectattr('failed', 'true') | map(attribute='item') | list }}"
+  when: brew_casks_result.results is defined and (brew_casks_result.results | selectattr('failed', 'true') | list | length) > 0
