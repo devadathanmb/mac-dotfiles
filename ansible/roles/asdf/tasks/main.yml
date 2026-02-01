@@ -1,0 +1,105 @@
+---
+# ASDF Version Manager Role
+# Installs ASDF, Python, and Node.js with latest stable versions
+
+# ASDF Installation
+- name: Check if ASDF is installed via Homebrew
+  ansible.builtin.command: brew --prefix asdf
+  register: asdf_check
+  failed_when: false
+  changed_when: false
+
+- name: Install ASDF (via Homebrew)
+  community.general.homebrew:
+    name: asdf
+    state: present
+  become: false
+  when: asdf_check.rc != 0
+
+- name: Add ASDF to shell configuration
+  ansible.builtin.lineinfile:
+    path: ~/.zshrc
+    line: '. "$(brew --prefix asdf)"/libexec/asdf.sh'
+    insertafter: EOF
+    state: present
+  when: asdf_check.rc != 0
+
+# Python Plugin
+- name: Check if Python plugin is installed
+  ansible.builtin.shell: asdf plugin list | grep -w python && echo "installed" || echo "not installed"
+  register: python_plugin_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Add Python plugin to ASDF
+  ansible.builtin.command:
+    cmd: asdf plugin add python
+  when: python_plugin_check.stdout == "not installed"
+  changed_when: true
+
+- name: Get latest stable Python version
+  ansible.builtin.command:
+    cmd: asdf latest python
+  register: python_latest_version
+  changed_when: false
+
+- name: Install latest stable Python
+  ansible.builtin.command:
+    cmd: "asdf install python {{ python_latest_version.stdout | trim }}"
+  register: python_install_result
+  changed_when: python_install_result.rc == 0
+
+- name: Set Python as global default (using .tool-versions)
+  ansible.builtin.command:
+    cmd: "asdf set -u python {{ python_latest_version.stdout | trim }}"
+  when: python_install_result.changed
+
+# Node.js Plugin
+- name: Check if Node.js plugin is installed
+  ansible.builtin.shell: asdf plugin list | grep -w nodejs && echo "installed" || echo "not installed"
+  register: nodejs_plugin_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Add Node.js plugin to ASDF
+  ansible.builtin.command:
+    cmd: asdf plugin add nodejs
+  when: nodejs_plugin_check.stdout == "not installed"
+  changed_when: true
+
+- name: Get latest stable Node.js version
+  ansible.builtin.command:
+    cmd: asdf latest nodejs
+  register: nodejs_latest_version
+  changed_when: false
+
+- name: Install latest stable Node.js
+  ansible.builtin.command:
+    cmd: "asdf install nodejs {{ nodejs_latest_version.stdout | trim }}"
+  register: nodejs_install_result
+  changed_when: nodejs_install_result.rc == 0
+
+- name: Set Node.js as global default (using .tool-versions)
+  ansible.builtin.command:
+    cmd: "asdf set -u nodejs {{ nodejs_latest_version.stdout | trim }}"
+  when: nodejs_install_result.changed
+
+# Reshim
+- name: Reshim ASDF for Python
+  ansible.builtin.command:
+    cmd: asdf reshim python
+  changed_when: false
+
+- name: Reshim ASDF for Node.js
+  ansible.builtin.command:
+    cmd: asdf reshim nodejs
+  changed_when: false
+
+# Summary
+- name: Display installed versions
+  ansible.builtin.debug:
+    msg: |
+      ASDF Setup Complete!
+      Python: {{ python_latest_version.stdout | trim }}
+      Node.js: {{ nodejs_latest_version.stdout | trim }}
+      Global versions set in ~/.tool-versions

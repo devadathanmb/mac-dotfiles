@@ -1,0 +1,14 @@
+---
+- name: Ensure git submodules are initialized
+  ansible.builtin.command:
+    cmd: git submodule update --init --recursive
+    chdir: "{{ dotfiles_repo }}"
+  register: submodule_result
+  changed_when: submodule_result.rc == 0
+
+- name: Run Dotbot to create symlinks
+  ansible.builtin.command:
+    cmd: ./install
+    chdir: "{{ dotfiles_repo }}"
+  register: dotbot_result
+  changed_when: dotbot_result.rc == 0

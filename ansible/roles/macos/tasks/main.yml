@@ -1,0 +1,641 @@
+---
+# macOS System Configuration Role
+# Manages system defaults via community.general.osx_defaults
+
+# ==============================================================================
+# TRACKPAD SETTINGS
+# ==============================================================================
+
+- name: Trackpad | Enable tap to click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: Clicking
+    type: bool
+    value: true
+
+- name: Trackpad | Enable tap behavior globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    host: currentHost
+
+- name: Trackpad | Enable right-click with two fingers
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadRightClick
+    type: bool
+    value: true
+
+- name: Trackpad | Enable three-finger drag
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerDrag
+    type: bool
+    value: true
+
+# ==============================================================================
+# FINDER SETTINGS
+# ==============================================================================
+
+- name: Finder | Show all filename extensions
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleShowAllExtensions
+    type: bool
+    value: true
+
+- name: Finder | Show full POSIX path in window title
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: _FXShowPosixPathInTitle
+    type: bool
+    value: true
+
+- name: Finder | Hide all desktop icons
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: CreateDesktop
+    type: bool
+    value: false
+
+- name: Finder | Disable warning before changing file extension
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXEnableExtensionChangeWarning
+    type: bool
+    value: false
+
+- name: Finder | Set default search scope to current folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXDefaultSearchScope
+    type: string
+    value: SCcf
+
+- name: Finder | Show status bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowStatusBar
+    type: bool
+    value: true
+
+- name: Finder | Show path bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowPathbar
+    type: bool
+    value: true
+
+- name: Finder | Use list view as default
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXPreferredViewStyle
+    type: string
+    value: Nlsv
+
+- name: Finder | Disable warning before emptying Trash
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: WarnOnEmptyTrash
+    type: bool
+    value: false
+
+- name: Finder | Show ~/Library folder
+  tags: [macos]
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/Library"
+    state: directory
+    mode: '0755'
+  register: library_folder
+
+- name: Finder | Check if ~/Library folder is hidden
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: "ls -ldO {{ ansible_env.HOME }}/Library"
+  register: library_chflags
+  changed_when: false
+
+- name: Finder | Remove hidden flag from ~/Library
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: "chflags nohidden {{ ansible_env.HOME }}/Library"
+  when: "'hidden' in library_chflags.stdout"
+
+# ==============================================================================
+# KEYBOARD AND TEXT INPUT SETTINGS
+# ==============================================================================
+
+- name: Keyboard | Disable automatic spelling correction
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticSpellingCorrectionEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Set fast key repeat rate
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: KeyRepeat
+    type: int
+    value: 1
+
+- name: Keyboard | Set fast initial key repeat
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: InitialKeyRepeat
+    type: int
+    value: 15
+
+- name: Keyboard | Disable press and hold for key repeat
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: ApplePressAndHoldEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Disable automatic capitalization
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticCapitalizationEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Disable automatic period substitution
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticPeriodSubstitutionEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Disable smart quotes
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticQuoteSubstitutionEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Disable smart dashes
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticDashSubstitutionEnabled
+    type: bool
+    value: false
+
+- name: Keyboard | Enable full keyboard access for all controls
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleKeyboardUIMode
+    type: int
+    value: 3
+
+# ==============================================================================
+# SAVE DIALOGS
+# ==============================================================================
+
+- name: Save Dialogs | Always expand save panel by default
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSNavPanelExpandedStateForSaveMode
+    type: bool
+    value: true
+
+- name: Save Dialogs | Always expand save panel (variant 2)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSNavPanelExpandedStateForSaveMode2
+    type: bool
+    value: true
+
+# ==============================================================================
+# DOCK SETTINGS
+# ==============================================================================
+
+- name: Dock | Auto-hide Dock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: autohide
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Disable click wallpaper to show desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: showDesktop
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Change minimize/maximize window effect to scale
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: mineffect
+    type: string
+    value: scale
+  notify: Restart Dock
+
+- name: Dock | Minimize windows into their application icon
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: minimize-to-application
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Show indicator lights for open applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: show-process-indicators
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Show only open applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: static-only
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Don't animate opening applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: launchanim
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Don't show recently used applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: show-recents
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Speed up Mission Control animations
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: expose-animation-duration
+    type: float
+    value: 0.1
+  notify: Restart Dock
+
+- name: Dock | Don't automatically rearrange Spaces
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: mru-spaces
+    type: bool
+    value: false
+  notify: Restart Dock
+
+# ==============================================================================
+# HOT CORNERS
+# ==============================================================================
+
+- name: Hot Corners | Top right screen corner - Disabled
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tr-corner
+    type: int
+    value: 0
+  notify: Restart Dock
+
+- name: Hot Corners | Top right screen corner modifier
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tr-modifier
+    type: int
+    value: 0
+  notify: Restart Dock
+
+# ==============================================================================
+# TERMINAL SETTINGS
+# ==============================================================================
+
+- name: Terminal | Use UTF-8 encoding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.terminal
+    key: StringEncodings
+    type: array
+    value:
+      - 4
+
+# ==============================================================================
+# SYSTEM UI SETTINGS
+# ==============================================================================
+
+- name: System UI | Show battery percentage in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter.plist
+    key: BatteryShowPercentage
+    type: bool
+    value: true
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Show volume icon in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter.plist
+    key: Sound
+    type: int
+    value: 18
+  notify: Restart SystemUIServer
+
+- name: System UI | Beep on moving the slider
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.sound.beep.feedback
+    type: int
+    value: 1
+
+- name: System UI | Use 24-hour time format
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleICUForce24HourTime
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Reduce status item spacing
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSStatusItemSpacing
+    type: int
+    value: 12
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Reduce status item selection padding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSStatusItemSelectionPadding
+    type: int
+    value: 12
+    host: currentHost
+  notify: Restart SystemUIServer
+
+# ==============================================================================
+# SCREENSHOT SETTINGS
+# ==============================================================================
+
+- name: Screenshots | Create Screenshots directory
+  tags: [macos]
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/Pictures/Screenshots"
+    state: directory
+    mode: '0755'
+
+- name: Screenshots | Save screenshots to Screenshots folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: location
+    type: string
+    value: "{{ ansible_env.HOME }}/Pictures/Screenshots"
+
+- name: Screenshots | Save screenshots in PNG format
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: type
+    type: string
+    value: png
+
+- name: Screenshots | Disable shadow in screenshots
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: disable-shadow
+    type: bool
+    value: true
+
+# ==============================================================================
+# SECURITY SETTINGS
+# ==============================================================================
+
+- name: Security | Require password immediately after sleep
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPassword
+    type: int
+    value: 1
+
+- name: Security | Set password delay to 0 seconds
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPasswordDelay
+    type: int
+    value: 0
+
+# ==============================================================================
+# PERFORMANCE SETTINGS
+# ==============================================================================
+
+- name: Performance | Disable automatic termination of inactive apps
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSDisableAutomaticTermination
+    type: bool
+    value: true
+
+# ==============================================================================
+# SAFARI & WEBKIT SETTINGS
+# ==============================================================================
+
+- name: Safari | Disable universal search
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: UniversalSearchEnabled
+    type: bool
+    value: false
+
+- name: Safari | Suppress search suggestions
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: SuppressSearchSuggestions
+    type: bool
+    value: true
+
+- name: Safari | Show full URL in address bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: ShowFullURLInSmartSearchField
+    type: bool
+    value: true
+
+- name: Safari | Enable Debug Menu
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: IncludeInternalDebugMenu
+    type: bool
+    value: true
+
+- name: Safari | Enable Develop menu
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: IncludeDevelopMenu
+    type: bool
+    value: true
+
+- name: Safari | Enable Web Inspector
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: WebKitDeveloperExtrasEnabledPreferenceKey
+    type: bool
+    value: true
+
+- name: Safari | Enable Web Inspector (variant 2)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled
+    type: bool
+    value: true
+
+- name: WebKit | Enable developer extras globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: WebKitDeveloperExtras
+    type: bool
+    value: true
+
+- name: Safari | Warn about fraudulent websites
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: WarnAboutFraudulentWebsites
+    type: bool
+    value: true
+
+- name: Safari | Update extensions automatically
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: InstallExtensionUpdatesAutomatically
+    type: bool
+    value: true
+
+# ==============================================================================
+# TEXTEDIT SETTINGS
+# ==============================================================================
+
+- name: TextEdit | Use plain text mode for new documents
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: RichText
+    type: int
+    value: 0
+
+- name: TextEdit | Use UTF-8 encoding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: PlainTextEncoding
+    type: int
+    value: 4
+
+- name: TextEdit | Use UTF-8 encoding for write
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: PlainTextEncodingForWrite
+    type: int
+    value: 4
+
+# ==============================================================================
+# ACTIVITY MONITOR SETTINGS
+# ==============================================================================
+
+- name: Activity Monitor | Show all processes
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: ShowCategory
+    type: int
+    value: 0
+
+- name: Activity Monitor | Sort by CPU usage
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: SortColumn
+    type: string
+    value: CPUUsage
+
+- name: Activity Monitor | Set sort direction
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: SortDirection
+    type: int
+    value: 0
+
+# ==============================================================================
+# APP STORE SETTINGS
+# ==============================================================================
+
+- name: App Store | Disable automatic downloads
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.SoftwareUpdate
+    key: AutomaticDownload
+    type: bool
+    value: false

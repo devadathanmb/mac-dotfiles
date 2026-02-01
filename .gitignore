@@ -6,3 +6,6 @@ untracked/*
 **/log
 **/log/
 **/history
+.cursor/*
+.claude/*
+.sisyphus/*

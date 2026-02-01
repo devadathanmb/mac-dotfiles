@@ -1,0 +1,9 @@
+---
+- name: ASDF Version Manager Setup
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  roles:
+    - role: asdf

@@ -5,6 +5,8 @@ balenaetcher
 burp-suite
 calibre
 claude
+claude-code
+copilot-cli
 cursor
 discord
 font-commit-mono-nerd-font

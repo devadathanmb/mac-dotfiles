@@ -1,0 +1,5 @@
+---
+# ASDF role defaults
+asdf_install_dir: ~/.asdf
+asdf_python_version: latest
+asdf_nodejs_version: latest
