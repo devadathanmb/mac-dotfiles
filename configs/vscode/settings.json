@@ -1,6 +1,6 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "custom-ui-style.font.sansSerif": "Maple Mono NF Medium",
   "custom-ui-style.font.monospace": "Maple Mono NF Medium",
@@ -60,7 +60,7 @@
   "editor.fontVariations": true,
   "editor.letterSpacing": -0.8,
   "editor.bracketPairColorization.enabled": true,
-  "editor.fontSize": 13.6,
+  "editor.fontSize": 13.0,
   "editor.minimap.enabled": false,
   "editor.quickSuggestionsDelay": 10,
   "editor.scrollbar.horizontal": "hidden",
@@ -292,7 +292,6 @@
     "reportOptionalMemberAccess": "none",
     "reportOptionalSubscript": "none"
   },
-  "python.formatting.provider": "black",
   "redhat.telemetry.enabled": false,
   "security.workspace.trust.untrustedFiles": "open",
   "terminal.integrated.fontFamily": "Maple Mono NF",
@@ -1494,5 +1493,5 @@
     "plaintext": false,
     "markdown": true,
     "scminput": false
-  }
+  },
 }
