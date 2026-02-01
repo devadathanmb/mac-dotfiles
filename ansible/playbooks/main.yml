@@ -1,0 +1,18 @@
+---
+- name: Dotfiles Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+  
+  roles:
+    - role: dotbot
+      tags: [dotbot, symlinks]
+    - role: homebrew
+      tags: [homebrew, packages]
+    - role: macos
+      tags: [macos, defaults]
+    - role: shell
+      tags: [shell, zsh]
+    - role: editors
+      tags: [editors, vscode, cursor]

@@ -1,0 +1,34 @@
+---
+- name: Check if VSCode is installed
+  ansible.builtin.command:
+    cmd: which code
+  register: code_check
+  ignore_errors: true
+
+- name: Install VSCode extensions
+  ansible.builtin.command:
+    cmd: "code --install-extension {{ item }}"
+  loop: "{{ vscode_extensions }}"
+  when: code_check.rc == 0
+  ignore_errors: true
+  register: vscode_extensions_result
+  changed_when: "'Extension' not in vscode_extensions_result.stdout"
+
+- name: Check if Cursor is installed
+  ansible.builtin.command:
+    cmd: which cursor
+  register: cursor_check
+  ignore_errors: true
+
+- name: Install Cursor extensions
+  ansible.builtin.command:
+    cmd: "cursor --install-extension {{ item }}"
+  loop: "{{ cursor_extensions }}"
+  when: cursor_check.rc == 0
+  ignore_errors: true
+  register: cursor_extensions_result
+  changed_when: "'Extension' not in cursor_extensions_result.stdout"
+
+- name: Display extension installation summary
+  ansible.builtin.debug:
+    msg: "VSCode and/or Cursor extensions installed. Some may have failed (deprecated extensions)."

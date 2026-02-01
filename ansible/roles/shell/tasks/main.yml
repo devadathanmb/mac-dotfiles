@@ -1,0 +1,11 @@
+---
+- name: Check if Zap ZSH is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.local/share/zap"
+  register: zap_installed
+
+- name: Install Zap ZSH
+  ansible.builtin.command:
+    cmd: zsh -c 'curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh | zsh -s -- --branch release-v1'
+  when: not zap_installed.stat.exists
+  changed_when: true

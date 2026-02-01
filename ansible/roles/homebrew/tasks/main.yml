@@ -1,0 +1,38 @@
+---
+- name: Ensure Homebrew is installed
+  ansible.builtin.command:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: /opt/homebrew/bin/brew
+  when: ansible_facts['os_family'] == "Darwin"
+  become: false
+
+- name: Update Homebrew
+  community.general.homebrew:
+    update_homebrew: true
+  become: false
+
+- name: Install Homebrew formulae
+  community.general.homebrew:
+    name: "{{ brew_formulae }}"
+    state: present
+  become: false
+  ignore_errors: true
+  register: brew_formulae_result
+
+- name: Display formulae installation results
+  ansible.builtin.debug:
+    msg: "Some formulae may have failed to install. Check output above."
+  when: brew_formulae_result.failed | length > 0
+
+- name: Install Homebrew casks
+  community.general.homebrew_cask:
+    name: "{{ brew_casks }}"
+    state: present
+  become: false
+  ignore_errors: true
+  register: brew_casks_result
+
+- name: Display casks installation results
+  ansible.builtin.debug:
+    msg: "Some casks may have failed to install. Check output above."
+  when: brew_casks_result.failed | length > 0
