@@ -1,0 +1,29 @@
+---
+# Ansible Lint Configuration for Personal Dotfiles
+# Focus: Catch bugs, not enforce corporate style guides
+
+# Skip rules that are too strict for personal projects
+skip_list:
+  - var-naming[no-role-prefix]  # Don't need role prefixes in personal repo
+  - name[casing]                # Allow flexible task naming
+  - ignore-errors               # Sometimes you really do want to ignore errors
+  - yaml[line-length]           # Don't enforce line length limits
+  - no-handler                  # Using 'when: changed' is fine for simple playbooks
+
+# Warn instead of fail for these
+warn_list:
+  - experimental                # Warn about experimental features
+  - no-changed-when             # Helpful but not critical
+
+# Enable offline mode to avoid checking for unknown modules
+# (assumes you know your requirements.yml is correct)
+offline: false
+
+# Exclude certain paths
+exclude_paths:
+  - .github/
+  - .git/
+  - venv/
+
+# Use parseable format for CI
+# parseable: true

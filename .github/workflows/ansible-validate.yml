@@ -1,0 +1,88 @@
+name: Ansible Validation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'ansible/**/*.yml'
+      - 'ansible/**/*.yaml'
+      - 'ansible/.ansible-lint'
+      - '.github/workflows/ansible-validate.yml'
+  pull_request:
+    paths:
+      - 'ansible/**/*.yml'
+      - 'ansible/**/*.yaml'
+      - 'ansible/.ansible-lint'
+      - '.github/workflows/ansible-validate.yml'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  validate:
+    name: Validate Ansible Playbooks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Ansible and dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ansible ansible-lint
+
+      - name: Install Ansible collections
+        working-directory: ansible
+        run: |
+          ansible-galaxy collection install -r requirements.yml
+
+      - name: Run syntax check
+        working-directory: ansible
+        run: |
+          echo "::group::Syntax Check"
+          for playbook in playbooks/*.yml; do
+            echo "Checking $(basename "$playbook")..."
+            ansible-playbook "$playbook" --syntax-check
+          done
+          echo "::endgroup::"
+
+      - name: Run ansible-lint
+        working-directory: ansible
+        run: |
+          echo "::group::Ansible Lint"
+          ansible-lint playbooks/*.yml || {
+            # Check if it's just warnings (non-blocking)
+            if ansible-lint playbooks/*.yml 2>&1 | grep -q "Passed:"; then
+              echo "::warning::Ansible lint found warnings (non-blocking)"
+              exit 0
+            else
+              echo "::error::Ansible lint found critical issues"
+              exit 1
+            fi
+          }
+          echo "::endgroup::"
+
+      - name: Check for deprecation warnings
+        working-directory: ansible
+        run: |
+          echo "::group::Deprecation Check"
+          DEPRECATION_OUTPUT=$(ANSIBLE_DEPRECATION_WARNINGS=True ansible-playbook playbooks/backup.yml --check --tags formulae 2>&1 || true)
+          if echo "$DEPRECATION_OUTPUT" | grep -qi "deprecation"; then
+            echo "::warning::Deprecation warnings found (non-blocking):"
+            echo "$DEPRECATION_OUTPUT" | grep -i "deprecation"
+          else
+            echo "✓ No deprecation warnings found"
+          fi
+          echo "::endgroup::"
+
+      - name: Validation summary
+        if: success()
+        run: |
+          echo "::notice::✅ All Ansible validation checks passed!"
