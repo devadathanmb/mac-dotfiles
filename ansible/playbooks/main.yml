@@ -12,7 +12,7 @@
       tags: [homebrew, packages]
     - role: macos
       tags: [macos, defaults]
-    - role: shell
-      tags: [shell, zsh]
+    - role: zsh
+      tags: [zsh]
     - role: editors
       tags: [editors, vscode, cursor]
