@@ -118,7 +118,7 @@
 - name: Finder | Show ~/Library folder
   tags: [macos]
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/Library"
+    path: "{{ ansible_facts['env']['HOME'] }}/Library"
     state: directory
     mode: '0755'
   register: library_folder
@@ -126,14 +126,14 @@
 - name: Finder | Check if ~/Library folder is hidden
   tags: [macos]
   ansible.builtin.command:
-    cmd: "ls -ldO {{ ansible_env.HOME }}/Library"
+    cmd: "ls -ldO {{ ansible_facts['env']['HOME'] }}/Library"
   register: library_chflags
   changed_when: false
 
 - name: Finder | Remove hidden flag from ~/Library
   tags: [macos]
   ansible.builtin.command:
-    cmd: "chflags nohidden {{ ansible_env.HOME }}/Library"
+    cmd: "chflags nohidden {{ ansible_facts['env']['HOME'] }}/Library"
   when: "'hidden' in library_chflags.stdout"
 
 # ==============================================================================
@@ -428,7 +428,7 @@
 - name: Screenshots | Create Screenshots directory
   tags: [macos]
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/Pictures/Screenshots"
+    path: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
     state: directory
     mode: '0755'
 
@@ -438,7 +438,7 @@
     domain: com.apple.screencapture
     key: location
     type: string
-    value: "{{ ansible_env.HOME }}/Pictures/Screenshots"
+    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
 
 - name: Screenshots | Save screenshots in PNG format
   tags: [macos]
