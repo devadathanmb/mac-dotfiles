@@ -1,0 +1,59 @@
+---
+- name: Ensure Homebrew is installed (Apple Silicon)
+  ansible.builtin.command:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: /opt/homebrew/bin/brew
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - ansible_architecture == "arm64"
+  become: false
+
+- name: Ensure Homebrew is installed (Intel)
+  ansible.builtin.command:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: /usr/local/bin/brew
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - ansible_architecture != "arm64"
+  become: false
+
+- name: Update Homebrew
+  community.general.homebrew:
+    update_homebrew: true
+  become: false
+
+- name: Read Homebrew formulae from file
+  ansible.builtin.set_fact:
+    brew_formulae: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_packages.txt').splitlines() | reject('==', '') | list }}"
+
+- name: Read Homebrew casks from file
+  ansible.builtin.set_fact:
+    brew_casks: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_casks.txt').splitlines() | reject('==', '') | list }}"
+
+- name: Install Homebrew formulae
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ brew_formulae }}"
+  become: false
+  ignore_errors: true
+  register: brew_formulae_result
+
+- name: Report failed Homebrew formulae
+  ansible.builtin.debug:
+    msg: "Some Homebrew formulae failed to install: {{ brew_formulae_result.results | selectattr('failed', 'true') | map(attribute='item') | list }}"
+  when: brew_formulae_result.results is defined and (brew_formulae_result.results | selectattr('failed', 'true') | list | length) > 0
+
+- name: Install Homebrew casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ brew_casks }}"
+  become: false
+  ignore_errors: true
+  register: brew_casks_result
+
+- name: Report failed Homebrew casks
+  ansible.builtin.debug:
+    msg: "Some Homebrew casks failed to install: {{ brew_casks_result.results | selectattr('failed', 'true') | map(attribute='item') | list }}"
+  when: brew_casks_result.results is defined and (brew_casks_result.results | selectattr('failed', 'true') | list | length) > 0
