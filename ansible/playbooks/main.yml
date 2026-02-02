@@ -13,6 +13,6 @@
     - role: macos
       tags: [macos, defaults]
     - role: zsh
-      tags: [shell]
+      tags: [zsh]
     - role: editors
       tags: [editors, vscode, cursor]
