@@ -24,7 +24,7 @@ ansible-playbook playbooks/main.yml
 ansible-playbook playbooks/main.yml --tags dotbot     # Symlinks
 ansible-playbook playbooks/main.yml --tags homebrew   # Homebrew packages
 ansible-playbook playbooks/main.yml --tags macos      # macOS defaults
-ansible-playbook playbooks/main.yml --tags shell      # Shell (Zap ZSH)
+ansible-playbook playbooks/main.yml --tags zsh      # ZSH (Zap ZSH)
 ansible-playbook playbooks/main.yml --tags editors    # Editor extensions
 ansible-playbook playbooks/asdf.yml                   # ASDF (Python + Node.js)
 
