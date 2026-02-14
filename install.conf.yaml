@@ -30,6 +30,7 @@
     ~/.config/btop: configs/btop
     ~/.config/mpv: configs/mpv
     ~/.config/zed: configs/zed
+    ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.local/bin: scripts/*
     # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
