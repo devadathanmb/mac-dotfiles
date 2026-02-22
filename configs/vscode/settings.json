@@ -1477,12 +1477,20 @@
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "terminal.integrated.defaultProfile.osx": "fish",
-  "python.defaultInterpreterPath": "/Users/devadathanmb/.local/bin/python3.9",
+  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "chat.tools.urls.autoApprove": {
     "https://github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://developers.raycast.com/basics/getting-started": {
+      "approveRequest": true,
+      "approveResponse": false
+    },
+    "https://developers.raycast.com": {
       "approveRequest": false,
       "approveResponse": true
     }
