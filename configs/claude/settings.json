@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm audit:*)",
+      "Bash(npm update:*)",
+      "Bash(npm info:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run format:check:*)",
+      "Bash(git rev-parse --short HEAD)",
+      "Bash(git remote get-url origin)",
+      "Bash(npm run build)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "plan"
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "model": "opus"
+}
