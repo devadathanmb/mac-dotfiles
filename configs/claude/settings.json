@@ -20,7 +20,6 @@
     "swift-lsp@claude-plugins-official": true,
     "learning-output-style@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -31,6 +30,5 @@
       }
     }
   },
-  "skipDangerousModePermissionPrompt": true,
-  "model": "opus"
+  "skipDangerousModePermissionPrompt": true
 }
