@@ -6,8 +6,9 @@ burp-suite
 calibre
 claude
 claude-code
+codex
+codex-app
 copilot-cli
-cursor
 discord
 font-commit-mono-nerd-font
 font-fira-code
@@ -37,7 +38,6 @@ spotify
 stats
 superwhisper
 tailscale-app
-telegram
 visual-studio-code
 zed
 zen
