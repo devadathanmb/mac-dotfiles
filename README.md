@@ -2,7 +2,7 @@
 
 > Hello, welcome $HOME
 
-Personal dotfiles repository for macOS, managed with [Ansible](https://docs.ansible.com/) orchestrating [Dotbot](https://github.com/deadc0de6/dotbot) for symlinks.
+Personal dotfiles repository for macOS, managed with [Ansible](https://docs.ansible.com/) orchestrating [Dotbot](https://github.com/anishathalye/dotbot) for symlinks.
 
 ## Quick Start
 
