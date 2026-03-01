@@ -147,7 +147,32 @@
       }
     }
   },
-   "experimental": {
-    "disable_paste_summary": true,
+  "experimental": {
+    "disable_paste_summary": true
   },
+  "permission": {
+    "bash": {
+      "gh * create*": "deny",
+      "gh * edit*": "deny",
+      "git push *--force": "ask",
+      "git push *--force *": "ask",
+      "git push -f": "ask",
+      "git push -f *": "ask",
+      "git push * -f": "ask",
+      "git push * -f *": "ask",
+      "git push +*": "ask",
+      "git push * +*": "ask",
+      "git branch -D": "ask",
+      "git branch -D *": "ask",
+      "git push --delete *": "ask",
+      "git push * --delete *": "ask",
+      "git reset --hard": "ask",
+      "git reset --hard *": "ask",
+      "git clean -f *": "ask",
+      "git clean -fd *": "ask",
+      "git clean -fdx *": "ask",
+      "rm *": "ask",
+      "sudo *": "ask"
+    }
+  }
 }
