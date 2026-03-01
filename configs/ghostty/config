@@ -80,7 +80,8 @@ keybind = alt+right=unbind
 theme=GitHub Dark High Contrast
 
 palette = 0=#000000
+palette = 8=#6e7681
 
 # Boost contrast significantly for better visibility
-minimum-contrast = 1.5
+# minimum-contrast = 1
 keybind = shift+enter=text:\x1b\r
