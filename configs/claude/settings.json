@@ -10,8 +10,31 @@
       "Bash(git remote get-url origin)",
       "Bash(npm run build)"
     ],
-    "deny": [],
-    "ask": [],
+    "deny": [
+      "Bash(gh * create*)",
+      "Bash(gh * edit*)"
+    ],
+    "ask": [
+      "Bash(git push *--force)",
+      "Bash(git push *--force *)",
+      "Bash(git push -f)",
+      "Bash(git push -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git push +*)",
+      "Bash(git push * +*)",
+      "Bash(git branch -D)",
+      "Bash(git branch -D *)",
+      "Bash(git push --delete *)",
+      "Bash(git push * --delete *)",
+      "Bash(git reset --hard)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -f *)",
+      "Bash(git clean -fd *)",
+      "Bash(git clean -fdx *)",
+      "Bash(rm *)",
+      "Bash(sudo *)"
+    ],
     "defaultMode": "plan"
   },
   "enabledPlugins": {

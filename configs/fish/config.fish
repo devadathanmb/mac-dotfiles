@@ -19,3 +19,6 @@ source ~/.config/fish/custom/external_tool_configs.fish
 
 # Init zoxide
 zoxide init fish | source
+
+# Created by `pipx` on 2026-02-28 12:47:03
+set PATH $PATH /Users/devadathanmb/Library/Python/3.9/bin
