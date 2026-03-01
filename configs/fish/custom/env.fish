@@ -1,6 +1,6 @@
 # Environment Variables
 set -gx GPG_TTY (tty)
-set -gx FZF_DEFAULT_OPTS --height=50%
+set -gx FZF_DEFAULT_OPTS "--bind=tab:down,shift-tab:up,ctrl-space:toggle,ctrl-u:preview-up,ctrl-d:preview-down --height=50%"
 set -gx PGTZ Asia/Kolkata
 set -gx PATH $PATH ~/go/bin
 set -gx LANG 'en_US.UTF-8'

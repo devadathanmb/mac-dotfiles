@@ -5,9 +5,6 @@ else
     set _asdf_shims "$ASDF_DATA_DIR/shims"
 end
 
-# Do not use fish_add_path (added in Fish 3.2) because it
-# potentially changes the order of items in PATH
-if not contains $_asdf_shims $PATH
-    set -gx --prepend PATH $_asdf_shims
-end
+# Keep asdf shims first in PATH so shimmed binaries win over system ones.
+set -gx PATH $_asdf_shims (string match -v -- $_asdf_shims $PATH)
 set --erase _asdf_shims
