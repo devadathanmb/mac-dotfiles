@@ -18,7 +18,7 @@
     ~/.p10k.zsh: .p10k.zsh
     ~/.gitconfig: .gitconfig
     ~/.zshrc: .zshrc
-    ~/.config/fish: .configs/fish
+    ~/.config/fish: configs/fish
     ~/.zprofile: .zprofile
     ~/.config/gh: configs/gh
     ~/.config/zsh: configs/zsh
@@ -31,7 +31,9 @@
     ~/.config/mpv: configs/mpv
     ~/.config/zed: configs/zed
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
-    ~/.local/bin: scripts/*
+    ~/.local/bin/:
+      glob: true
+      path: scripts/*
     # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
@@ -39,6 +41,7 @@
 
     "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
     "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
+    "~/Library/Application Support/zoxide": configs/zoxide
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
