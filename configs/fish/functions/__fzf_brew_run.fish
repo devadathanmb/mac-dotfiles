@@ -23,20 +23,34 @@ function __fzf_brew_run --argument-names action kind --description "Run brew act
         return 0
     end
 
-    # Execute the appropriate brew command based on action and kind.
-    # We use 'command' to bypass any shell aliases/functions.
+    # Build the final brew command once so interactive shells can inject the
+    # exact command line into the prompt before execution.
+    set -l brew_args brew
     switch $action
         case install
             if test "$kind" = cask
-                command brew install --cask $selection
+                set -a brew_args install --cask $selection
             else
-                command brew install $selection
+                set -a brew_args install $selection
             end
         case uninstall
             if test "$kind" = cask
-                command brew uninstall --cask $selection
+                set -a brew_args uninstall --cask $selection
             else
-                command brew uninstall $selection
+                set -a brew_args uninstall $selection
             end
     end
+
+    # In interactive fish sessions, replace the prompt buffer so the user sees
+    # the expanded brew command as the command being executed.
+    if status is-interactive
+        set -l brew_cmd (string join ' ' (string escape --style=script -- $brew_args))
+        commandline -r $brew_cmd
+        commandline -f repaint execute
+        return 0
+    end
+
+    # Non-interactive sessions (tests, scripts) cannot edit the command line,
+    # so execute directly. We use 'command' to bypass shell aliases/functions.
+    command $brew_args
 end
