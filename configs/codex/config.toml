@@ -1,0 +1,19 @@
+personality = "pragmatic"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+service_tier = "fast"
+
+[mcp_servers.context7-mcp]
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.grep]
+url = "https://mcp.grep.app"
+
+[mcp_servers.deepwiki]
+url = "https://mcp.deepwiki.com/mcp"
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp"
+
+[tui]
+status_line = ["model-with-reasoning", "context-remaining", "current-dir", "git-branch", "five-hour-limit", "weekly-limit", "context-window-size", "used-tokens"]

@@ -9,3 +9,4 @@ untracked/*
 .cursor/*
 .claude/*
 .sisyphus/*
+configs/zoxide/db.zo
