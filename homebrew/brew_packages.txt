@@ -1,10 +1,10 @@
 ada-url
-aiven-client
 ansible
 ansible-lint
 aom
 asciinema
 asdf
+ast-grep
 atuin
 awscli
 bash
@@ -50,7 +50,6 @@ gemini-cli
 gettext
 gh
 giflib
-git
 git-delta
 git-filter-repo
 gitleaks
@@ -77,7 +76,6 @@ icu4c@77
 icu4c@78
 imagemagick
 imath
-ipython
 jpeg-turbo
 jpeg-xl
 jq
@@ -104,7 +102,6 @@ libgcrypt
 libgit2
 libgpg-error
 libheif
-libiconv
 libidn2
 libksba
 liblinear
@@ -152,6 +149,7 @@ lz4
 lzo
 m4
 minikube
+mole
 molten-vk
 mpdecimal
 mpfr
