@@ -25,7 +25,6 @@ http-toolkit
 iterm2
 jordanbaird-ice
 localsend
-ngrok
 obsidian
 onlyoffice
 paper
