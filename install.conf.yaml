@@ -40,7 +40,7 @@
     ~/.agents/skills: configs/agents/skills
     ~/.local/bin/:
       glob: true
-      path: scripts/*
+      path: scripts/*/*
     # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
 
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
