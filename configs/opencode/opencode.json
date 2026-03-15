@@ -126,30 +126,6 @@
           }
         }
       }
-    },
-    "nanogpt": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "NanoGPT",
-      "options": {
-        "baseURL": "https://nano-gpt.com/api/v1"
-      },
-      "models": {
-        "zai-org/glm-4.7:thinking": {
-          "name": "GLM 4.7 Thinking",
-        },
-        "zai-org/glm-5:thinking": {
-          "name": "GLM 5 Thinking",
-        },
-        "moonshotai/kimi-k2.5:thinking": {
-          "name": "Kimi K2.5 Thinking",
-        },
-        "deepseek/deepseek-v3.2": {
-          "name": "DeepSeek V3.2"
-        },
-        "deepseek/deepseek-v3.2:thinking": {
-          "name": "DeepSeek V3.2 Thinking"
-        }
-      }
     }
   },
   "experimental": {

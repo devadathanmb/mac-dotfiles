@@ -1,7 +1,6 @@
 personality = "pragmatic"
 model = "gpt-5.4"
-model_reasoning_effort = "high"
-service_tier = "fast"
+model_reasoning_effort = "medium"
 
 [mcp_servers.context7-mcp]
 url = "https://mcp.context7.com/mcp"
@@ -17,3 +16,20 @@ url = "https://mcp.exa.ai/mcp"
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir", "git-branch", "five-hour-limit", "weekly-limit", "context-window-size", "used-tokens"]
+
+[projects."/Users/devadathanmb/repos/raycast-smithery"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/.codex"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/.opencode"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/.mac-dots"]
+trust_level = "trusted"
+
+[features]
+js_repl = true
+multi_agent = true
+prevent_idle_sleep = true
