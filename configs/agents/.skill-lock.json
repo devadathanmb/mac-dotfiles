@@ -60,6 +60,8 @@
     "github-copilot",
     "kimi-cli",
     "opencode",
-    "antigravity"
+    "warp",
+    "antigravity",
+    "claude-code"
   ]
 }
