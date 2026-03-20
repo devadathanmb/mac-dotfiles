@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import re
 import subprocess
 import sys
+import zipfile
+from functools import lru_cache
 from pathlib import Path
 from shutil import which
 from typing import Any, Iterable, Sequence
@@ -48,8 +51,14 @@ REDIRECTED_OUTPUT_PATTERNS = (
     r">\s*result\.\w+",
 )
 
-DEFAULT_MAX_LINES = 160
+DEFAULT_MAX_LINES = 100
 DEFAULT_CONTEXT_LINES = 30
+DEFAULT_MAX_FAILURES = 3
+
+# When set, overrides the repo slug derived from the local git context.
+# Used for cross-repo inspection (e.g. the agent is in repo A but inspecting repo B's CI).
+_REPO_SLUG_OVERRIDE: str | None = None
+
 PENDING_LOG_MARKERS = (
     "still in progress",
     "log will be available when it is complete",
@@ -86,8 +95,8 @@ def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Inspect failing GitHub PR checks, fetch GitHub Actions logs, and extract a "
-            "failure snippet."
+            "Inspect failing GitHub Actions checks from a PR, run, job, or Actions URL "
+            "and extract actionable failure context."
         ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -97,10 +106,33 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--pr", default=None, help="PR number or URL (defaults to current branch PR)."
     )
+    parser.add_argument("--run", default=None, help="GitHub Actions run id.")
+    parser.add_argument("--job", default=None, help="GitHub Actions job id.")
+    parser.add_argument(
+        "--url",
+        default=None,
+        help="GitHub Actions run/job URL or PR URL. Useful when pasting a failing check link.",
+    )
     parser.add_argument("--max-lines", type=int, default=DEFAULT_MAX_LINES)
     parser.add_argument("--context", type=int, default=DEFAULT_CONTEXT_LINES)
     parser.add_argument(
         "--json", action="store_true", help="Emit JSON instead of text output."
+    )
+    parser.add_argument(
+        "--max-failures",
+        type=int,
+        default=DEFAULT_MAX_FAILURES,
+        help="Maximum number of failing jobs to analyze per run.",
+    )
+    parser.add_argument(
+        "--repo-slug",
+        default=None,
+        metavar="OWNER/REPO",
+        help=(
+            "Override the repository slug used for GitHub API calls "
+            "(e.g. 'owner/repo-name'). Use when inspecting a repo "
+            "different from the one your current directory belongs to."
+        ),
     )
     return parser.parse_args()
 
@@ -115,37 +147,125 @@ def main() -> int:
     if not ensure_gh_available(repo_root):
         return 1
 
-    pr_value = resolve_pr(args.pr, repo_root)
-    if pr_value is None:
-        return 1
+    # Resolve the repo slug early so all subsequent API calls use the right repo.
+    # Priority: explicit --repo-slug > slug extracted from any GitHub URL > local git context.
+    global _REPO_SLUG_OVERRIDE
+    if args.repo_slug:
+        _REPO_SLUG_OVERRIDE = args.repo_slug
+    else:
+        for url_candidate in filter(None, [args.url, args.pr]):
+            slug = extract_repo_from_url(str(url_candidate))
+            if slug:
+                _REPO_SLUG_OVERRIDE = slug
+                break
 
-    checks = fetch_checks(pr_value, repo_root)
-    if checks is None:
-        return 1
+    run_id, job_id, pr_value = resolve_explicit_target(
+        pr_value=args.pr,
+        run_value=args.run,
+        job_value=args.job,
+        url_value=args.url,
+    )
 
-    failing = [c for c in checks if is_failing(c)]
-    if not failing:
-        print(f"PR #{pr_value}: no failing checks detected.")
-        return 0
+    results: list[dict[str, Any]]
+    target_label: str
 
-    results = []
-    for check in failing:
-        results.append(
-            analyze_check(
-                check,
+    if job_id:
+        results = [
+            analyze_job(
+                job_id=job_id,
                 repo_root=repo_root,
                 max_lines=max(1, args.max_lines),
                 context=max(1, args.context),
                 pr_value=pr_value,
+                run_id=run_id,
+                details_url=args.url,
             )
+        ]
+        target_label = f"job {job_id}"
+    elif run_id:
+        results = analyze_run(
+            run_id=run_id,
+            repo_root=repo_root,
+            max_lines=max(1, args.max_lines),
+            context=max(1, args.context),
+            pr_value=pr_value,
+            prefer_url=args.url,
+            max_failures=args.max_failures,
         )
+        target_label = f"run {run_id}"
+    else:
+        pr_value = resolve_pr(pr_value, repo_root)
+        if pr_value is None:
+            return 1
+
+        checks = fetch_checks(pr_value, repo_root)
+        if checks is None:
+            return 1
+
+        failing = [c for c in checks if is_failing(c)][: args.max_failures]
+        if not failing:
+            print(f"PR #{pr_value}: no failing checks detected.")
+            return 0
+
+        results = []
+        for check in failing:
+            results.append(
+                analyze_check(
+                    check,
+                    repo_root=repo_root,
+                    max_lines=max(1, args.max_lines),
+                    context=max(1, args.context),
+                    pr_value=pr_value,
+                )
+            )
+        target_label = f"PR #{pr_value}"
+
+    failing_results = [result for result in results if result_indicates_failure(result)]
+    if not failing_results:
+        print(f"{target_label}: no failing GitHub Actions jobs detected.")
+        return 0
 
     if args.json:
-        print(json.dumps({"pr": pr_value, "results": results}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "target": target_label,
+                    "pr": pr_value,
+                    "runId": run_id,
+                    "jobId": job_id,
+                    "results": failing_results,
+                },
+                indent=2,
+            )
+        )
     else:
-        render_results(pr_value, results)
+        render_results(target_label, failing_results)
 
     return 1
+
+
+def resolve_explicit_target(
+    *,
+    pr_value: str | None,
+    run_value: str | None,
+    job_value: str | None,
+    url_value: str | None,
+) -> tuple[str | None, str | None, str | None]:
+    run_id = run_value
+    job_id = job_value
+    resolved_pr = pr_value
+
+    if url_value:
+        extracted_run_id = extract_run_id(url_value)
+        extracted_job_id = extract_job_id(url_value)
+        extracted_pr = extract_pr_number(url_value)
+        run_id = run_id or extracted_run_id
+        job_id = job_id or extracted_job_id
+        resolved_pr = resolved_pr or extracted_pr
+        if run_id is None and job_id is None and extracted_pr and pr_value is None:
+            return None, None, extracted_pr
+
+    return run_id, job_id, resolved_pr
 
 
 def find_git_root(start: Path) -> Path | None:
@@ -260,6 +380,19 @@ def is_failing(check: dict[str, Any]) -> bool:
     return bucket in FAILURE_BUCKETS
 
 
+def is_failing_job(job: dict[str, Any]) -> bool:
+    conclusion = normalize_field(job.get("conclusion"))
+    if conclusion in FAILURE_CONCLUSIONS:
+        return True
+    status = normalize_field(job.get("status"))
+    return status in FAILURE_STATES
+
+
+def result_indicates_failure(result: dict[str, Any]) -> bool:
+    status = normalize_field(result.get("status"))
+    return status not in {"external", "skipped"}
+
+
 def analyze_check(
     check: dict[str, Any],
     repo_root: Path,
@@ -307,7 +440,6 @@ def analyze_check(
     base["status"] = "ok"
     base["run"] = metadata or {}
     base["logSnippet"] = snippet
-    base["logTail"] = tail_lines(log_text, max_lines)
 
     # Detect when the failing command redirected its output to a file.
     # The actual failure detail won't be in the log — surface alternative sources.
@@ -332,6 +464,127 @@ def analyze_check(
     return base
 
 
+def analyze_run(
+    *,
+    run_id: str,
+    repo_root: Path,
+    max_lines: int,
+    context: int,
+    pr_value: str | None = None,
+    prefer_url: str | None = None,
+    max_failures: int = DEFAULT_MAX_FAILURES,
+) -> list[dict[str, Any]]:
+    metadata = fetch_run_metadata(run_id, repo_root) or {}
+    jobs = fetch_run_jobs(run_id, repo_root)
+    failing_jobs = [job for job in jobs if is_failing_job(job)][:max_failures]
+
+    if failing_jobs:
+        return [
+            analyze_job(
+                job_id=str(job.get("id")),
+                repo_root=repo_root,
+                max_lines=max_lines,
+                context=context,
+                pr_value=pr_value,
+                run_id=run_id,
+                job_data=job,
+                details_url=job.get("html_url") or prefer_url,
+            )
+            for job in failing_jobs
+            if job.get("id")
+        ]
+
+    log_text, log_error, log_status = fetch_check_log(
+        run_id=run_id,
+        job_id=None,
+        repo_root=repo_root,
+    )
+    result: dict[str, Any] = {
+        "name": metadata.get("workflowName") or metadata.get("name") or f"run {run_id}",
+        "detailsUrl": prefer_url or metadata.get("url") or "",
+        "runId": run_id,
+        "jobId": None,
+        "run": metadata,
+    }
+
+    if log_status == "pending":
+        result["status"] = "log_pending"
+        result["note"] = log_error or "Logs are not available yet."
+        return [result]
+
+    if log_error:
+        result["status"] = "log_unavailable"
+        result["error"] = log_error
+        return [result]
+
+    result["status"] = "ok"
+    result["logSnippet"] = extract_failure_snippet(
+        log_text, max_lines=max_lines, context=context
+    )
+    if has_redirected_output(log_text):
+        enrich_redirected_output(
+            result,
+            log_text=log_text,
+            run_id=run_id,
+            repo_root=repo_root,
+            pr_value=pr_value,
+        )
+    return [result]
+
+
+def analyze_job(
+    *,
+    job_id: str,
+    repo_root: Path,
+    max_lines: int,
+    context: int,
+    pr_value: str | None = None,
+    run_id: str | None = None,
+    job_data: dict[str, Any] | None = None,
+    details_url: str | None = None,
+) -> dict[str, Any]:
+    job = job_data or fetch_job_metadata(job_id, repo_root) or {}
+    resolved_run_id = run_id or extract_run_id(details_url or "") or derive_run_id_from_job(
+        job, repo_root
+    )
+    metadata = fetch_run_metadata(resolved_run_id, repo_root) if resolved_run_id else None
+
+    base: dict[str, Any] = {
+        "name": job.get("name") or f"job {job_id}",
+        "detailsUrl": details_url or job.get("html_url") or "",
+        "runId": resolved_run_id,
+        "jobId": job_id,
+        "run": metadata or {},
+        "job": {
+            k: job[k]
+            for k in ("conclusion", "status", "started_at", "completed_at", "name")
+            if k in job
+        },
+    }
+
+    log_text, log_error = fetch_job_log(job_id, repo_root)
+    if log_error and is_log_pending_message(log_error):
+        base["status"] = "log_pending"
+        base["note"] = log_error
+        return base
+    if log_error:
+        base["status"] = "log_unavailable"
+        base["error"] = log_error
+        return base
+
+    base["status"] = "ok"
+    base["logSnippet"] = extract_failure_snippet(log_text, max_lines=max_lines, context=context)
+    if has_redirected_output(log_text) and resolved_run_id:
+        enrich_redirected_output(
+            base,
+            log_text=log_text,
+            run_id=resolved_run_id,
+            repo_root=repo_root,
+            pr_value=pr_value,
+        )
+    return base
+
+
 def extract_run_id(url: str) -> str | None:
     if not url:
         return None
@@ -349,6 +602,15 @@ def extract_job_id(url: str) -> str | None:
     if match:
         return match.group(1)
     match = re.search(r"/job/(\d+)", url)
+    if match:
+        return match.group(1)
+    return None
+
+
+def extract_pr_number(url: str) -> str | None:
+    if not url:
+        return None
+    match = re.search(r"/pull/(\d+)", url)
     if match:
         return match.group(1)
     return None
@@ -379,24 +641,81 @@ def fetch_run_metadata(run_id: str, repo_root: Path) -> dict[str, Any] | None:
     return data
 
 
+def fetch_run_jobs(run_id: str, repo_root: Path) -> list[dict[str, Any]]:
+    repo_slug = fetch_repo_slug(repo_root)
+    if not repo_slug:
+        return []
+    endpoint = f"/repos/{repo_slug}/actions/runs/{run_id}/jobs?per_page=100"
+    result = run_gh_command(["api", endpoint], cwd=repo_root)
+    if result.returncode != 0:
+        return []
+    try:
+        data = json.loads(result.stdout or "{}")
+    except json.JSONDecodeError:
+        return []
+    jobs = data.get("jobs", [])
+    return jobs if isinstance(jobs, list) else []
+
+
+def fetch_job_metadata(job_id: str, repo_root: Path) -> dict[str, Any] | None:
+    repo_slug = fetch_repo_slug(repo_root)
+    if not repo_slug:
+        return None
+    endpoint = f"/repos/{repo_slug}/actions/jobs/{job_id}"
+    result = run_gh_command(["api", endpoint], cwd=repo_root)
+    if result.returncode != 0:
+        return None
+    try:
+        data = json.loads(result.stdout or "{}")
+    except json.JSONDecodeError:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def derive_run_id_from_job(job: dict[str, Any], repo_root: Path) -> str | None:
+    html_url = str(job.get("html_url") or "")
+    run_id = extract_run_id(html_url)
+    if run_id:
+        return run_id
+
+    check_run_url = str(job.get("check_run_url") or "")
+    match = re.search(r"/check-runs/(\d+)", check_run_url)
+    if not match:
+        return None
+
+    repo_slug = fetch_repo_slug(repo_root)
+    if not repo_slug:
+        return None
+    endpoint = f"/repos/{repo_slug}/check-runs/{match.group(1)}"
+    result = run_gh_command(["api", endpoint], cwd=repo_root)
+    if result.returncode != 0:
+        return None
+    try:
+        data = json.loads(result.stdout or "{}")
+    except json.JSONDecodeError:
+        return None
+    details_url = str(data.get("details_url") or "")
+    return extract_run_id(details_url)
+
+
 def fetch_check_log(
     run_id: str,
     job_id: str | None,
     repo_root: Path,
 ) -> tuple[str, str, str]:
-    log_text, log_error = fetch_run_log(run_id, repo_root)
-    if not log_error:
-        return log_text, "", "ok"
-
-    if is_log_pending_message(log_error) and job_id:
+    if job_id:
         job_log, job_error = fetch_job_log(job_id, repo_root)
         if job_log:
             return job_log, "", "ok"
         if job_error and is_log_pending_message(job_error):
             return "", job_error, "pending"
+
         if job_error:
             return "", job_error, "error"
-        return "", log_error, "pending"
+
+    log_text, log_error = fetch_run_log(run_id, repo_root)
+    if not log_error:
+        return log_text, "", "ok"
 
     if is_log_pending_message(log_error):
         return "", log_error, "pending"
@@ -424,11 +743,45 @@ def fetch_job_log(job_id: str, repo_root: Path) -> tuple[str, str]:
         message = (stderr or stdout_bytes.decode(errors="replace")).strip()
         return "", message or "gh api job logs failed"
     if is_zip_payload(stdout_bytes):
+        extracted = extract_text_from_zip(stdout_bytes)
+        if extracted:
+            return extracted, ""
         return "", "Job logs returned a zip archive; unable to parse."
     return stdout_bytes.decode(errors="replace"), ""
 
 
+def extract_text_from_zip(payload: bytes) -> str:
+    try:
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            text_chunks = []
+            for name in archive.namelist():
+                if name.endswith("/"):
+                    continue
+                with archive.open(name) as handle:
+                    text_chunks.append(handle.read().decode(errors="replace"))
+            return "\n".join(chunk for chunk in text_chunks if chunk)
+    except zipfile.BadZipFile:
+        return ""
+
+
+def extract_repo_from_url(url: str) -> str | None:
+    """Parse owner/repo from a GitHub URL (PR, Actions run/job, or bare repo URL)."""
+    if not url:
+        return None
+    match = re.search(r"github\.com/([^/]+)/([^/?#]+)", url)
+    if match:
+        return f"{match.group(1)}/{match.group(2)}"
+    return None
+
+
 def fetch_repo_slug(repo_root: Path) -> str | None:
+    if _REPO_SLUG_OVERRIDE is not None:
+        return _REPO_SLUG_OVERRIDE
+    return _fetch_repo_slug_from_git(repo_root)
+
+
+@lru_cache(maxsize=None)
+def _fetch_repo_slug_from_git(repo_root: Path) -> str | None:
     result = run_gh_command(["repo", "view", "--json", "nameWithOwner"], cwd=repo_root)
     if result.returncode != 0:
         return None
@@ -485,6 +838,30 @@ def has_redirected_output(log_text: str) -> bool:
         if re.search(pattern, log_text):
             return True
     return False
+
+
+def enrich_redirected_output(
+    result: dict[str, Any],
+    *,
+    log_text: str,
+    run_id: str,
+    repo_root: Path,
+    pr_value: str | None,
+) -> None:
+    result["redirectedOutputWarning"] = (
+        "The failing command redirected its output to a file. "
+        "The log snippet may not contain the real failure detail."
+    )
+    artifacts = fetch_run_artifacts(run_id, repo_root)
+    if artifacts:
+        result["artifacts"] = [
+            {"name": a.get("name"), "id": a.get("id"), "expired": a.get("expired")}
+            for a in artifacts
+        ]
+    if pr_value:
+        bot_comments = fetch_pr_bot_comments(pr_value, repo_root)
+        if bot_comments:
+            result["latestBotComment"] = bot_comments[0][:4000]
 
 
 def fetch_pr_bot_comments(pr_value: str, repo_root: Path) -> list[str]:
@@ -556,16 +933,9 @@ def find_failure_index(lines: Sequence[str]) -> int | None:
     return None
 
 
-def tail_lines(text: str, max_lines: int) -> str:
-    if max_lines <= 0:
-        return ""
-    lines = text.splitlines()
-    return "\n".join(lines[-max_lines:])
-
-
-def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
+def render_results(target_label: str, results: Iterable[dict[str, Any]]) -> None:
     results_list = list(results)
-    print(f"PR #{pr_number}: {len(results_list)} failing checks analyzed.")
+    print(f"{target_label}: {len(results_list)} failing checks analyzed.")
     for result in results_list:
         print("-" * 60)
         print(f"Check: {result.get('name', '')}")
@@ -591,6 +961,16 @@ def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
                 print(f"Branch/SHA: {branch} {sha}")
             if run_meta.get("url"):
                 print(f"Run URL: {run_meta['url']}")
+
+        job_meta = result.get("job", {})
+        if job_meta:
+            conclusion = job_meta.get("conclusion") or job_meta.get("status") or ""
+            started_at = job_meta.get("started_at") or ""
+            completed_at = job_meta.get("completed_at") or ""
+            if conclusion:
+                print(f"Job Conclusion: {conclusion}")
+            if started_at or completed_at:
+                print(f"Job Timing: {started_at} -> {completed_at}")
 
         if result.get("note"):
             print(f"Note: {result['note']}")
