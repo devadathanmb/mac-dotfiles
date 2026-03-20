@@ -14,9 +14,23 @@
   },
   "custom-ui-style.webview.enable": true,
   "custom-ui-style.webview.removeCSP": true,
+  "custom-ui-style.webview.monospaceSelector": [
+    "html",
+    "body",
+    "body *",
+    "input",
+    "textarea",
+    "[contenteditable='true']",
+    "pre",
+    "code"
+  ],
+  "custom-ui-style.webview.sansSerifSelector": [],
   "custom-ui-style.webview.stylesheet": {
     "html, body, body *": {
       "letter-spacing": "-0.80px !important",
+    },
+    "input, textarea, [contenteditable='true']": {
+      "font-family": "var(--cus-monospace-font) !important",
     },
   },
   // Relative numbering
