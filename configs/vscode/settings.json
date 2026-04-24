@@ -1489,6 +1489,7 @@
     "scminput": false,
   },
   "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
     "*.md": "markdownEditorOptimized.editor",
     "*.markdown": "markdownEditorOptimized.editor",
     "*.mdx": "markdownEditorOptimized.editor",
@@ -1508,6 +1509,9 @@
     "chat-editing-text-model:**/*.md": "default",
     "chat-editing-text-model:**/*.markdown": "default",
     "chat-editing-text-model:**/*.mdx": "default",
-    "chat-editing-text-model:**/*.mdc": "default"
+    "chat-editing-text-model:**/*.mdc": "default",
+    "/Users/devadathanmb/Library/Application Support/Code/User/settings.json": "default"
   },
+  "claudeCode.preferredLocation": "panel",
+  "diffEditor.renderSideBySide": false,
 }
