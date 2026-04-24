@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: 'Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping'
+description: 'Creates git commits with well-formed conventional commit messages. Use whenever the user wants to commit changes, asks for a commit message, or mentions "/commit". Reads the actual diff, proposes a message, confirms with the user, then commits.'
 license: MIT
 allowed-tools: Bash
 ---
@@ -9,42 +9,34 @@ allowed-tools: Bash
 
 ## Overview
 
-Create standardized, semantic git commits using the Conventional Commits specification. Analyze the actual diff to determine appropriate type, scope, and message.
+Create standardized, semantic git commits using the Conventional Commits specification. Analyze the actual diff to determine the appropriate type and message.
 
 ## Conventional Commit Format
 
 ```
-<type>[optional scope]: <description>
+<type>(<scope>): <description>
 
 [optional body]
 
 [optional footer(s)]
 ```
 
+The scope is required and should be derived from the diff — use the component, module, directory, or area being changed (e.g., `auth`, `ui`, `api`, `config`, `deps`).
+
 ## Commit Types
 
-| Type       | Purpose                        |
-| ---------- | ------------------------------ |
-| `feat`     | New feature                    |
-| `fix`      | Bug fix                        |
-| `docs`     | Documentation only             |
-| `style`    | Formatting/style (no logic)    |
-| `refactor` | Code refactor (no feature/fix) |
-| `perf`     | Performance improvement        |
-| `test`     | Add/update tests               |
-| `build`    | Build system/dependencies      |
-| `ci`       | CI/config changes              |
-| `chore`    | Maintenance/misc               |
-| `revert`   | Revert commit                  |
+| Type        | Purpose                          |
+| ----------- | -------------------------------- |
+| `feat`      | New feature                      |
+| `fix`       | Bug fix                          |
+| `refactor`  | Code refactor (no feature/fix)   |
+| `chore`     | Maintenance, deps, config, misc  |
 
 ## Breaking Changes
 
 ```
-# Exclamation mark after type/scope
-feat!: remove deprecated endpoint
-
 # BREAKING CHANGE footer
-feat: allow config to extend other configs
+feat(config): allow config to extend other configs
 
 BREAKING CHANGE: `extends` key behavior changed
 ```
@@ -87,22 +79,33 @@ git add -p
 Analyze the diff to determine:
 
 - **Type**: What kind of change is this?
-- **Scope**: What area/module is affected?
-- **Description**: One-line summary of what changed (present tense, imperative mood, <72 chars)
+- **Scope**: What area, module, or component does this change affect? Derive from the diff — look at the files changed and identify the logical grouping (e.g., `auth`, `ui`, `api`, `config`, `deps`). Keep it short and lowercase.
+- **Subject line**: A single descriptive line that clearly explains *what* is being changed. Be specific and verbose enough that someone reading the git log immediately understands the change without needing to look at the diff. Don't be vague — "fix bug" is bad, "fix null pointer crash when user profile image is missing" is good. No length limit, but it must remain a single line.
+- **Body**: Explain *what exactly* was changed — which files, functions, logic, or behavior was modified and how. This is where you elaborate on the subject. Every commit should have a body unless the change is completely trivial.
 
-### 4. Execute Commit
+### 4. Confirm with User
+
+Before committing, show the proposed message to the user and ask for confirmation:
+
+```
+Proposed commit message:
+
+  <type>(<scope>): <descriptive subject line>
+
+  <body explaining what exactly was changed>
+
+Proceed with this commit? (yes to confirm, or provide edits)
+```
+
+Wait for the user to confirm or request changes. Apply any edits they provide before committing.
+
+### 5. Execute Commit
 
 ```bash
-# Single line
-git commit -m "<type>[scope]: <description>"
-
-# Multi-line with body/footer
 git commit -m "$(cat <<'EOF'
-<type>[scope]: <description>
+<type>(<scope>): <descriptive subject line>
 
-<optional body>
-
-<optional footer>
+<body explaining what exactly was changed>
 EOF
 )"
 ```
@@ -112,8 +115,9 @@ EOF
 - One logical change per commit
 - Present tense: "add" not "added"
 - Imperative mood: "fix bug" not "fixes bug"
-- Reference issues: `Closes #123`, `Refs #456`
-- Keep description under 72 characters
+- Subject line should be specific enough to understand the change from git log alone — verbose is fine
+- Body should describe exactly what was changed: which functions, files, or behaviors, and how
+- Reference issues in the body: `Closes #123`, `Refs #456`
 
 ## Git Safety Protocol
 
