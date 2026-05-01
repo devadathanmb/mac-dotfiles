@@ -44,7 +44,7 @@ function __fzf_brew_run --argument-names action kind --description "Run brew act
     # In interactive fish sessions, replace the prompt buffer so the user sees
     # the expanded brew command as the command being executed.
     if status is-interactive
-        set -l brew_cmd (string join ' ' (string escape --style=script -- $brew_args))
+        set -l brew_cmd (string join -- ' ' (string escape --style=script -- $brew_args))
         commandline -r $brew_cmd
         commandline -f repaint execute
         return 0

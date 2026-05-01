@@ -9,4 +9,5 @@ untracked/*
 .cursor/*
 .claude/*
 .sisyphus/*
+configs/pgcli/log
 configs/zoxide/db.zo
