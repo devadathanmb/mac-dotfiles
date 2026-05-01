@@ -1,0 +1,241 @@
+// Zed keymap — migrated from Cursor keybindings + vim normalModeKeyBindings
+//
+// WhichKey is enabled in settings.json. The space leader menu is entirely
+// driven by these multi-stroke bindings — WhichKey shows them automatically.
+[
+  // ─── Global ──────────────────────────────────────────────────────────────────
+  {
+    "bindings": {
+      // Toggle explorer (cursor: ctrl+e → workbench.view.explorer)
+      "ctrl-e": "project_panel::Toggle",
+      // Toggle terminal panel
+      "ctrl-/": "terminal_panel::Toggle",
+      "ctrl-shift-t": "terminal_panel::Toggle"
+    }
+  },
+
+  // ─── Project Panel (File Explorer) ───────────────────────────────────────────
+  // Vim-style navigation inside the file tree
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "j": "menu::SelectNext",
+      "k": "menu::SelectPrevious",
+      "h": "project_panel::CollapseSelectedEntry",
+      "l": "project_panel::Open",
+      "enter": "project_panel::OpenPermanent",
+      "r": "project_panel::Rename",
+      "a": "project_panel::NewFile",
+      "shift-a": "project_panel::NewDirectory",
+      "d": "project_panel::Delete",
+      "x": "project_panel::Cut",
+      "y": "project_panel::Copy",
+      "p": "project_panel::Paste",
+      // Return focus to editor
+      "ctrl-l": "workspace::ActivatePaneRight"
+    }
+  },
+
+  // ─── Tab Switcher ─────────────────────────────────────────────────────────────
+  {
+    "context": "TabSwitcher",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  },
+
+  // ─── Completion & Code-Action Menus ──────────────────────────────────────────
+  {
+    "context": "Editor && showing_completions",
+    "bindings": {
+      "ctrl-j": "editor::ContextMenuNext",
+      "ctrl-k": "editor::ContextMenuPrevious"
+    }
+  },
+  {
+    "context": "Editor && showing_code_actions",
+    "bindings": {
+      "ctrl-j": "editor::ContextMenuNext",
+      "ctrl-k": "editor::ContextMenuPrevious"
+    }
+  },
+
+  // ─── Picker / Quick-Open Navigation ──────────────────────────────────────────
+  // (file finder, command palette, symbol picker …)
+  {
+    "context": "Picker > Editor",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious",
+      "ctrl-n": "menu::SelectNext",
+      "ctrl-p": "menu::SelectPrevious"
+    }
+  },
+
+  // ─── Terminal ────────────────────────────────────────────────────────────────
+  {
+    "context": "Terminal",
+    "bindings": {
+      // Escape terminal focus back to editor above
+      "ctrl-k": "workspace::ActivatePaneUp"
+    }
+  },
+
+  // ─── Vim: Normal + Visual + Operator (VimControl) ────────────────────────────
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      // Sneak motion — s/S replace vim's 's' (substitute); use 'cl' instead
+      "s": "vim::PushSneak",
+      "shift-s": "vim::PushSneakBackward",
+
+      // Pane / split navigation (ctrl-hjkl)
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+
+      "space y": "editor::CopyFileLocation"
+    }
+  },
+
+  // ─── Vim: Normal Mode ────────────────────────────────────────────────────────
+  {
+    "context": "vim_mode == normal && !menu",
+    "bindings": {
+      // Override bare space at the same precedence level so leader chords can match.
+      "space": null,
+
+      // ── Tab navigation (H / L) ───────────────────────────────────────────────
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+
+      // Close active item (ctrl-x, like Emacs-style / cursor habit)
+      "ctrl-x": "pane::CloseActiveItem",
+
+      // ── LSP / Go-to (g-prefix) ───────────────────────────────────────────────
+      // These mirror the cursor vim normalModeKeyBindings
+      "g d": "editor::GoToDefinition",
+      "g shift-d": "editor::GoToDeclaration",
+      "g i": "editor::GoToImplementation",
+      "g t": "editor::GoToTypeDefinition",
+      "g r": "editor::FindAllReferences",
+      "g h": "editor::Hover",
+      "g q": "editor::ToggleCodeActions",
+      // Open in a split (closest to VSCode "peek")
+      "g p d": "editor::GoToDefinitionSplit",
+      "g p i": "editor::GoToImplementationSplit",
+      "g p t": "editor::GoToTypeDefinitionSplit",
+
+      // ── Space Leader ─────────────────────────────────────────────────────────
+      // WhichKey shows all space-* completions after delay_ms ms
+
+      // Top-level single-key
+      "space ;": "command_palette::Toggle",
+      "space e": "workspace::ToggleLeftDock",
+      "space f": "file_finder::Toggle",
+      "space t": "terminal_panel::Toggle",
+      "space v": "pane::SplitRight",
+      "space h": "pane::SplitDown",
+      "space y": "editor::CopyFileLocation",
+
+      // ── Copilot / Agent (space c) ───────────────────────────────────────────
+      "space c c": "agent::Toggle",
+
+      // ── Buffers (space B) ────────────────────────────────────────────────────
+      "space B b": "tab_switcher::Toggle",
+      "space B d": "pane::CloseActiveItem",
+      "space B n": "pane::ActivateNextItem",
+      "space B p": "pane::ActivatePreviousItem",
+      "space B x": "pane::CloseAllItems",
+      "space B u": "pane::ReopenClosedItem",
+      "space B y": "editor::CopyFileLocation",
+
+      // ── Git (space g) ────────────────────────────────────────────────────────
+      "space g g": "git_panel::Toggle",
+      "space g j": "editor::GoToHunk",
+      "space g k": "editor::GoToPreviousHunk",
+      "space g r": "editor::RevertSelectedHunks",
+      "space g b": "editor::ToggleGitBlameInline",
+
+      // ── LSP / Language (space l) ─────────────────────────────────────────────
+      "space l s": "outline_panel::ToggleFocus",
+      "space l h": "editor::Hover",
+      "space l d": "diagnostics::Deploy",
+      "space l j": "editor::GoToDiagnostic",
+      "space l k": "editor::GoToPreviousDiagnostic",
+      "space l r": "editor::Rename",
+      "space l f": "editor::Format",
+      "space l a": "editor::ToggleCodeActions",
+      "space l i": "editor::ToggleInlayHints",
+
+      // ── Search (space s) ─────────────────────────────────────────────────────
+      "space s f": "file_finder::Toggle",
+      "space s l": "pane::DeploySearch",
+      "space s s": "outline_panel::ToggleFocus",
+      "space s b": "tab_switcher::Toggle",
+      "space s p": "pane::DeploySearch",
+
+      // ── Find & Replace (space r) ─────────────────────────────────────────────
+      "space r f": "buffer_search::Deploy",
+      "space r s": "editor::Rename",
+      "space r p": "pane::DeploySearch",
+
+      // ── Show panels (space S) ────────────────────────────────────────────────
+      "space S e": "project_panel::ToggleFocus",
+      "space S g": "git_panel::ToggleFocus",
+      "space S s": "pane::DeploySearch",
+      "space S d": "diagnostics::Deploy",
+      "space S o": "outline_panel::ToggleFocus",
+      "space S t": "terminal_panel::Toggle",
+
+      // ── UI Toggles (space u) ─────────────────────────────────────────────────
+      "space u b": "workspace::ToggleLeftDock",
+      "space u j": "workspace::ToggleBottomDock",
+      "space u r": "workspace::ToggleRightDock",
+      "space u z": "workspace::ToggleCenteredLayout",
+
+      // ── Window / Splits (space w) ────────────────────────────────────────────
+      "space w v": "pane::SplitRight",
+      "space w h": "pane::SplitDown",
+      "space w d": "pane::CloseActiveItem",
+      "space w m": "workspace::ToggleZoom",
+      "space w W": "workspace::ActivatePreviousPane",
+      "space w left": "workspace::ActivatePaneLeft",
+      "space w right": "workspace::ActivatePaneRight",
+      "space w down": "workspace::ActivatePaneDown",
+      "space w up": "workspace::ActivatePaneUp"
+    }
+  },
+
+  // ─── Vim: Visual Mode ────────────────────────────────────────────────────────
+  {
+    "context": "Editor && vim_mode == visual && !menu",
+    "bindings": {
+      // Tab navigation
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      // Minimal leader access in visual
+      "space ;": "command_palette::Toggle",
+      "space l f": "editor::Format",
+      "space l a": "editor::ToggleCodeActions"
+    }
+  },
+
+  // ─── Tab Switcher (after Vim blocks so these win on the focused picker) ─────
+  {
+    "context": "TabSwitcher > Picker > Editor",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  },
+  {
+    "context": "TabSwitcher > Picker > menu",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  }
+]

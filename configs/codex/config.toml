@@ -1,6 +1,6 @@
 personality = "pragmatic"
-model = "gpt-5.4"
-model_reasoning_effort = "high"
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
 
 [mcp_servers.context7-mcp]
 url = "https://mcp.context7.com/mcp"
@@ -21,6 +21,9 @@ args = ["-y", "@playwright/mcp@latest"]
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir", "git-branch", "five-hour-limit", "weekly-limit", "context-window-size", "used-tokens"]
 
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
 [projects."/Users/devadathanmb/repos/raycast-smithery"]
 trust_level = "trusted"
 
@@ -34,6 +37,15 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/devadathanmb/repos/personal-blog"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/pgspecial"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/ktu-bot-private"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/opencode-minimax-easy-vision"]
 trust_level = "trusted"
 
 [features]

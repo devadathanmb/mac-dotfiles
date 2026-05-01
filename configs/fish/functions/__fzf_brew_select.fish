@@ -92,7 +92,7 @@ function __fzf_brew_select --argument-names kind action --description "Select br
 
     # Add query pre-fill if user provided args (e.g., `fbi git` starts with "git")
     if test (count $query) -gt 0
-        set -l query_str (string join ' ' $query)
+        set -l query_str (string join -- ' ' $query)
         set -a fzf_opts --query $query_str
     end
 

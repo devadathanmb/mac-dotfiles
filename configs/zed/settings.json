@@ -7,43 +7,235 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-    "terminal": {
-        "font_size": 13.0,
-        "font_family": "Maple Mono NF"
+    // ─── Font ────────────────────────────────────────────────────────────────────
+    "auto_update": true,
+    "ui_font_weight": 800.0,
+    "agent_ui_font_size": 18,
+    "agent_buffer_font_size": 16,
+    "project_panel": {
+        "dock": "left",
     },
-    "telemetry": {
-        "diagnostics": false,
-        "metrics": false
+    "outline_panel": {
+        "dock": "left",
     },
-    "base_keymap": "VSCode",
-    "tab_bar": {
-        "show": true
+    "collaboration_panel": {
+        "dock": "left",
     },
-    "relative_line_numbers": true,
-    "gutter": {
-        "line_numbers": true
+    "agent": {
+        "default_model": {
+            "provider": "ollama",
+            "model": "minimax-m2:cloud",
+            "enable_thinking": false
+        },
+        "dock": "right",
+        "favorite_models": [],
+        "model_parameters": [],
     },
+    "git_panel": {
+        "dock": "left",
+    },
+    "agent_servers": {
+        "opencode": {
+            "type": "registry",
+        },
+        "auggie": {
+            "type": "registry",
+        },
+        "cursor": {
+            "type": "registry",
+        },
+        "codex-acp": {
+            "type": "registry",
+        },
+        "claude-acp": {
+            "type": "registry",
+        },
+    },
+    "buffer_font_family": "Maple Mono NF",
+    "buffer_font_size": 16.0,
+    "buffer_font_weight": 500,
+    "buffer_font_features": {
+        "cv01": true,
+        "zero": true,
+        "cr41": true,
+        "cv02": true,
+        "cv08": true,
+        "cv34": true,
+        "cv62": true,
+        "ss05": true,
+        "ss07": true,
+        "ss08": true,
+        "ss09": true,
+        "ss10": true,
+        "ss11": true,
+        "calt": true,
+    },
+    "ui_font_family": "Maple Mono NF",
+    "ui_font_size": 17.0,
+
+    // ─── Editor ──────────────────────────────────────────────────────────────────
+    // "combined" layers LSP semantic tokens on top of tree-sitter highlights
+    "semantic_tokens": "combined",
+    "relative_line_numbers": "enabled",
+    "cursor_blink": true,
+    "soft_wrap": "editor_width",
+    "close_panel_on_toggle": true,
+    "show_whitespaces": "boundary",
+    "tab_size": 4,
+    "hard_tabs": false,
     "minimap": {
-        "show": "never"
+        "show": "never",
     },
     "scrollbar": {
         "axes": {
-            "horizontal": true
-        }
+            "horizontal": false,
+            "vertical": true,
+        },
     },
-    "cursor_blink": true,
-    "buffer_font_family": "JetBrains Mono",
-    "file_types": {},
-    "show_whitespaces": "boundary",
-    "soft_wrap": "editor_width",
-    "hard_tabs": false,
-    "tab_size": 4,
-    "vim_mode": true,
-    "ui_font_size": 16,
-    "buffer_font_size": 14.600000381469727,
+
+    // ─── Theme ───────────────────────────────────────────────────────────────────
     "theme": {
         "mode": "system",
         "light": "One Light",
-        "dark": "GitHub Dark Default"
-    }
+        "dark": "GitHub Dark Default",
+    },
+    "theme_overrides": {
+        "Github Dark": {
+            "syntax": {
+                "comment": {
+                    "font_style": "italic",
+                },
+                "comment.doc": {
+                    "font_style": "italic",
+                },
+            },
+        },
+    },
+
+    // ─── Inlay Hints ─────────────────────────────────────────────────────────────
+    "inlay_hints": {
+        "enabled": true,
+        "show_value_hints": true,
+        "show_type_hints": true,
+        "show_parameter_hints": true,
+        "show_other_hints": true,
+        "show_background": false,
+        "edit_debounce_ms": 700,
+        "scroll_debounce_ms": 50,
+        "toggle_on_modifiers_press": {
+            "control": false,
+            "alt": false,
+            "shift": false,
+            "platform": false,
+            "function": false,
+        },
+    },
+
+    // ─── Telemetry ───────────────────────────────────────────────────────────────
+    "telemetry": {
+        "diagnostics": false,
+        "metrics": false,
+    },
+
+    // ─── Vim ─────────────────────────────────────────────────────────────────────
+    "vim_mode": true,
+    "vim": {
+        "use_system_clipboard": "always",
+        "highlight_on_yank_duration": 200,
+        "use_smartcase_find": true,
+        // Keep line numbers relative at all times (no toggle on mode change)
+        "toggle_relative_line_numbers": false,
+    },
+
+    // ─── Keymap Base ─────────────────────────────────────────────────────────────
+    "base_keymap": "Cursor",
+
+    // ─── WhichKey ────────────────────────────────────────────────────────────────
+    "which_key": {
+        "enabled": true,
+        "delay_ms": 300,
+    },
+
+    // ─── LSP ───────────────────────────────────────────────────────────────────
+    "lsp": {
+        "basedpyright": {
+            "settings": {
+                "basedpyright.analysis": {
+                    "autoImportCompletions": true,
+                    "diagnosticSeverityOverrides": {
+                        "reportReturnType": "warning",
+                        "reportGeneralTypeIssues": "warning",
+                        "reportInvalidTypeForm": "error",
+                        "reportOptionalMemberAccess": "none",
+                        "reportAssignmentType": "none",
+                        "reportOptionalSubscript": "none",
+                        "reportAttributeAccessIssue": "none",
+                        "reportUnknownMemberType": "none",
+                        "reportArgumentType": "none",
+                    },
+                },
+            },
+        },
+        "vtsls": {
+            "settings": {
+                "typescript": {
+                    "inlayHints": {
+                        "parameterNames": {
+                            "enabled": "none",
+                        },
+                        "parameterTypes": {
+                            "enabled": false,
+                        },
+                        "variableTypes": {
+                            "enabled": false,
+                        },
+                        "propertyDeclarationTypes": {
+                            "enabled": false,
+                        },
+                        "functionLikeReturnTypes": {
+                            "enabled": false,
+                        },
+                        "enumMemberValues": {
+                            "enabled": false,
+                        },
+                    },
+                },
+            },
+        },
+    },
+
+    // ─── Git ─────────────────────────────────────────────────────────────────────
+    "git": {
+        "inline_blame": {
+            "enabled": true,
+        },
+    },
+
+    // ─── Terminal ────────────────────────────────────────────────────────────────
+    "terminal": {
+        "font_family": "Maple Mono NF",
+        "font_size": 13,
+        "shell": {
+            "program": "/opt/homebrew/bin/fish",
+        },
+    },
+
+    // ─── Language Overrides ──────────────────────────────────────────────────────
+    "languages": {
+        "Python": {
+            "tab_size": 4,
+            "format_on_save": "off",
+            "formatter": {
+                "external": {
+                    "command": "black",
+                    "arguments": ["--stdin-filename", "{buffer_path}", "-"],
+                },
+            },
+        },
+
+        // YAML / Docker Compose use 2-space indentation
+        "YAML": {
+            "tab_size": 2,
+        },
+    },
 }

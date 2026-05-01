@@ -6,10 +6,10 @@
   "custom-ui-style.font.monospace": "Maple Mono NF Medium",
   "custom-ui-style.stylesheet": {
     "body *:not(.monaco-editor *):not(.monaco-editor), .find-widget .monaco-inputbox .input, .mdc-editor, .mdc-editor *, .composer-code-block-container, .composer-code-block-container *, .composer-message-codeblock, .composer-message-codeblock *, .suggest-input-container *, .simple-code-render *": {
-      "letter-spacing": "-0.80px !important",
+      "letter-spacing": "-0.60px !important",
     },
     ":is(.interactive-input-editor, .scm-editor-container) :is(.native-edit-context, .view-lines, .view-overlays, .margin-view-overlays, .cursors-layer .cursor, .inline-edits-view-gutter-indicator)": {
-      "letter-spacing": "-0.80px !important",
+      "letter-spacing": "-0.60px !important",
     },
   },
   "custom-ui-style.webview.enable": true,
@@ -22,12 +22,12 @@
     "textarea",
     "[contenteditable='true']",
     "pre",
-    "code"
+    "code",
   ],
   "custom-ui-style.webview.sansSerifSelector": [],
   "custom-ui-style.webview.stylesheet": {
     "html, body, body *": {
-      "letter-spacing": "-0.80px !important",
+      "letter-spacing": "-0.60px !important",
     },
     "input, textarea, [contenteditable='true']": {
       "font-family": "var(--cus-monospace-font) !important",
@@ -47,7 +47,7 @@
   // "editor.fontLigatures": true,
   "editor.fontLigatures": "'cv01', 'zero', 'cr41', 'cv02', 'cv08', 'cv34', 'cv62', 'ss05', 'ss07', 'ss08', 'ss09', 'ss10', 'ss11', 'calt'",
   "editor.fontVariations": true,
-  "editor.letterSpacing": -0.8,
+  "editor.letterSpacing": -0.6,
   "editor.bracketPairColorization.enabled": true,
   "editor.fontSize": 13.0,
   "editor.minimap.enabled": false,
@@ -382,6 +382,20 @@
     },
   ],
   "whichkey.bindings": [
+    {
+      // "bindings": [
+      //   {
+      //     "command": "context-link.copyContext",
+      //     "key": "y",
+      //     "name": "Copy context link",
+      //     "type": "command",
+      //   },
+      // ],
+      "key": "y",
+      "name": "Copy Context",
+      "type": "bindings",
+      "command": "context-link.copyContext",
+    },
     {
       "command": "workbench.action.showCommands",
       "key": ";",
@@ -1510,7 +1524,6 @@
     "chat-editing-text-model:**/*.markdown": "default",
     "chat-editing-text-model:**/*.mdx": "default",
     "chat-editing-text-model:**/*.mdc": "default",
-    "/Users/devadathanmb/Library/Application Support/Code/User/settings.json": "default"
   },
   "claudeCode.preferredLocation": "panel",
   "diffEditor.renderSideBySide": false,
