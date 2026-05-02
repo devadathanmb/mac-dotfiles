@@ -7,6 +7,7 @@
 
   vars:
     dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
+    zed_extensions_installed_dir: "{{ lookup('env', 'HOME') }}/Library/Application Support/Zed/extensions/installed"
 
   tasks:
     # Homebrew Formulae Backup
@@ -113,6 +114,47 @@
       when: cursor_check.rc == 0
       tags: cursor
 
+    # Zed Extensions Backup
+    - name: Check if Zed extensions directory exists
+      ansible.builtin.stat:
+        path: "{{ zed_extensions_installed_dir }}"
+      register: zed_extensions_dir
+      tags: zed
+
+    - name: Get installed Zed extensions
+      ansible.builtin.command:
+        argv:
+          - find
+          - "{{ zed_extensions_installed_dir }}"
+          - -mindepth
+          - "1"
+          - -maxdepth
+          - "1"
+          - -type
+          - d
+          - -exec
+          - basename
+          - "{}"
+          - ";"
+      register: zed_extensions
+      changed_when: false
+      when: zed_extensions_dir.stat.exists
+      tags: zed
+
+    - name: Write Zed extensions to file
+      ansible.builtin.copy:
+        content: "{{ zed_extensions.stdout_lines | sort | join('\n') }}\n"
+        dest: "{{ dotfiles_repo }}/configs/zed/extensions.txt"
+        mode: '0644'
+      when: zed_extensions_dir.stat.exists and zed_extensions.stdout_lines | default([]) | length > 0
+      tags: zed
+
+    - name: Display Zed extensions backup result
+      ansible.builtin.debug:
+        msg: "Backed up {{ zed_extensions.stdout_lines | default([]) | length }} Zed extensions to extensions.txt"
+      when: zed_extensions_dir.stat.exists
+      tags: zed
+
     # Summary
     - name: Display backup summary
       ansible.builtin.debug:
@@ -124,5 +166,6 @@
           Homebrew casks: {{ installed_casks.stdout_lines | default([]) | length }}
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
           Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}
+          Zed extensions: {{ zed_extensions.stdout_lines | default([]) | length }}
           ========================================
           Run `git diff` to see changes, then `git add` and `git commit` to save.

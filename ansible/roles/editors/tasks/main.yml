@@ -39,6 +39,19 @@
   ignore_errors: true
   changed_when: false
 
+- name: Read Zed extensions from file
+  ansible.builtin.set_fact:
+    zed_extensions: "{{ lookup('file', dotfiles_repo + '/configs/zed/extensions.txt').splitlines() | reject('==', '') | list }}"
+
+- name: Configure Zed extension auto-install
+  ansible.builtin.blockinfile:
+    path: "{{ dotfiles_repo }}/configs/zed/settings.json"
+    marker: "    // {mark} ANSIBLE MANAGED ZED EXTENSIONS"
+    insertafter: "^{"
+    block: |2
+          "auto_install_extensions": {{ dict(zed_extensions | zip([true] * (zed_extensions | length))) | to_nice_json(indent=4) | indent(4, false) }},
+  when: zed_extensions | length > 0
+
 - name: Display extension installation summary
   ansible.builtin.debug:
-    msg: "VSCode and/or Cursor extensions installed. Some may have failed (deprecated extensions)."
+    msg: "VSCode and/or Cursor extensions installed; Zed extensions configured for auto-install on startup. Some may have failed (deprecated extensions)."
