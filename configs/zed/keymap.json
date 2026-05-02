@@ -10,6 +10,7 @@
             "ctrl-e": "project_panel::Toggle",
             // Toggle terminal panel
             "ctrl-/": "terminal_panel::Toggle",
+            "ctrl-\\": "terminal_panel::Toggle",
             "ctrl-shift-t": "terminal_panel::Toggle",
         },
     },
