@@ -55,7 +55,7 @@ ansible/
 │   ├── packages.yml         # Homebrew packages
 │   ├── macos.yml            # macOS defaults
 │   ├── zsh.yml              # Zap ZSH shell
-│   ├── editors.yml          # VSCode + Cursor extensions
+│   ├── editors.yml          # VSCode + Cursor + Zed extensions
 │   ├── asdf.yml             # ASDF version manager
 │   └── backup.yml           # Backup packages/extensions
 └── roles/

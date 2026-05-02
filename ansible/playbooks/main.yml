@@ -15,4 +15,4 @@
     - role: zsh
       tags: [zsh]
     - role: editors
-      tags: [editors, vscode, cursor]
+      tags: [editors, vscode, cursor, zed]
