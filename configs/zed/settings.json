@@ -9,11 +9,20 @@
 {
     // ─── Font ────────────────────────────────────────────────────────────────────
     "auto_update": true,
-    "ui_font_weight": 800.0,
-    "agent_ui_font_size": 18,
+    "agent_ui_font_size": 16,
     "agent_buffer_font_size": 16,
+    "buffer_font_family": "Maple Mono",
+    "buffer_font_size": 16,
+    "buffer_font_weight": 500,
+    // "ui_font_weight": 800.0,
+    "ui_font_family": "Maple Mono",
+    "ui_font_size": 17,
     "project_panel": {
         "dock": "left",
+    },
+    "toolbar": {
+        "breadcrumbs": true,
+        "quick_actions": false,
     },
     "outline_panel": {
         "dock": "left",
@@ -51,9 +60,6 @@
             "type": "registry",
         },
     },
-    "buffer_font_family": "Maple Mono NF",
-    "buffer_font_size": 16.0,
-    "buffer_font_weight": 500,
     "buffer_font_features": {
         "cv01": true,
         "zero": true,
@@ -70,8 +76,6 @@
         "ss11": true,
         "calt": true,
     },
-    "ui_font_family": "Maple Mono NF",
-    "ui_font_size": 17.0,
 
     // ─── Editor ──────────────────────────────────────────────────────────────────
     // "combined" layers LSP semantic tokens on top of tree-sitter highlights
@@ -153,7 +157,7 @@
     // ─── WhichKey ────────────────────────────────────────────────────────────────
     "which_key": {
         "enabled": true,
-        "delay_ms": 300,
+        "delay_ms": 500,
     },
 
     // ─── LSP ───────────────────────────────────────────────────────────────────
