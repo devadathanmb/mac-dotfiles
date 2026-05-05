@@ -78,7 +78,8 @@
     {
         "context": "Terminal",
         "bindings": {
-            // Escape terminal focus back to editor above
+            // Escape terminal focus back to adjacent editor panes
+            "ctrl-h": "workspace::ActivatePaneLeft",
             "ctrl-k": "workspace::ActivatePaneUp",
         },
     },
