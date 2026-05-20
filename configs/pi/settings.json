@@ -1,0 +1,16 @@
+{
+  "lastChangelogVersion": "0.75.4",
+  "theme": "custom-ansi-dark",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "qwen3.6-plus",
+  "defaultThinkingLevel": "high",
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-mcp-adapter",
+    "npm:@ollama/pi-web-search",
+    "git:github.com/leblancfg/pi-ansi-themes",
+    "npm:@narumitw/pi-btw",
+    "npm:@narumitw/pi-codex-usage"
+  ],
+  "hideThinkingBlock": true
+}
