@@ -49,5 +49,11 @@
     "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
     "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
 
+    # Pi Coding Agent
+    ~/.pi/agent/settings.json: configs/pi/settings.json
+    ~/.pi/agent/extensions: configs/pi/extensions
+    ~/.pi/agent/themes: configs/pi/themes
+    ~/.config/mcp/mcp.json: configs/mcp/mcp.json
+
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
