@@ -1,7 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-minimax-easy-vision"
+    "opencode-minimax-easy-vision",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "mcp": {
     "exa": {

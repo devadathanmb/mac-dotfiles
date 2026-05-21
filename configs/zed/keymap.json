@@ -88,6 +88,10 @@
     {
         "context": "VimControl && !menu",
         "bindings": {
+            // Unbind bare space here (not only in normal mode) so the default
+            // vim::WrappingRight does not steal the leader; which-key can stay pending.
+            "space": null,
+
             // Sneak motion — s/S replace vim's 's' (substitute); use 'cl' instead
             "s": "vim::PushSneak",
             "shift-s": "vim::PushSneakBackward",
@@ -150,6 +154,7 @@
             "space B d": "pane::CloseActiveItem",
             "space B n": "pane::ActivateNextItem",
             "space B p": "pane::ActivatePreviousItem",
+            "space B c": "pane::CloseOtherItems",
             "space B x": "pane::CloseAllItems",
             "space B u": "pane::ReopenClosedItem",
             "space B y": "editor::CopyFileLocation",
@@ -170,6 +175,13 @@
             "space l k": "editor::GoToPreviousDiagnostic",
             "space l r": "editor::Rename",
             "space l f": "editor::Format",
+            // FIXME: FormatSelections is a no-op with external formatters (e.g. black).
+            // Zed only supports range formatting via LSPs that advertise
+            // `documentRangeFormattingProvider`. Revisit when Zed adds an external
+            // range-formatting protocol, or switch the Python formatter to `ruff`.
+            // See: https://github.com/zed-industries/zed/issues/25343
+            //      https://github.com/zed-industries/zed/issues/25796
+            "space l v": "editor::FormatSelections",
             "space l a": "editor::ToggleCodeActions",
             "space l i": "editor::ToggleInlayHints",
 

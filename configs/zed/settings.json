@@ -8,20 +8,25 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
     // ─── Font ────────────────────────────────────────────────────────────────────
+    "diff_view_style": "split",
+    "edit_predictions": {
+        "provider": "copilot",
+    },
     "auto_update": true,
-    "agent_ui_font_size": 16,
-    "agent_buffer_font_size": 16,
-    "buffer_font_family": "Maple Mono",
-    "buffer_font_size": 16,
-    "buffer_font_weight": 500,
+    "agent_ui_font_size": 17,
+    "agent_buffer_font_size": 15,
+    "buffer_font_family": "JetBrains Mono",
+    "buffer_font_size": 15.5,
+    "buffer_font_weight": 600,
     // "ui_font_weight": 800.0,
-    "ui_font_family": "Maple Mono",
+    "ui_font_family": "JetBrains Mono",
     "ui_font_size": 17,
+    "file_scan_exclusions": ["**/.env"],
     "project_panel": {
         "dock": "left",
     },
     "toolbar": {
-        "breadcrumbs": true,
+        "breadcrumbs": false,
         "quick_actions": false,
     },
     "outline_panel": {
@@ -32,9 +37,10 @@
     },
     "agent": {
         "default_model": {
-            "provider": "ollama",
-            "model": "minimax-m2:cloud",
-            "enable_thinking": false,
+            "effort": "high",
+            "provider": "copilot_chat",
+            "model": "claude-sonnet-4.6",
+            "enable_thinking": true,
         },
         "dock": "right",
         "favorite_models": [],
@@ -43,7 +49,14 @@
     "git_panel": {
         "dock": "left",
     },
+    "file_finder": {
+        "modal_max_width": "large",
+        "include_ignored": "all",
+    },
     "agent_servers": {
+        "github-copilot-cli": {
+            "type": "registry",
+        },
         "opencode": {
             "type": "registry",
         },
@@ -161,9 +174,16 @@
     },
 
     // ─── LSP ───────────────────────────────────────────────────────────────────
+    // Zed's default Python LS is basedpyright (see https://zed.dev/docs/languages/python).
+    // Use lsp.basedpyright… — lsp.pyright only applies if you enable the "pyright" language server.
     "lsp": {
         "basedpyright": {
             "settings": {
+                "python": {
+                    // Prefer the real interpreter path over asdf shims so the LS matches `python --version`.
+                    "pythonPath": "/Users/devadathanmb/.asdf/installs/python/3.12.8/bin/python",
+                    "defaultInterpreterPath": "/Users/devadathanmb/.asdf/installs/python/3.12.8/bin/python",
+                },
                 "basedpyright.analysis": {
                     "autoImportCompletions": true,
                     "diagnosticSeverityOverrides": {
@@ -230,6 +250,14 @@
         "Python": {
             "tab_size": 4,
             "format_on_save": "off",
+            // Zed's default Python pipeline runs ruff `source.organizeImports`
+            // BEFORE the configured formatter. Empty this out so only Black
+            // touches the file — otherwise ruff reorders imports and you see
+            // changes that look like "something other than black" is running.
+            // See: https://zed.dev/docs/languages/python#configuring-formatting
+            "code_actions_on_format": {
+                "source.organizeImports.ruff": false,
+            },
             "formatter": {
                 "external": {
                     "command": "black",
