@@ -93,6 +93,22 @@ export default function (pi: ExtensionAPI) {
 		return regex.test(targetPath) || regex.test(relativePath) || targetPath.includes(resolvedPattern) || relativePath.includes(resolvedPattern);
 	}
 
+	function isMutatingBash(command: string): boolean {
+		return [
+			/\brm\b/,
+			/\bmv\b/,
+			/\btee\b/,
+			/\bsed\s+-i\b/,
+			/\bperl\s+-i\b/,
+			/\btruncate\b/,
+			/\bdd\b/,
+			/\bchmod\b/,
+			/\bchown\b/,
+			/\brsync\b.*--delete\b/,
+			/\binstall\b/,
+		].some((pattern) => pattern.test(command));
+	}
+
 	pi.on("session_start", async (_event, ctx) => {
 		const projectRulesPath = path.join(ctx.cwd, ".pi", "damage-control-rules.yaml");
 		const globalRulesPath = path.join(os.homedir(), ".pi", "damage-control-rules.yaml");
@@ -180,11 +196,9 @@ export default function (pi: ExtensionAPI) {
 				}
 
 				if (!violationReason) {
-					for (const rop of rules.readOnlyPaths) {
-						if (command.includes(rop) && (/[\s>|]/.test(command) || command.includes("rm") || command.includes("mv") || command.includes("sed"))) {
-							violationReason = `Bash command may modify read-only path: ${rop}`;
-							break;
-						}
+					const rop = rules.readOnlyPaths.find((pathPattern) => command.includes(pathPattern));
+					if (rop && isMutatingBash(command)) {
+						violationReason = `Bash command may modify read-only path: ${rop}`;
 					}
 				}
 
