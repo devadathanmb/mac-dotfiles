@@ -1,0 +1,12 @@
+{
+  "name": "damage-control",
+  "private": true,
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "dependencies": {
+    "yaml": "^2.7.1"
+  }
+}

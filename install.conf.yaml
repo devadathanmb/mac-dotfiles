@@ -51,8 +51,13 @@
 
     # Pi Coding Agent
     ~/.pi/agent/settings.json: configs/pi/settings.json
+    ~/.pi/agent/keybindings.json: configs/pi/keybindings.json
+    ~/.pi/agent/APPEND_SYSTEM.md: configs/pi/APPEND_SYSTEM.md
+    ~/.pi/agent/mcp.json.disabled: configs/pi/mcp.json.disabled
     ~/.pi/agent/extensions: configs/pi/extensions
     ~/.pi/agent/themes: configs/pi/themes
+    ~/.pi/agent/npm/package.json: configs/pi/npm/package.json
+    ~/.pi/agent/npm/package-lock.json: configs/pi/npm/package-lock.json
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
 - shell:
