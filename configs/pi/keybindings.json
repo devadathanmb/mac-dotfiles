@@ -1,0 +1,10 @@
+{
+  "app.thinking.cycle": ["ctrl+t"],
+  "app.thinking.toggle": ["ctrl+shift+t"],
+  "app.tree.filter.noTools": ["ctrl+alt+t"],
+  "tui.select.down": ["down", "ctrl+j"],
+  "tui.select.up": ["up", "ctrl+k"],
+  "app.model.cycleForward": [],
+  "app.session.togglePath": [],
+  "app.model.select": "ctrl+p"
+}

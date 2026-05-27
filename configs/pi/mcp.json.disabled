@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "toolPrefix": "server",
+    "idleTimeout": 10
+  },
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "directTools": true
+    },
+    "exa": {
+      "url": "https://mcp.exa.ai/mcp",
+      "directTools": true
+    },
+    "grep_app": {
+      "url": "https://mcp.grep.app",
+      "directTools": true
+    },
+    "deepwiki": {
+      "url": "https://mcp.deepwiki.com/mcp",
+      "directTools": true
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "pi-extensions",
+  "private": true,
+  "dependencies": {
+    "@johnnywu/pi-filechanges": "^1.2.2",
+    "@narumitw/pi-btw": "^0.1.36",
+    "@narumitw/pi-codex-usage": "^0.1.36",
+    "@ollama/pi-web-search": "^0.0.5",
+    "pi-mcp-adapter": "^2.8.0",
+    "pi-subagents": "^0.25.0"
+  }
+}

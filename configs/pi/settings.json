@@ -1,16 +1,23 @@
 {
-  "lastChangelogVersion": "0.75.4",
+  "lastChangelogVersion": "0.75.5",
   "theme": "custom-github-dark",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.4-mini",
+  "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "medium",
   "packages": [
     "npm:pi-subagents",
     "npm:pi-mcp-adapter",
-    "npm:@ollama/pi-web-search",
-    "git:github.com/leblancfg/pi-ansi-themes",
-    "npm:@narumitw/pi-btw",
-    "npm:@narumitw/pi-codex-usage"
+    "npm:@narumitw/pi-btw"
   ],
-  "hideThinkingBlock": false
+  "hideThinkingBlock": false,
+  "extensions": [
+    "extensions/gitignored-at-files.ts"
+  ],
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "enableInstallTelemetry": false,
+  "editorPaddingX": 2,
+  "showHardwareCursor": false,
+  "quietStartup": true
 }

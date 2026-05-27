@@ -1,178 +1,344 @@
 /**
  * Footer — Rich custom status bar
  *
- * Line 1: provider/model + [thinking] + context meter on left, tokens + cost on right
- * Line 2: OpenAI/Codex limits, only for OpenAI models
- * Line 3: cwd (branch) on left, tool tally on right
+ * Line 1: provider/model + [thinking] + context meter, tokens + cost
+ * Line 2: cwd (branch) on left, tool tally on right
+ * Line 3: OpenAI/Codex limits
  *
  * Usage: pi -e extensions/footer.ts
+ *
+ * All colors are pulled from the active Pi theme — no hardcoded palette.
  */
-
 import type { AssistantMessage } from "@earendil-works/pi-ai";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, Theme, ThemeColor } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
-import os from "node:os";
-import path from "node:path";
+import { execFile } from "node:child_process";
+import { homedir } from "node:os";
+import { relative } from "node:path";
+import { promisify } from "node:util";
 
 type FooterModel = {
-	provider?: string;
-	id?: string;
+  provider?: string;
+  id?: string;
+};
+type CodexUsageWindow = {
+  usedPercent: number;
+  resetsAt?: number;
+};
+type CodexUsageSnapshot = {
+  primary?: CodexUsageWindow;
+  secondary?: CodexUsageWindow;
+};
+type CodexUsageUpdate = {
+  snapshot?: CodexUsageSnapshot;
 };
 
-const footerPalette = {
-	modelProvider: "#9198a1",
-	modelId: "#f0f3f6",
-	thinking: "#91cbff",
-	bracket: "#3d444d",
-	progress: "#4ae168",
-	emptyProgress: "#3d444d",
-	context: "#71b7ff",
-	muted: "#6e7681",
-	separator: "#3d444d",
-	input: "#4ae168",
-	output: "#91cbff",
-	cost: "#f0b72f",
-	limit5h: "#39c5cf",
-	limitWeekly: "#71b7ff",
-	cwd: "#9198a1",
-	branch: "#f0b72f",
-	tool: "#91cbff",
-} as const;
+const CODEX_USAGE_UPDATE_EVENT = "codex-usage:update";
+const CODEX_USAGE_REQUEST_EVENT = "codex-usage:request";
+const execFileAsync = promisify(execFile);
 
+// ---------------------------------------------------------------------------
+// Build ANSI fg escape from resolved hex (used for dynamic/computed colors
+// that don't map directly to a theme token, e.g. the context-meter bar fill).
+// ---------------------------------------------------------------------------
 function hexFg(hex: string, text: string): string {
-	const color = hex.replace(/^#/, "");
-	const r = Number.parseInt(color.slice(0, 2), 16);
-	const g = Number.parseInt(color.slice(2, 4), 16);
-	const b = Number.parseInt(color.slice(4, 6), 16);
-	return `\x1b[38;2;${r};${g};${b}m${text}\x1b[39m`;
+  const c = hex.replace(/^#/, "");
+  const r = Number.parseInt(c.slice(0, 2), 16);
+  const g = Number.parseInt(c.slice(2, 4), 16);
+  const b = Number.parseInt(c.slice(4, 6), 16);
+  return `\x1b[38;2;${r};${g};${b}m${text}\x1b[39m`;
+}
+
+/** Extract hex from a theme fg ANSI escape like \x1b[38;2;R;G;Bm */
+function extractHexFromTheme(theme: Theme, color: ThemeColor): string {
+  const ansi = theme.getFgAnsi(color);
+  // ANSI format: \x1b[38;2;R;G;Bm — extract R, G, B
+  const match = ansi.match(/38;2;(\d+);(\d+);(\d+)/);
+  if (match) {
+    const r = Number.parseInt(match[1]).toString(16).padStart(2, "0");
+    const g = Number.parseInt(match[2]).toString(16).padStart(2, "0");
+    const b = Number.parseInt(match[3]).toString(16).padStart(2, "0");
+    return `#${r}${g}${b}`;
+  }
+  return "";
 }
 
 function isOpenAIModel(model: FooterModel | undefined): boolean {
-	if (!model) return false;
-	const provider = model.provider ?? "";
-	return provider === "openai" || provider.startsWith("openai-") || provider.startsWith("openai/");
+  if (!model) return false;
+  const provider = model.provider ?? "";
+  return provider === "openai" || provider.startsWith("openai-") || provider.startsWith("openai/");
 }
 
-function sanitizeStatusText(text: string): string {
-	return text.replace(/[\r\n\t]/g, " ").replace(/ +/g, " ").trim();
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
 }
 
-function formatCodexUsageForFooter(status: string): string | undefined {
-	const cleaned = sanitizeStatusText(status).replace(/^📊\s*/, "").trim();
-	const match = cleaned.match(/(\d+)%\s+5h(?:\s+(\d+)%\s+wk)?/i);
-	if (!match) return cleaned && cleaned !== "checking" ? hexFg(footerPalette.muted, cleaned) : undefined;
+function hyperlink(url: string, text: string): string {
+  return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
+}
 
-	const fiveHour = hexFg(footerPalette.limit5h, `5h ${match[1]}% left`);
-	const weekly = match[2]
-		? hexFg(footerPalette.muted, " · ") + hexFg(footerPalette.limitWeekly, `weekly ${match[2]}% left`)
-		: "";
-	return fiveHour + weekly;
+async function getCurrentPrLabel(cwd: string): Promise<string | undefined> {
+  try {
+    const { stdout } = await execFileAsync(
+      "gh",
+      ["pr", "view", "--json", "number,url", "--jq", "[.number, .url] | @tsv"],
+      { cwd, timeout: 2500 },
+    );
+    const [number, url] = stdout.trim().split("\t");
+    if (!number) return undefined;
+    const label = `#${number}`;
+    return url ? hyperlink(url, label) : label;
+  } catch {
+    return undefined;
+  }
+}
+
+function composeLeftRight(left: string, right: string, width: number): string {
+  const rightWidth = visibleWidth(right);
+  const leftWidth = Math.max(0, width - rightWidth - 1);
+  const trimmedLeft = truncateToWidth(left, leftWidth, "");
+  const pad = " ".repeat(Math.max(1, width - visibleWidth(trimmedLeft) - rightWidth));
+  return truncateToWidth(trimmedLeft + pad + right, width, "");
 }
 
 export default function (pi: ExtensionAPI) {
-	const counts: Record<string, number> = {};
+  const counts: Record<string, number> = {};
+  let requestFooterRender: (() => void) | undefined;
 
-	pi.on("tool_execution_end", async (event) => {
-		counts[event.toolName] = (counts[event.toolName] || 0) + 1;
-	});
+  pi.on("tool_execution_end", async (event) => {
+    counts[event.toolName] = (counts[event.toolName] || 0) + 1;
+    requestFooterRender?.();
+  });
 
-	pi.on("session_start", async (_event, ctx) => {
-		ctx.ui.setFooter((tui, _theme, footerData) => {
-			const unsub = footerData.onBranchChange(() => tui.requestRender());
+  pi.on("session_start", async (_event, ctx) => {
+    if (!ctx.hasUI) return;
+    for (const key of Object.keys(counts)) delete counts[key];
+    ctx.ui.setFooter((tui, theme, footerData) => {
+      const renderCurrentFooter = () => tui.requestRender();
+      requestFooterRender = renderCurrentFooter;
+      let prLabel: string | undefined;
+      let prLookupKey = "";
+      let prLookupInFlight = false;
+      let codexUsageSnapshot: CodexUsageSnapshot | undefined;
 
-			return {
-				dispose: unsub,
-				invalidate() {},
-				render(width: number): string[] {
-					// --- Line 1: model + context meter (left), tokens + cost (right) ---
-					let tokIn = 0;
-					let tokOut = 0;
-					let cost = 0;
-					for (const entry of ctx.sessionManager.getBranch()) {
-						if (entry.type === "message" && entry.message.role === "assistant") {
-							const m = entry.message as AssistantMessage;
-							tokIn += m.usage.input;
-							tokOut += m.usage.output;
-							cost += m.usage.cost.total;
-						}
-					}
+      // Resolve hex colors from the theme instance for dynamic colors
+      const c = {
+        muted: extractHexFromTheme(theme, "muted"),
+        success: extractHexFromTheme(theme, "success"),
+        warning: extractHexFromTheme(theme, "warning"),
+        error: extractHexFromTheme(theme, "error"),
+        mdCode: extractHexFromTheme(theme, "mdCode"),
+        mdHeading: extractHexFromTheme(theme, "mdHeading"),
+        mdLink: extractHexFromTheme(theme, "mdLink"),
+        toolTitle: extractHexFromTheme(theme, "toolTitle"),
+        border: extractHexFromTheme(theme, "border"),
+      };
 
-					const fmt = (n: number) => n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`;
-					const home = os.homedir();
-					const dir = ctx.cwd.startsWith(home) ? `~/${path.relative(home, ctx.cwd)}` : ctx.cwd;
-					const branch = footerData.getGitBranch();
+      const refreshPrInfo = () => {
+        const branch = footerData.getGitBranch();
+        const key = branch ? `${ctx.cwd}\n${branch}` : "";
+        if (!key || key === prLookupKey || prLookupInFlight) return;
+        prLookupKey = key;
+        prLookupInFlight = true;
+        void getCurrentPrLabel(ctx.cwd)
+          .then((nextPrLabel) => {
+            prLabel = nextPrLabel;
+            tui.requestRender();
+          })
+          .finally(() => {
+            prLookupInFlight = false;
+          });
+      };
+      refreshPrInfo();
 
-					// --- Line 1: model + context meter (left), tokens + cost (right) ---
-					const usage = ctx.getContextUsage();
-					const pct = usage?.percent ?? 0;
-					const filled = Math.round(pct / 10) || 1;
-					const model = ctx.model
-						? `${ctx.model.provider}/${ctx.model.id}`
-						: "no-model";
-					const [modelProvider, ...modelIdParts] = model.split("/");
-					const modelId = modelIdParts.join("/");
-					const thinkingLevel = pi.getThinkingLevel();
-					const thinking = thinkingLevel ? ` [${thinkingLevel}]` : "";
+      const unsubBranch = footerData.onBranchChange(() => {
+        prLookupKey = "";
+        prLabel = undefined;
+        refreshPrInfo();
+        tui.requestRender();
+      });
 
-					const ctxWindow = usage ? usage.contextWindow : 0;
-					const ctxTokens = usage?.tokens ?? (tokIn + tokOut);
-					const codexStatus = isOpenAIModel(ctx.model)
-						? footerData.getExtensionStatuses().get("codex-usage")
-						: undefined;
-					const codexUsage = codexStatus ? formatCodexUsageForFooter(codexStatus) : undefined;
+      const unsubUsage = pi.events.on(CODEX_USAGE_UPDATE_EVENT, (data) => {
+        codexUsageSnapshot = isCodexUsageUpdate(data) ? data.snapshot : undefined;
+        tui.requestRender();
+      });
 
-					const modelDisplay = modelId
-						? hexFg(footerPalette.modelProvider, ` ${modelProvider}/`) + hexFg(footerPalette.modelId, modelId)
-						: hexFg(footerPalette.modelId, ` ${model}`);
-					const l1Left =
-						modelDisplay +
-						hexFg(footerPalette.thinking, thinking) +
-						hexFg(footerPalette.muted, " ") +
-						hexFg(footerPalette.bracket, "[") +
-						hexFg(footerPalette.progress, "#".repeat(filled)) +
-						hexFg(footerPalette.emptyProgress, "-".repeat(10 - filled)) +
-						hexFg(footerPalette.bracket, "]") +
-						hexFg(footerPalette.muted, " ") +
-						hexFg(footerPalette.context, `${Math.round(pct)}%`) +
-						hexFg(footerPalette.muted, ` (${fmt(ctxTokens)}/${fmt(ctxWindow)})`);
+      pi.events.emit(CODEX_USAGE_REQUEST_EVENT, { model: ctx.model });
 
-					const sep = hexFg(footerPalette.separator, " · ");
-					const sep2 = hexFg(footerPalette.separator, " │ ");
-					const l1Right =
-						hexFg(footerPalette.input, `${fmt(tokIn)}`) +
-						hexFg(footerPalette.muted, " in") + sep +
-						hexFg(footerPalette.output, `${fmt(tokOut)}`) +
-						hexFg(footerPalette.muted, " out") + sep2 +
-						hexFg(footerPalette.cost, `$${cost.toFixed(4)}`) +
-						hexFg(footerPalette.muted, " ");
+      return {
+        dispose() {
+          unsubBranch();
+          unsubUsage();
+          if (requestFooterRender === renderCurrentFooter) requestFooterRender = undefined;
+        },
+        invalidate() {},
+        render(width: number): string[] {
+          let tokIn = 0;
+          let tokOut = 0;
+          let cost = 0;
+          for (const entry of ctx.sessionManager.getBranch()) {
+            if (entry.type === "message" && entry.message.role === "assistant") {
+              const m = entry.message as AssistantMessage;
+              tokIn += m.usage.input;
+              tokOut += m.usage.output;
+              cost += m.usage.cost.total;
+            }
+          }
 
-					const pad1 = " ".repeat(Math.max(1, width - visibleWidth(l1Left) - visibleWidth(l1Right)));
-					const line1 = truncateToWidth(l1Left + pad1 + l1Right, width, "");
+          const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
 
-					// --- Line 2: cwd + branch (left), tool tally (right) ---
-					const l2Left =
-						hexFg(footerPalette.cwd, ` ${dir}`) +
-						(branch
-							? hexFg(footerPalette.muted, " ") + hexFg(footerPalette.separator, "(") + hexFg(footerPalette.branch, branch) + hexFg(footerPalette.separator, ")")
-							: "");
+          const home = homedir();
+          const dir = ctx.cwd.startsWith(home) ? `~/${relative(home, ctx.cwd)}` : ctx.cwd;
 
-					const entries = Object.entries(counts);
-					const l2Right = entries.length === 0
-						? hexFg(footerPalette.muted, "waiting for tools ")
-						: entries.map(
-							([name, count]) =>
-								hexFg(footerPalette.tool, name) + hexFg(footerPalette.muted, " ") + hexFg(footerPalette.input, `${count}`)
-						).join(hexFg(footerPalette.separator, " │ ")) + hexFg(footerPalette.muted, " ");
+          const branch = footerData.getGitBranch();
 
-					const pad2 = " ".repeat(Math.max(1, width - visibleWidth(l2Left) - visibleWidth(l2Right)));
-					const line2 = truncateToWidth(l2Left + pad2 + l2Right, width, "");
-					const limitsLine = codexUsage
-						? truncateToWidth(hexFg(footerPalette.muted, " limits ") + codexUsage, width, "")
-						: undefined;
+          // Context meter
+          const usage = ctx.getContextUsage();
+          const pct = usage?.percent ?? 0;
+          const filled = Math.round(pct / 10) || 1;
+          const ctxBarColor = pct < 50 ? c.success : pct < 70 ? c.warning : c.error;
 
-					return limitsLine ? [line1, limitsLine, line2] : [line1, line2];
-				},
-			};
-		});
-	});
+          // Model display
+          const model = ctx.model ? `${ctx.model.provider}/${ctx.model.id}` : "no-model";
+          const [modelProvider, ...modelIdParts] = model.split("/");
+          const modelId = modelIdParts.join("/");
+          const thinkingLevel = pi.getThinkingLevel();
+          const thinking = thinkingLevel ? ` [${thinkingLevel}]` : "";
+          const ctxWindow = usage ? usage.contextWindow : 0;
+          const ctxTokens = usage?.tokens ?? tokIn + tokOut;
+
+          const codexUsage = isOpenAIModel(ctx.model)
+            ? formatCodexUsage(codexUsageSnapshot, c)
+            : undefined;
+
+          // --- Line 1: left (model + context) | right (tokens + cost) ---
+          const modelDisplay = modelId
+            ? theme.fg("muted", ` ${modelProvider}/`) + theme.fg("text", modelId)
+            : theme.fg("text", ` ${model}`);
+
+          const l1Left =
+            modelDisplay +
+            hexFg(c.mdCode, thinking) +
+            theme.fg("muted", " ") +
+            theme.fg("dim", "[") +
+            hexFg(ctxBarColor, "#".repeat(filled)) +
+            hexFg(c.border, "-".repeat(10 - filled)) +
+            theme.fg("dim", "]") +
+            theme.fg("muted", " ") +
+            hexFg(ctxBarColor, `${Math.round(pct)}%`) +
+            theme.fg("muted", ` (${fmt(ctxTokens)}/${fmt(ctxWindow)})`);
+
+          const sep = theme.fg("muted", " · ");
+
+          const l1Right =
+            theme.fg("success", `${fmt(tokIn)}`) +
+            theme.fg("muted", " in") +
+            sep +
+            theme.fg("mdCode", `${fmt(tokOut)}`) +
+            theme.fg("muted", " out") +
+            sep +
+            theme.fg("mdHeading", `$${cost.toFixed(4)}`) +
+            theme.fg("muted", " ");
+
+          const line1 = composeLeftRight(l1Left, l1Right, width);
+
+          // --- Line 2: cwd + branch (left), tool tally (right) ---
+          refreshPrInfo();
+
+          const l2Left =
+            theme.fg("muted", ` 󰉋  ${dir}`) +
+            (branch
+              ? theme.fg("muted", " · ") +
+                theme.fg("mdHeading", `󰊢 ${branch}`) +
+                (prLabel
+                  ? theme.fg("muted", " ") +
+                    theme.fg("muted", "(") +
+                    theme.fg("mdLink", prLabel) +
+                    theme.fg("muted", ")")
+                  : "")
+              : "");
+
+          const entries = Object.entries(counts);
+          const toolStatus =
+            entries.length === 0
+              ? theme.fg("dim", "idle")
+              : entries
+                  .map(
+                    ([name, count]) =>
+                      theme.fg("mdCode", name) +
+                      theme.fg("muted", " ") +
+                      theme.fg("success", `${count}`),
+                  )
+                  .join(theme.fg("muted", " │ "));
+
+          const line2 = composeLeftRight(l2Left, toolStatus + theme.fg("muted", " "), width);
+
+          // --- Line 3: Codex usage ---
+          const line3 = codexUsage
+            ? truncateToWidth(theme.fg("muted", " ") + codexUsage, width, "")
+            : undefined;
+
+          return line3 ? [line1, "", line2, "", line3] : [line1, "", line2];
+        },
+      };
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Codex usage formatting (only runs for OpenAI models)
+// ---------------------------------------------------------------------------
+
+interface Colors {
+  muted: string;
+  success: string;
+  warning: string;
+  error: string;
+  toolTitle: string;
+}
+
+function limitColorHex(remainingPercent: number, c: Colors): string {
+  if (remainingPercent >= 50) return c.success;
+  if (remainingPercent >= 20) return c.warning;
+  return c.error;
+}
+
+function formatReset(epochSeconds: number | undefined, c: Colors): string {
+  if (!epochSeconds) return "";
+  const date = new Date(epochSeconds * 1000);
+  if (Number.isNaN(date.getTime())) return "";
+  const time = `${date.getHours().toString().padStart(2, "0")}:${date
+    .getMinutes()
+    .toString()
+    .padStart(2, "0")}`;
+  const now = new Date();
+  const reset =
+    date.toDateString() === now.toDateString()
+      ? time
+      : `${date.getDate()} ${date.toLocaleDateString(undefined, { month: "short" })} ${time}`;
+  return (
+    hexFg(c.muted, "  ") + hexFg(c.toolTitle, "") + hexFg(c.muted, "  ") + hexFg(c.muted, reset)
+  );
+}
+
+function formatLimitItem(label: string, window: CodexUsageWindow, c: Colors): string {
+  const percent = 100 - clampPercent(window.usedPercent);
+  return (
+    hexFg(c.muted, label) +
+    hexFg(limitColorHex(percent, c), ` ${percent.toFixed(0)}%`) +
+    formatReset(window.resetsAt, c)
+  );
+}
+
+function formatCodexUsage(snapshot: CodexUsageSnapshot | undefined, c: Colors): string | undefined {
+  if (!snapshot) return undefined;
+  const parts: string[] = [];
+  if (snapshot.primary) parts.push(formatLimitItem("5h", snapshot.primary, c));
+  if (snapshot.secondary) parts.push(formatLimitItem("wk", snapshot.secondary, c));
+  return parts.join(hexFg(c.muted, " · "));
+}
+
+function isCodexUsageUpdate(data: unknown): data is CodexUsageUpdate {
+  return !!data && typeof data === "object" && !Array.isArray(data);
 }
