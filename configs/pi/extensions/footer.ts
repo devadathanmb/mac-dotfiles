@@ -172,7 +172,7 @@ export default function (pi: ExtensionAPI) {
           unsubUsage();
           if (requestFooterRender === renderCurrentFooter) requestFooterRender = undefined;
         },
-        invalidate() {},
+        invalidate() { },
         render(width: number): string[] {
           let tokIn = 0;
           let tokOut = 0;
@@ -219,7 +219,7 @@ export default function (pi: ExtensionAPI) {
 
           const l1Left =
             modelDisplay +
-            hexFg(c.mdCode, thinking) +
+            hexFg(c.mdLink, thinking) +
             theme.fg("muted", " ") +
             theme.fg("dim", "[") +
             hexFg(ctxBarColor, "#".repeat(filled)) +
@@ -247,16 +247,16 @@ export default function (pi: ExtensionAPI) {
           refreshPrInfo();
 
           const l2Left =
-            theme.fg("muted", ` 󰉋  ${dir}`) +
+            theme.fg("muted", ` 󰉋 ${dir}`) +
             (branch
               ? theme.fg("muted", " · ") +
-                theme.fg("mdHeading", `󰊢 ${branch}`) +
-                (prLabel
-                  ? theme.fg("muted", " ") +
-                    theme.fg("muted", "(") +
-                    theme.fg("mdLink", prLabel) +
-                    theme.fg("muted", ")")
-                  : "")
+              theme.fg("mdHeading", ` ${branch}`) +
+              (prLabel
+                ? theme.fg("muted", " ") +
+                theme.fg("muted", "(") +
+                theme.fg("mdLink", prLabel) +
+                theme.fg("muted", ")")
+                : "")
               : "");
 
           const entries = Object.entries(counts);
@@ -264,13 +264,13 @@ export default function (pi: ExtensionAPI) {
             entries.length === 0
               ? theme.fg("dim", "idle")
               : entries
-                  .map(
-                    ([name, count]) =>
-                      theme.fg("mdCode", name) +
-                      theme.fg("muted", " ") +
-                      theme.fg("success", `${count}`),
-                  )
-                  .join(theme.fg("muted", " │ "));
+                .map(
+                  ([name, count]) =>
+                    theme.fg("mdCode", name) +
+                    theme.fg("muted", " ") +
+                    theme.fg("success", `${count}`),
+                )
+                .join(theme.fg("muted", " │ "));
 
           const line2 = composeLeftRight(l2Left, toolStatus + theme.fg("muted", " "), width);
 

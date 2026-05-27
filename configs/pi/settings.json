@@ -1,9 +1,9 @@
 {
   "lastChangelogVersion": "0.75.5",
-  "theme": "custom-github-dark",
+  "theme": "github-dark-high-contrast",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "gpt-5.2",
+  "defaultThinkingLevel": "off",
   "packages": [
     "npm:pi-subagents",
     "npm:pi-mcp-adapter",
