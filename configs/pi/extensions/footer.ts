@@ -318,7 +318,7 @@ function formatReset(epochSeconds: number | undefined, c: Colors): string {
       ? time
       : `${date.getDate()} ${date.toLocaleDateString(undefined, { month: "short" })} ${time}`;
   return (
-    hexFg(c.muted, "  ") + hexFg(c.toolTitle, "") + hexFg(c.muted, "  ") + hexFg(c.muted, reset)
+    hexFg(c.muted, " ") + hexFg(c.toolTitle, "  ") + hexFg(c.muted, " ") + hexFg(c.muted, reset)
   );
 }
 
@@ -335,7 +335,7 @@ function formatCodexUsage(snapshot: CodexUsageSnapshot | undefined, c: Colors): 
   if (!snapshot) return undefined;
   const parts: string[] = [];
   if (snapshot.primary) parts.push(formatLimitItem("5h", snapshot.primary, c));
-  if (snapshot.secondary) parts.push(formatLimitItem("wk", snapshot.secondary, c));
+  if (snapshot.secondary) parts.push(formatLimitItem("weekly", snapshot.secondary, c));
   return parts.join(hexFg(c.muted, " · "));
 }
 
