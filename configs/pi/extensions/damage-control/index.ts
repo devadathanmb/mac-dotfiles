@@ -93,7 +93,7 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("session_start", async (event, ctx) => {
     const quietStartup = event.reason === "startup" && isQuietStartup(ctx.cwd);
-    const rulesPath = join(ctx.cwd, "damage-control-rules.yaml");
+    const rulesPath = join(homedir(), ".pi", "agent", "damage-control-rules.yaml");
     try {
       if (existsSync(rulesPath)) {
         const content = readFileSync(rulesPath, "utf8");

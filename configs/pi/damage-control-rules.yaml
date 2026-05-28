@@ -1,0 +1,102 @@
+# 🛡️ Damage-Control Rules
+#
+# bashToolPatterns: regex patterns to check against bash commands
+#   pattern:  JavaScript regex (tested against the full command string)
+#   reason:   Message shown when matched
+#   ask:      true  → show confirm dialog (you can approve)
+#             false → hard block without asking (default)
+#
+# zeroAccessPaths: completely off-limits (no read, write, bash, etc.)
+# readOnlyPaths:   readable but not modifiable
+# noDeletePaths:   protected from rm/mv
+
+bashToolPatterns:
+  - pattern: \brm\s+(-rf?|--recursive)
+    reason: "Recursive/forced deletion"
+    ask: true
+
+  - pattern: \bsudo\b
+    reason: "Running command as root"
+    ask: true
+
+  - pattern: \b(chmod|chown)\b.*777
+    reason: "Setting world-writable permissions"
+    ask: true
+
+  - pattern: \bcurl\s+.*\|\s*(bash|sh)\b
+    reason: "Piping curl output directly to shell"
+    ask: true
+
+  # ── gh CLI creation commands ──
+  - pattern: \bgh\s+\w+\s+create\b
+    reason: "gh CLI creation command"
+    ask: true
+
+  # ── Git force push ──
+  - pattern: \bgit\s+push\s+.*--force\b
+    reason: "Force push to remote"
+    ask: true
+
+  - pattern: \bgit\s+push\s+-f\b
+    reason: "Force push (-f) to remote"
+    ask: true
+
+  # ── Git destructive operations ──
+  - pattern: \bgit\s+reset\s+--hard\b
+    reason: "Hard reset (destroys local changes)"
+    ask: true
+
+  - pattern: \bgit\s+rebase\b
+    reason: "Git rebase (rewrites history)"
+    ask: true
+
+  - pattern: \bgit\s+commit\s+--amend\b
+    reason: "Amending commit (rewrites history)"
+    ask: true
+
+  - pattern: \bgit\s+branch\s+-[dD]\b
+    reason: "Deleting a git branch"
+    ask: true
+
+  - pattern: \bgit\s+clean\s+-[^\s]*f\b
+    reason: "Force clean (removes untracked files)"
+    ask: true
+
+  - pattern: \bgit\s+stash\s+drop\b
+    reason: "Dropping a stash"
+    ask: true
+
+  - pattern: \bgit\s+checkout\s+--\b
+    reason: "Discarding local file changes"
+    ask: true
+
+  # ── AWS CLI ──
+  - pattern: \baws\s
+    reason: "The user prefers to run AWS CLI commands manually — ask them to execute it"
+
+  # ── Infrastructure / orchestration ──
+  - pattern: \bterraform\b
+    reason: "The user prefers to run Terraform commands manually — ask them to execute it"
+
+  - pattern: \bkubectl\b
+    reason: "The user prefers to run kubectl commands manually — ask them to execute it"
+
+  - pattern: \bhelm\b
+    reason: "The user prefers to run Helm commands manually — ask them to execute it"
+
+  - pattern: \bansible\b
+    reason: "The user prefers to run Ansible commands manually — ask them to execute it"
+
+  - pattern: \bpulumi\b
+    reason: "The user prefers to run Pulumi commands manually — ask them to execute it"
+
+zeroAccessPaths:
+  - "~/.ssh/"
+  - ".env"
+
+readOnlyPaths:
+  - "node_modules/"
+  - "package-lock.json"
+
+noDeletePaths:
+  - ".git/"

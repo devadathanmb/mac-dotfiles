@@ -58,6 +58,7 @@
     ~/.pi/agent/themes: configs/pi/themes
     ~/.pi/agent/npm/package.json: configs/pi/npm/package.json
     ~/.pi/agent/npm/package-lock.json: configs/pi/npm/package-lock.json
+    ~/.pi/agent/damage-control-rules.yaml: configs/pi/damage-control-rules.yaml
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
 - shell:
