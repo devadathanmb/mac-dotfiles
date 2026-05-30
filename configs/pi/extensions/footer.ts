@@ -122,17 +122,16 @@ export default function (pi: ExtensionAPI) {
       let prLookupInFlight = false;
       let codexUsageSnapshot: CodexUsageSnapshot | undefined;
 
-      // Resolve hex colors from the theme instance for dynamic colors
+      // Resolve hex colors from the active theme. Keep the footer mapped to
+      // semantic tokens instead of hardcoding a separate palette.
       const c = {
         muted: extractHexFromTheme(theme, "muted"),
         success: extractHexFromTheme(theme, "success"),
         warning: extractHexFromTheme(theme, "warning"),
         error: extractHexFromTheme(theme, "error"),
-        mdCode: extractHexFromTheme(theme, "mdCode"),
-        mdHeading: extractHexFromTheme(theme, "mdHeading"),
         mdLink: extractHexFromTheme(theme, "mdLink"),
         toolTitle: extractHexFromTheme(theme, "toolTitle"),
-        border: extractHexFromTheme(theme, "border"),
+        borderMuted: extractHexFromTheme(theme, "borderMuted"),
       };
 
       const refreshPrInfo = () => {
@@ -221,10 +220,10 @@ export default function (pi: ExtensionAPI) {
             modelDisplay +
             hexFg(c.mdLink, thinking) +
             theme.fg("muted", " ") +
-            theme.fg("dim", "[") +
+            theme.fg("text", "[") +
             hexFg(ctxBarColor, "#".repeat(filled)) +
-            hexFg(c.border, "-".repeat(10 - filled)) +
-            theme.fg("dim", "]") +
+            hexFg(c.borderMuted, "-".repeat(10 - filled)) +
+            theme.fg("text", "]") +
             theme.fg("muted", " ") +
             hexFg(ctxBarColor, `${Math.round(pct)}%`) +
             theme.fg("muted", ` (${fmt(ctxTokens)}/${fmt(ctxWindow)})`);
@@ -247,30 +246,32 @@ export default function (pi: ExtensionAPI) {
           refreshPrInfo();
 
           const l2Left =
-            theme.fg("muted", ` 󰉋 ${dir}`) +
+            theme.fg("accent", " 󰉋  ") +
+            theme.fg("text", dir) +
             (branch
-              ? theme.fg("muted", " · ") +
-              theme.fg("mdHeading", ` ${branch}`) +
+              ? theme.fg("dim", " · ") +
+              theme.fg("accent", " ") +
+              theme.fg("text", branch) +
               (prLabel
-                ? theme.fg("muted", " ") +
-                theme.fg("muted", "(") +
+                ? theme.fg("dim", " ") +
+                theme.fg("dim", "(") +
                 theme.fg("mdLink", prLabel) +
-                theme.fg("muted", ")")
+                theme.fg("dim", ")")
                 : "")
               : "");
 
           const entries = Object.entries(counts);
           const toolStatus =
             entries.length === 0
-              ? theme.fg("dim", "idle")
+              ? theme.fg("muted", "idle")
               : entries
                 .map(
                   ([name, count]) =>
-                    theme.fg("mdCode", name) +
-                    theme.fg("muted", " ") +
+                    theme.fg("toolTitle", name) +
+                    theme.fg("dim", " ") +
                     theme.fg("success", `${count}`),
                 )
-                .join(theme.fg("muted", " │ "));
+                .join(theme.fg("dim", " │ "));
 
           const line2 = composeLeftRight(l2Left, toolStatus + theme.fg("muted", " "), width);
 
