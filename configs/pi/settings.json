@@ -1,13 +1,16 @@
 {
-  "lastChangelogVersion": "0.75.5",
+  "lastChangelogVersion": "0.78.0",
   "theme": "github-dark-high-contrast",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.2",
-  "defaultThinkingLevel": "off",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "qwen3.7-max",
+  "defaultThinkingLevel": "medium",
   "packages": [
-    "npm:pi-subagents",
     "npm:pi-mcp-adapter",
-    "npm:@narumitw/pi-btw"
+    "npm:@narumitw/pi-btw",
+    "npm:@burneikis/pi-vim",
+    "npm:@gotgenes/pi-permission-system",
+    "npm:@gotgenes/pi-subagents",
+    "npm:pi-tool-display"
   ],
   "hideThinkingBlock": false,
   "extensions": [
@@ -17,7 +20,7 @@
     "showTerminalProgress": true
   },
   "enableInstallTelemetry": false,
-  "editorPaddingX": 2,
+  "editorPaddingX": 1,
   "showHardwareCursor": false,
   "quietStartup": true
 }

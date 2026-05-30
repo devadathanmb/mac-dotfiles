@@ -7,11 +7,11 @@
 		"bgInset": "#010409",
 		"fg": "#f0f3f5",
 		"white": "#d9dde3",
-		"gray": "#7a828e",
+		"gray": "#8b949e",
 		"blue": "#71b7ff",
 		"green": "#26cd4d",
 		"yellow": "#f0b72f",
-		"red": "#ff9492",
+		"red": "#ff7b72",
 		"magenta": "#cb9eff",
 		"cyan": "#39c5cf",
 		"orange": "#ffa657"
@@ -25,7 +25,7 @@
 		"error": "red",
 		"warning": "yellow",
 		"muted": "gray",
-		"dim": "#484f58",
+		"dim": "#6e7681",
 		"text": "fg",
 		"thinkingText": "gray",
 
@@ -56,7 +56,7 @@
 		"toolDiffRemoved": "red",
 		"toolDiffContext": "gray",
 
-		"syntaxComment": "#484f58",
+		"syntaxComment": "#6e7681",
 		"syntaxKeyword": "red",
 		"syntaxFunction": "magenta",
 		"syntaxVariable": "orange",
@@ -66,10 +66,10 @@
 		"syntaxOperator": "gray",
 		"syntaxPunctuation": "gray",
 
-		"thinkingOff": "#484f58",
+		"thinkingOff": "#5d6673",
 		"thinkingMinimal": "gray",
-		"thinkingLow": "blue",
-		"thinkingMedium": "magenta",
+		"thinkingLow": "#b7c0cc",
+		"thinkingMedium": "blue",
 		"thinkingHigh": "yellow",
 		"thinkingXhigh": "red",
 

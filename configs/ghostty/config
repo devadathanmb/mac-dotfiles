@@ -18,7 +18,7 @@
 # Shell
 command = /opt/homebrew/bin/fish --login --interactive
 
-font-family = "Maple Mono NF Medium"
+font-family = "JetBrainsMono NF Medium"
 font-size = 16.4
 font-thicken = true
 adjust-cell-width = "-4%"
