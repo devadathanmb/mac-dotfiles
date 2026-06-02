@@ -1,13 +1,11 @@
 {
   "lastChangelogVersion": "0.78.0",
-  "theme": "github-dark-high-contrast",
+  "theme": "pi-github-dark",
   "defaultProvider": "opencode-go",
-  "defaultModel": "qwen3.7-max",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "deepseek-v4-flash",
+  "defaultThinkingLevel": "high",
   "packages": [
     "npm:pi-mcp-adapter",
-    "npm:@narumitw/pi-btw",
-    "npm:@burneikis/pi-vim",
     "npm:@gotgenes/pi-permission-system",
     "npm:@gotgenes/pi-subagents",
     "npm:pi-tool-display"
