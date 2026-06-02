@@ -1,13 +1,7 @@
 {
-  "$schema": "https://raw.githubusercontent.com/gotgenes/pi-permission-system/main/schemas/permissions.schema.json",
   "debugLog": false,
   "permissionReviewLog": true,
-  "piInfrastructureReadPaths": [
-    "~/.agents/skills",
-    "~/.pi/agent/agents",
-    " /var/folders/tn"
-  ],
-  "yoloMode": false,
+  "yoloMode": true,
   "permission": {
     "*": "allow",
     "path": {
@@ -57,13 +51,11 @@
       "*;db-*": "deny",
       "*| db-*": "deny",
       "*|db-*": "deny",
-
       "docker push*": "deny",
       "docker * push*": "deny",
       "bash -lc *docker push*": "deny",
       "docker login*": "deny",
       "docker logout*": "deny",
-
       "nc *": "deny",
       "netcat *": "deny",
       "telnet *": "deny",
@@ -72,7 +64,6 @@
       "bash -lc *netcat *": "deny",
       "bash -lc *telnet *": "deny",
       "bash -lc *socat *": "deny",
-
       "env": "deny",
       "printenv": "deny",
       "set": "deny",
@@ -94,14 +85,12 @@
       "*${*PASSWORD*": "deny",
       "*${*CREDENTIAL*": "deny",
       "*${*AUTH*": "deny",
-
       "aws *": "deny",
       "terraform*": "deny",
       "kubectl*": "deny",
       "helm*": "deny",
       "ansible*": "deny",
       "pulumi*": "deny",
-
       "git push*": "ask",
       "bash -lc *git push*": "ask",
       "git tag -d*": "ask",
@@ -114,7 +103,6 @@
       "git clean *f*": "ask",
       "git stash drop*": "ask",
       "git checkout --*": "ask",
-
       "rm *": "ask",
       "bash -lc *rm *": "ask",
       "cp *": "ask",
@@ -183,7 +171,6 @@
       "yarn init*": "ask",
       "npx *": "ask",
       "bunx *": "ask",
-
       "* f-*": "deny",
       "*'f-*": "deny",
       "*\"f-*": "deny",
@@ -196,9 +183,6 @@
       "*'db-*": "deny",
       "*\"db-*": "deny",
       "*`db-*": "deny",
-      "*&&db-*": "deny",
-      "*;db-*": "deny",
-      "*|db-*": "deny",
       "*(db-*": "deny"
     },
     "external_directory": "ask"
