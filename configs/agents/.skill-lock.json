@@ -15,9 +15,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/vercel-labs/skills.git",
       "skillPath": "skills/find-skills/SKILL.md",
-      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "skillFolderHash": "3013fdeb8a11b10b1eb795ec3ae8bfca38f7c26d",
       "installedAt": "2026-02-13T17:49:12.607Z",
-      "updatedAt": "2026-02-13T17:49:12.607Z"
+      "updatedAt": "2026-06-06T15:21:19.992Z"
     },
     "golang-patterns": {
       "source": "affaan-m/everything-claude-code",
