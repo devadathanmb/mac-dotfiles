@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>appearanceSize</key>
+	<string>2</string>
+	<key>appearanceStyle</key>
+	<string>2</string>
+	<key>cursorFollowFocus</key>
+	<integer>1</integer>
+	<key>hideColoredCircles</key>
+	<string>false</string>
+	<key>hideSpaceNumberLabels</key>
+	<string>true</string>
+	<key>hideStatusIcons</key>
+	<string>true</string>
+	<key>holdShortcut</key>
+	<dict>
+		<key>secureData</key>
+		<data>
+		YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9i
+		amVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGlCwwZGhtV
+		JG51bGzWDQ4PEBESExQVFBcUXW1vZGlmaWVyRmxhZ3NfEBtjaGFyYWN0ZXJz
+		SWdub3JpbmdNb2RpZmllcnNWJGNsYXNzWmNoYXJhY3RlcnNXa2V5Q29kZVd2
+		ZXJzaW9ugAOAAIAEgACAAoAAEf//EgAQAADSHB0eH1okY2xhc3NuYW1lWCRj
+		bGFzc2VzWlNSU2hvcnRjdXSiHiBYTlNPYmplY3QIERokKTI3SUxRU1lfbHqY
+		n6qyury+wMLExsnO097n8vUAAAAAAAABAQAAAAAAAAAhAAAAAAAAAAAAAAAA
+		AAAA/g==
+		</data>
+		<key>string</key>
+		<string>⌘</string>
+	</dict>
+	<key>menubarIconShown</key>
+	<string>false</string>
+	<key>mouseHoverEnabled</key>
+	<string>true</string>
+	<key>previewFadeInAnimation</key>
+	<string>false</string>
+	<key>settingsWindowShownOnFirstLaunch</key>
+	<string>true</string>
+	<key>showHiddenWindows</key>
+	<string>1</string>
+	<key>showMinimizedWindows</key>
+	<string>1</string>
+	<key>showTitles</key>
+	<string>2</string>
+	<key>showWindowlessApps</key>
+	<string>1</string>
+	<key>spacesToShow</key>
+	<string>0</string>
+	<key>updatePolicy</key>
+	<string>2</string>
+	<key>vimKeysEnabled</key>
+	<string>false</string>
+	<key>windowDisplayDelay</key>
+	<string>0</string>
+</dict>
+</plist>

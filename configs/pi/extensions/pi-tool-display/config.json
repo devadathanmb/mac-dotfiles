@@ -8,7 +8,7 @@
     "edit": true,
     "write": true
   },
-  "enableNativeUserMessageBox": true,
+  "enableNativeUserMessageBox": false,
   "readOutputMode": "summary",
   "searchOutputMode": "preview",
   "mcpOutputMode": "summary",
@@ -17,7 +17,7 @@
   "bashOutputMode": "summary",
   "bashCollapsedLines": 10,
   "diffViewMode": "auto",
-  "diffIndicatorMode": "classic",
+  "diffIndicatorMode": "bars",
   "diffSplitMinWidth": 120,
   "diffCollapsedLines": 24,
   "diffWordWrap": true,
