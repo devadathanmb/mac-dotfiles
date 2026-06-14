@@ -46,6 +46,15 @@
       "pluginName": "example-skills",
       "installedAt": "2026-03-01T10:44:28.855Z",
       "updatedAt": "2026-03-01T10:44:28.855Z"
+    },
+    "stop-slop": {
+      "source": "hardikpandya/stop-slop",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/hardikpandya/stop-slop.git",
+      "skillPath": "SKILL.md",
+      "skillFolderHash": "8da1f030185bdfe8471220585162991eaeb970e9",
+      "installedAt": "2026-06-13T10:36:19.283Z",
+      "updatedAt": "2026-06-13T10:36:19.283Z"
     }
   },
   "dismissed": {
@@ -54,16 +63,17 @@
   "lastSelectedAgents": [
     "amp",
     "antigravity",
+    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
     "deepagents",
-    "firebender",
     "gemini-cli",
     "github-copilot",
-    "kimi-cli",
+    "kimi-code-cli",
     "opencode",
     "warp",
+    "zed",
     "claude-code"
   ]
 }

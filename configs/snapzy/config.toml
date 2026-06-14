@@ -1,5 +1,5 @@
 schema_version = 1
-snapzy_min_version = "1.20.6"
+snapzy_min_version = "1.21.0"
 
 [general]
 language = "en"
@@ -85,8 +85,8 @@ hold_duration = 0.3
 [quick_access]
 enabled = true
 position = "bottomRight"
-auto_dismiss = true
-auto_dismiss_delay = 10.0
+auto_dismiss = false
+auto_dismiss_delay = 15.0
 pause_countdown_on_hover = true
 overlay_scale = 1.0
 drag_drop = true
@@ -170,12 +170,12 @@ key = "E"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.cloud_uploads]
-enabled = true
+enabled = false
 key = "L"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.shortcut_list]
-enabled = true
+enabled = false
 key = "K"
 modifiers = ["command", "shift"]
 
@@ -190,7 +190,7 @@ key = "1"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.history]
-enabled = true
+enabled = false
 key = "H"
 modifiers = ["command", "shift"]
 
@@ -242,3 +242,8 @@ modifiers = ["command", "control"]
 enabled = true
 key = "U"
 modifiers = ["command"]
+
+[shortcuts.annotate_actions.auto_redact_sensitive_data]
+enabled = true
+key = ""
+modifiers = []

@@ -1,9 +1,9 @@
 {
-  "lastChangelogVersion": "0.78.1",
+  "lastChangelogVersion": "0.79.1",
   "theme": "pi-github-dark",
   "defaultProvider": "opencode-go",
-  "defaultModel": "deepseek-v4-flash",
-  "defaultThinkingLevel": "high",
+  "defaultModel": "minimax-m3",
+  "defaultThinkingLevel": "medium",
   "packages": [
     "npm:pi-mcp-adapter",
     "npm:@gotgenes/pi-permission-system",
@@ -20,5 +20,7 @@
   "enableInstallTelemetry": false,
   "editorPaddingX": 1,
   "showHardwareCursor": false,
-  "quietStartup": true
+  "quietStartup": true,
+  "treeFilterMode": "default",
+  "doubleEscapeAction": "none"
 }

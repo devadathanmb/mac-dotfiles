@@ -1,6 +1,7 @@
 [user]
 	name = Devadathan M B
 	email = devadathanmb@gmail.com
+	signingkey = /Users/devadathanmb/.ssh/id_ed25519_signing.pub
 
 [alias]
     graph = log --all --graph --decorate
@@ -26,3 +27,9 @@
 
 [core]
 	ignorecase = false
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
