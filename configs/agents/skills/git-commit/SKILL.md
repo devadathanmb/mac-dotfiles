@@ -135,4 +135,5 @@ EOF
 | Adding bullets from session chat that are absent from the diff | Only describe what the diff shows |
 | Describing a change as "merged X into Y" when the diff shows Y as purely new | Trust the diff: if the base had no Y, Y is new — say "added", not "merged" |
 | Describing removal of a symbol not visible in the diff | Map every bullet to specific diff hunks before writing |
+| Describing an intra-session refactor on a new file as a "drop" or "remove" | If the file is new, there are no removals — the diff only shows additions. Something cleaned up before the first commit never existed in the diff; omit it entirely |
 | Using session discussion to infer what "must have changed" | If it is not in the diff, it is not in the message |

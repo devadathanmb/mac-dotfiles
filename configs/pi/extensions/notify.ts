@@ -52,6 +52,42 @@ function notify(title: string, body: string): void {
   }
 }
 
+type NotifyEvent = {
+  title?: unknown;
+  body?: unknown;
+};
+
+type DamageControlPermissionEvent = {
+  tool?: unknown;
+  ruleId?: unknown;
+  reason?: unknown;
+  command?: unknown;
+  display?: unknown;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function toText(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function notifyFromEvent(data: unknown): void {
+  if (!isRecord(data)) return;
+  const event = data as NotifyEvent;
+  notify(toText(event.title) ?? "Pi", toText(event.body) ?? "Attention needed");
+}
+
+function notifyDamageControlPermission(data: unknown): void {
+  if (!isRecord(data)) return;
+  const event = data as DamageControlPermissionEvent;
+  const tool = toText(event.tool) ?? "tool";
+  const reason = toText(event.reason) ?? "Permission required";
+  const attempted = toText(event.command) ?? toText(event.display);
+  notify("Pi needs permission", attempted ? `${tool}: ${reason}\n${attempted}` : `${tool}: ${reason}`);
+}
+
 /** Strip OSC protocol delimiters and control characters from notification text. */
 function sanitizeForOSC(text: string): string {
   return text.replace(/[;\x07\x1b]/g, "");
@@ -63,6 +99,9 @@ function sanitizeForPowerShell(text: string): string {
 }
 
 export default function (pi: ExtensionAPI) {
+  pi.events.on("notify:send", notifyFromEvent);
+  pi.events.on("damage-control:permission-request", notifyDamageControlPermission);
+
   pi.on("agent_end", async () => {
     notify("Pi", "Ready for input");
   });

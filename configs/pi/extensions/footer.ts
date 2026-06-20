@@ -7,7 +7,6 @@
 import type { ExtensionAPI, Theme } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { execFile } from "node:child_process";
-import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { relative } from "node:path";
 import { promisify } from "node:util";
@@ -39,10 +38,17 @@ type GitInfo = {
   conflicts?: number;
 };
 
+type DamageControlStatus = {
+  mode?: "off" | "yolo" | "blacklist" | "whitelist" | "ask";
+  enabled?: boolean;
+  rulesLoaded?: number;
+};
+
 const CODEX_PROVIDER_ID = "openai-codex";
 const CODEX_USAGE_UPDATE_EVENT = "codex-usage:update";
 const CODEX_USAGE_REQUEST_EVENT = "codex-usage:request";
-const PERMISSION_CONFIG_PATH = `${homedir()}/.pi/agent/extensions/pi-permission-system/config.json`;
+const DAMAGE_CONTROL_STATUS_EVENT = "damage-control:status";
+const DAMAGE_CONTROL_STATUS_REQUEST_EVENT = "damage-control:status-request";
 const execFileAsync = promisify(execFile);
 
 function clampPercent(value: number): number {
@@ -129,16 +135,6 @@ async function getGitInfo(cwd: string, branchFromFooter?: string | null): Promis
   };
 }
 
-async function getYoloMode(): Promise<boolean> {
-  try {
-    const raw = await readFile(PERMISSION_CONFIG_PATH, "utf8");
-    const parsed = JSON.parse(raw) as { yoloMode?: unknown };
-    return parsed.yoloMode === true;
-  } catch {
-    return false;
-  }
-}
-
 function buildContextDisplay(
   usage: { percent: number | null; tokens: number | null; contextWindow: number } | undefined,
   theme: Theme,
@@ -188,6 +184,25 @@ function buildCodexDisplay(snapshot: CodexUsageSnapshot | undefined, theme: Them
   return parts.length > 0 ? parts.join(theme.fg("dim", "  ")) : undefined;
 }
 
+function buildDamageControlDisplay(status: DamageControlStatus | undefined, fallback: string | undefined, theme: Theme): string {
+  const mode = status?.mode ?? parseDamageControlMode(fallback);
+  if (mode) {
+    if (mode === "yolo") return theme.fg("warning", " YOLO");
+    if (mode === "off") return theme.fg("dim", " off");
+    const color = mode === "ask" ? "warning" : mode === "whitelist" ? "success" : "muted";
+    return theme.fg(color, ` ${mode}`);
+  }
+  return fallback ?? "";
+}
+
+function parseDamageControlMode(status: string | undefined): DamageControlStatus["mode"] | undefined {
+  if (!status) return undefined;
+  const match = status.match(/(?:DC:\s*|\s*)(off|yolo|YOLO|blacklist|whitelist|ask)/);
+  if (!match?.[1]) return undefined;
+  const mode = match[1].toLowerCase();
+  return isDamageControlMode(mode) ? mode : undefined;
+}
+
 export default function (pi: ExtensionAPI) {
   let requestFooterRender: (() => void) | undefined;
   let refreshGitInfo: ((force?: boolean) => void) | undefined;
@@ -207,16 +222,8 @@ export default function (pi: ExtensionAPI) {
       let gitInfo: GitInfo | undefined;
       let gitRefreshInFlight = false;
       let codexUsageSnapshot: CodexUsageSnapshot | undefined;
-      let yoloMode = false;
+      let damageControlStatus: DamageControlStatus | undefined;
       let disposed = false;
-
-      const refreshYoloMode = () => {
-        void getYoloMode().then((next) => {
-          if (disposed || next === yoloMode) return;
-          yoloMode = next;
-          tui.requestRender();
-        });
-      };
 
       refreshGitInfo = (force = false) => {
         if (gitRefreshInFlight && !force) return;
@@ -233,31 +240,34 @@ export default function (pi: ExtensionAPI) {
       };
 
       refreshGitInfo(true);
-      refreshYoloMode();
-      const yoloTimer = setInterval(refreshYoloMode, 2500);
-      yoloTimer.unref?.();
 
       const unsubBranch = footerData.onBranchChange(() => refreshGitInfo?.(true));
       const unsubUsage = pi.events.on(CODEX_USAGE_UPDATE_EVENT, (data) => {
         codexUsageSnapshot = isCodexUsageUpdate(data) ? data.snapshot : undefined;
         tui.requestRender();
       });
+      const unsubDamageControl = pi.events.on(DAMAGE_CONTROL_STATUS_EVENT, (data) => {
+        damageControlStatus = isDamageControlStatus(data) ? data : undefined;
+        tui.requestRender();
+      });
 
       pi.events.emit(CODEX_USAGE_REQUEST_EVENT, { model: ctx.model });
+      pi.events.emit(DAMAGE_CONTROL_STATUS_REQUEST_EVENT, {});
 
       return {
         dispose() {
           disposed = true;
-          clearInterval(yoloTimer);
           unsubBranch();
           unsubUsage();
+          unsubDamageControl();
           if (requestFooterRender === renderCurrentFooter) requestFooterRender = undefined;
           if (refreshGitInfo) refreshGitInfo = undefined;
         },
         invalidate() {},
         render(width: number): string[] {
           const contextDisplay = theme.fg("muted", " ") + buildContextDisplay(ctx.getContextUsage(), theme);
-          const modeDisplay = yoloMode ? theme.fg("warning", "YOLO") : "";
+          const fallbackStatus = footerData.getExtensionStatuses().get("damage-control");
+          const modeDisplay = buildDamageControlDisplay(damageControlStatus, fallbackStatus, theme);
           const line1 = composeLeftRight(contextDisplay, modeDisplay, width);
 
           const gitDisplay = theme.fg("muted", " ") + buildGitDisplay(ctx.cwd, gitInfo, theme);
@@ -304,4 +314,13 @@ function formatLimitItem(label: string, window: CodexUsageWindow, theme: Theme):
 
 function isCodexUsageUpdate(data: unknown): data is CodexUsageUpdate {
   return !!data && typeof data === "object" && !Array.isArray(data);
+}
+
+function isDamageControlStatus(data: unknown): data is DamageControlStatus {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return false;
+  return isDamageControlMode((data as DamageControlStatus).mode);
+}
+
+function isDamageControlMode(mode: unknown): mode is NonNullable<DamageControlStatus["mode"]> {
+  return mode === "off" || mode === "yolo" || mode === "blacklist" || mode === "whitelist" || mode === "ask";
 }
