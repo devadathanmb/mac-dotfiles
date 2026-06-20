@@ -1,0 +1,352 @@
+version: 1
+mode: blacklist
+
+cycleModes:
+  - blacklist
+  - whitelist
+  - ask
+  - yolo
+
+keymaps:
+  cycleMode: shift+tab
+  toggleYolo: ctrl+shift+y
+
+ui:
+  footerStatus: true
+  notifyOnBlock: true
+  notifyOnAsk: false
+  showChatMessages: true
+
+feedback:
+  blockedToolResult: continue
+  includeAdaptationHints: true
+
+defaults:
+  noUiAskBehavior: block
+
+rules:
+  - id: bash.rm-recursive
+    description: Recursive or forced deletion
+    match:
+      tool: bash
+      command:
+        program: rm
+        flagsAny: ["-r", "-R", "-f", "--recursive", "--force"]
+    action: ask
+    severity: high
+
+  - id: bash.sudo
+    description: Running a command as root
+    match:
+      tool: bash
+      command:
+        program: sudo
+    action: ask
+    severity: high
+
+  - id: bash.chmod-world-writable
+    description: Setting world-writable permissions
+    match:
+      tool: bash
+      commandRegex: "\\b(chmod|chown)\\b.*777"
+    action: ask
+    severity: high
+
+  - id: bash.curl-pipe-shell
+    description: Piping downloaded code directly to a shell
+    match:
+      tool: bash
+      commandRegex: "\\bcurl\\s+.*\\|\\s*(bash|sh)\\b"
+    action: ask
+    severity: high
+
+  - id: gh.create
+    description: GitHub CLI creation command
+    match:
+      tool: bash
+      commandRegex: "\\bgh\\s+\\w+\\s+create\\b"
+    action: ask
+    severity: medium
+
+  - id: git.force-push
+    description: Force push to remote
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["push"]
+        flagsAny: ["--force", "--force-with-lease", "-f"]
+    action: ask
+    severity: high
+
+  - id: git.reset-hard
+    description: Hard reset destroys local changes
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["reset", "--hard"]
+    action: ask
+    severity: high
+
+  - id: git.rebase
+    description: Rebase rewrites history
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["rebase"]
+    action: ask
+    severity: medium
+
+  - id: git.commit-amend
+    description: Amending a commit rewrites history
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["commit"]
+        flagsAny: ["--amend"]
+    action: ask
+    severity: medium
+
+  - id: git.branch-delete
+    description: Deleting a git branch
+    match:
+      tool: bash
+      commandRegex: "\\bgit\\s+branch\\s+-[dD]\\b"
+    action: ask
+    severity: medium
+
+  - id: git.clean-force
+    description: Force clean removes untracked files
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["clean"]
+        flagsAny: ["-f", "--force"]
+    action: ask
+    severity: high
+
+  - id: git.stash-drop
+    description: Dropping a stash removes saved work
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["stash", "drop"]
+    action: ask
+    severity: medium
+
+  - id: git.checkout-discard
+    description: Discarding local file changes
+    match:
+      tool: bash
+      commandRegex: "\\bgit\\s+checkout\\s+--\\b"
+    action: ask
+    severity: high
+
+  # --- Package installs: never let the agent fetch/install on its own -------------
+  - id: pkg.npm-install
+    description: Installing or changing npm dependencies
+    match:
+      tool: bash
+      commandRegex: "\\bnpm\\s+(install|i|ci|add|update|up)\\b"
+    action: ask
+    feedback:
+      agentHint: Don't add or install npm packages yourself; ask the user to run it.
+
+  - id: pkg.pip-install
+    description: Installing Python packages with pip
+    match:
+      tool: bash
+      commandRegex: "\\b(pip[0-9]*|python[0-9]*\\s+-m\\s+pip)\\s+install\\b"
+    action: ask
+    feedback:
+      agentHint: Don't pip-install packages yourself; ask the user to run it.
+
+  - id: pkg.go-install
+    description: Fetching or installing Go modules
+    match:
+      tool: bash
+      commandRegex: "\\bgo\\s+(install|get)\\b"
+    action: ask
+    feedback:
+      agentHint: Don't run go install/go get yourself; ask the user to run it.
+
+  - id: secrets.env
+    description: Do not read or modify env files
+    match:
+      path:
+        globAny: [".env", ".env.*", "**/.env", "**/.env.*"]
+        except: [".env.example", "**/.env.example"]
+    action: block
+    severity: critical
+    feedback:
+      agentHint: If you need a secret or env value, ask the user instead of reading the file.
+
+  - id: secrets.ssh
+    description: SSH keys and config are off-limits
+    match:
+      path:
+        globAny: ["~/.ssh/**"]
+    action: block
+    severity: critical
+
+  - id: node-modules.readonly
+    description: Do not modify node_modules
+    match:
+      path:
+        globAny: ["node_modules/**", "**/node_modules/**"]
+        operationsAny: ["write", "edit", "delete", "move"]
+    action: block
+    severity: medium
+
+  - id: lockfile.readonly
+    description: Do not modify package-lock.json without explicit user approval
+    match:
+      path:
+        globAny: ["package-lock.json", "**/package-lock.json"]
+        operationsAny: ["write", "edit", "delete", "move"]
+    action: block
+    severity: medium
+
+  - id: git-dir.protected
+    description: Do not modify or delete the .git directory
+    match:
+      path:
+        globAny: [".git/**", "**/.git/**"]
+        operationsAny: ["write", "edit", "delete", "move"]
+    action: block
+    severity: critical
+
+  - id: infra.aws.manual
+    description: The user prefers to run AWS CLI commands manually
+    match:
+      tool: bash
+      command:
+        program: aws
+    action: block
+    severity: medium
+    feedback:
+      agentHint: Ask the user to run the AWS command manually.
+
+  - id: infra.terraform.manual
+    description: The user prefers to run Terraform commands manually
+    match:
+      tool: bash
+      command:
+        program: terraform
+    action: block
+    severity: medium
+    feedback:
+      agentHint: Ask the user to run Terraform manually.
+
+  # Cluster-changing kubectl is manual (block); read/inspect/exec needs approval (ask).
+  # The mutating block rule wins over the ask rule below it (block > ask).
+  - id: infra.kubectl.mutating
+    description: Cluster-changing kubectl command; run it manually
+    match:
+      tool: bash
+      commandRegex: "\\bkubectl\\s+(apply|create|delete|edit|patch|replace|scale|rollout|drain|cordon|uncordon|taint|set|annotate|label|expose|autoscale)\\b"
+    action: block
+    feedback:
+      agentHint: Ask the user to run cluster-changing kubectl commands manually.
+
+  - id: infra.kubectl.other
+    description: Other kubectl commands (get, logs, describe, exec, port-forward, …)
+    match:
+      tool: bash
+      command:
+        program: kubectl
+    action: ask
+    feedback:
+      agentHint: For read-only kubectl output, ask the user to run it and share the result.
+
+  - id: infra.helm.manual
+    description: The user prefers to run Helm commands manually
+    match:
+      tool: bash
+      command:
+        program: helm
+    action: block
+    severity: medium
+    feedback:
+      agentHint: Ask the user to run Helm manually.
+
+  - id: infra.ansible.manual
+    description: The user prefers to run Ansible commands manually
+    match:
+      tool: bash
+      command:
+        program: ansible
+    action: block
+    severity: medium
+    feedback:
+      agentHint: Ask the user to run Ansible manually.
+
+  - id: infra.pulumi.manual
+    description: The user prefers to run Pulumi commands manually
+    match:
+      tool: bash
+      command:
+        program: pulumi
+    action: block
+    severity: medium
+    feedback:
+      agentHint: Ask the user to run Pulumi manually.
+
+  # --- Docker: local builds are fine; pushing/publishing images is manual ---------
+  - id: docker.push
+    description: Pushing a Docker image to a registry
+    match:
+      tool: bash
+      commandRegex: "\\bdocker(-compose)?\\s+(image\\s+|compose\\s+)?push\\b"
+    action: block
+    feedback:
+      agentHint: Don't push images; ask the user to run the docker push manually.
+
+  - id: docker.build-push
+    description: Building a Docker image with an inline push (buildx --push)
+    match:
+      tool: bash
+      commandRegex: "\\bdocker\\s+(buildx\\s+)?build\\b.*--push\\b"
+    action: block
+    feedback:
+      agentHint: Don't push images; build locally and ask the user to push.
+
+  # =================================================================================
+  # Whitelist baseline
+  # ---------------------------------------------------------------------------------
+  # These `allow` rules only matter in `mode: whitelist`, where an unmatched call is
+  # blocked. They let normal work through while the block/ask rules above still apply
+  # (block > ask > allow, so e.g. `npm install` still asks and `aws ...` still blocks).
+  #
+  # NOTE: they ALSO apply in `ask`/`blacklist` mode — harmless in blacklist, and in
+  # `ask` mode they mean these won't prompt (usually what you want). If you'd rather be
+  # asked before file writes even here, drop `allow.file-edits`.
+  #
+  # Caveat: program-prefix allowlisting can be widened by command chaining
+  # (`ls && something-else`); the path-based block rules above still protect secrets,
+  # .git, node_modules and lockfiles regardless.
+  # =================================================================================
+  - id: allow.read-shell
+    description: Common read-only shell commands
+    match:
+      tool: bash
+      commandRegex: "^\\s*(ls|cat|bat|head|tail|less|more|grep|rg|ag|find|fd|pwd|echo|printf|which|type|file|stat|wc|nl|cut|tr|sort|uniq|column|tree|du|df|date|whoami|id|hostname|uname|printenv|env|jq|yq|tldr|man)\\b"
+    action: allow
+
+  - id: allow.git-readonly
+    description: Read-only git inspection
+    match:
+      tool: bash
+      commandRegex: "^\\s*git\\s+(status|diff|log|show|branch|remote|tag|describe|blame|shortlog|rev-parse|ls-files|config\\s+--get)\\b"
+    action: allow
+
+  - id: allow.file-edits
+    description: Let the agent read and edit project files (path blocks still apply)
+    match:
+      toolsAny: ["read", "write", "edit", "grep", "ls", "find"]
+    action: allow

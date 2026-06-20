@@ -2,9 +2,6 @@
   "name": "pi-extensions",
   "private": true,
   "dependencies": {
-    "@gotgenes/pi-permission-system": "^12.0.0",
-    "@gotgenes/pi-subagents": "^15.0.1",
-    "pi-mcp-adapter": "^2.9.0",
-    "pi-tool-display": "^0.4.2"
+    "pi-mcp-adapter": "^2.10.0"
   }
 }

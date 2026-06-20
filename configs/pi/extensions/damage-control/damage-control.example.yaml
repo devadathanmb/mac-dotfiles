@@ -1,0 +1,149 @@
+# Damage Control — example configuration
+# ---------------------------------------
+# Copy this to your global config to get started:
+#
+#     cp damage-control.example.yaml ~/.pi/agent/damage-control.yaml
+#
+# A per-project override can live at <project>/.pi/damage-control.yaml; its rules are
+# appended to these, and it can drop rules below by id via `disableRules`.
+# See README.md for the full schema.
+
+# What happens to a tool call that NO rule below matches:
+#   off       -> allow everything (firewall disabled)
+#   yolo      -> allow everything (temporary; restores previous mode when toggled off)
+#   blacklist -> allow unless a rule says otherwise   (recommended default)
+#   whitelist -> block unless a rule allows it (read-only ops still pass)
+#   ask       -> ask for every unmatched call
+mode: blacklist
+
+# Order the `cycleMode` shortcut steps through.
+cycleModes:
+  - blacklist
+  - whitelist
+  - ask
+  - yolo
+
+keymaps:
+  cycleMode: shift+tab       # cycle through cycleModes
+  toggleYolo: ctrl+shift+y   # jump to YOLO and back
+
+ui:
+  footerStatus: true         # show "DC <mode>" in the footer
+  notifyOnBlock: true        # toast when a call is blocked
+  notifyOnAsk: false         # toast when a call needs approval
+  showChatMessages: true     # render block decisions inline in the transcript
+
+feedback:
+  blockedToolResult: continue  # continue = tell the agent and keep going; abort = stop the turn
+  includeAdaptationHints: true # add "if destructive, stop and ask" guidance for the agent
+
+# Rule ids to drop after merging (handy in a project config to relax a global rule).
+disableRules: []
+
+rules:
+  # --- command.program + flagsAny: destructive deletes ---------------------------
+  - id: bash.rm-recursive
+    description: Recursive or forced deletion
+    action: ask
+    match:
+      tool: bash
+      command:
+        program: rm
+        flagsAny: ["-r", "-R", "-f", "--recursive", "--force"]
+
+  # --- command.program: privilege escalation -------------------------------------
+  - id: bash.sudo
+    description: Running a command as root
+    action: ask
+    match:
+      tool: bash
+      command:
+        program: sudo
+
+  # --- commandRegex: free-form pattern over the raw command ----------------------
+  - id: bash.curl-pipe-shell
+    description: Piping downloaded code directly to a shell
+    action: ask
+    match:
+      tool: bash
+      commandRegex: "\\bcurl\\s+.*\\|\\s*(bash|sh)\\b"
+
+  # --- command.argsSequence + flagsAny: history-rewriting git --------------------
+  - id: git.force-push
+    description: Force push to remote
+    action: ask
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["push"]
+        flagsAny: ["--force", "--force-with-lease", "-f"]
+
+  - id: git.reset-hard
+    description: Hard reset destroys local changes
+    action: ask
+    match:
+      tool: bash
+      command:
+        program: git
+        argsSequence: ["reset", "--hard"]
+
+  # --- path.globAny + except: block secrets, allow the sample --------------------
+  - id: secrets.env
+    description: Do not read or modify env files
+    action: block
+    match:
+      path:
+        globAny: [".env", ".env.*", "**/.env", "**/.env.*"]
+        except: [".env.example", "**/.env.example"]
+    feedback:
+      agentHint: If you need a secret or env value, ask the user instead of reading the file.
+
+  # --- path.globAny with ~ expansion: SSH material -------------------------------
+  - id: secrets.ssh
+    description: SSH keys and config are off-limits
+    action: block
+    match:
+      path:
+        globAny: ["~/.ssh/**"]
+
+  # --- path.globAny + operationsAny: read-only directories -----------------------
+  # Reads pass; only mutating operations are blocked.
+  - id: node-modules.readonly
+    description: Do not modify node_modules
+    action: block
+    match:
+      path:
+        globAny: ["node_modules/**", "**/node_modules/**"]
+        operationsAny: ["write", "edit", "delete", "move"]
+
+  - id: git-dir.protected
+    description: Do not modify or delete the .git directory
+    action: block
+    match:
+      path:
+        globAny: [".git/**", "**/.git/**"]
+        operationsAny: ["write", "edit", "delete", "move"]
+
+  # --- command.program + agentHint: "I'll run this myself" tools -----------------
+  - id: infra.terraform.manual
+    description: The user prefers to run Terraform commands manually
+    action: block
+    match:
+      tool: bash
+      command:
+        program: terraform
+    feedback:
+      agentHint: Ask the user to run Terraform manually.
+
+  # --- whitelist starter (only used in `mode: whitelist`) ------------------------
+  # In blacklist/ask these allow rules are harmless; in whitelist they are what lets
+  # everyday work through. Uncomment and tailor when locking down.
+  #
+  # - id: allow.safe-readers
+  #   description: Allow common read-only shell tools
+  #   action: allow
+  #   match:
+  #     tool: bash
+  #     command:
+  #       includesAny: ["ls", "cat", "grep", "rg", "find", "git status", "git diff"]

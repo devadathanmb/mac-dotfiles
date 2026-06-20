@@ -1,19 +1,14 @@
 {
-  "lastChangelogVersion": "0.79.1",
+  "lastChangelogVersion": "0.79.8",
   "theme": "pi-github-dark",
   "defaultProvider": "opencode-go",
-  "defaultModel": "minimax-m3",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "deepseek-v4-flash",
+  "defaultThinkingLevel": "high",
   "packages": [
-    "npm:pi-mcp-adapter",
-    "npm:@gotgenes/pi-permission-system",
-    "npm:@gotgenes/pi-subagents",
-    "npm:pi-tool-display"
+    "npm:pi-mcp-adapter"
   ],
   "hideThinkingBlock": false,
-  "extensions": [
-    "extensions/gitignored-at-files.ts"
-  ],
+  "extensions": [],
   "terminal": {
     "showTerminalProgress": true
   },
