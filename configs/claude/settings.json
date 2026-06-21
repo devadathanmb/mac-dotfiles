@@ -37,6 +37,9 @@
     ],
     "defaultMode": "plan"
   },
+  "hooks": {
+    "PreToolUse": []
+  },
   "statusLine": {
     "type": "command",
     "command": "bash $HOME/.claude/statusline-command.sh"
@@ -63,5 +66,11 @@
       }
     }
   },
-  "skipDangerousModePermissionPrompt": true
+  "effortLevel": "medium",
+  "tui": "default",
+  "skipDangerousModePermissionPrompt": true,
+  "editorMode": "normal",
+  "verbose": true,
+  "preferredNotifChannel": "ghostty",
+  "voiceEnabled": true
 }
