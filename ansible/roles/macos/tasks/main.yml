@@ -231,6 +231,30 @@
     type: int
     value: 0
 
+- name: Trackpad | Enable force click globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.forceClick
+    type: int
+    value: 1
+
+- name: Trackpad | Enable spring-loaded folders
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.enabled
+    type: bool
+    value: true
+
+- name: Trackpad | Set spring-loaded folder delay
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.delay
+    type: float
+    value: 0.5
+
 # ==============================================================================
 # FINDER SETTINGS
 # ==============================================================================
@@ -307,6 +331,46 @@
     type: bool
     value: false
 
+- name: Finder | Open new windows to Home folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: NewWindowTarget
+    type: string
+    value: PfHm
+
+- name: Finder | Don't sync Desktop to iCloud Drive
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXICloudDriveDesktop
+    type: bool
+    value: false
+
+- name: Finder | Don't sync Documents to iCloud Drive
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXICloudDriveDocuments
+    type: bool
+    value: false
+
+- name: Finder | Auto-remove trash items after 30 days
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXRemoveOldTrashItems
+    type: bool
+    value: true
+
+- name: Finder | Hide recent tags in sidebar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowRecentTags
+    type: bool
+    value: false
+
 - name: Finder | Show ~/Library folder
   tags: [macos]
   ansible.builtin.file:
@@ -354,7 +418,7 @@
     domain: NSGlobalDomain
     key: InitialKeyRepeat
     type: int
-    value: 15
+    value: 10
 
 - name: Keyboard | Disable press and hold for key repeat
   tags: [macos]
@@ -364,21 +428,21 @@
     type: bool
     value: false
 
-- name: Keyboard | Disable automatic capitalization
+- name: Keyboard | Enable automatic capitalization
   tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticCapitalizationEnabled
     type: bool
-    value: false
+    value: true
 
-- name: Keyboard | Disable automatic period substitution
+- name: Keyboard | Enable automatic period substitution
   tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticPeriodSubstitutionEnabled
     type: bool
-    value: false
+    value: true
 
 - name: Keyboard | Disable smart quotes
   tags: [macos]
@@ -423,6 +487,50 @@
     key: NSNavPanelExpandedStateForSaveMode2
     type: bool
     value: true
+
+# ==============================================================================
+# APPEARANCE SETTINGS
+# ==============================================================================
+
+- name: Appearance | Enable Dark Mode
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleInterfaceStyle
+    type: string
+    value: Dark
+
+- name: Appearance | Set accent colour to Green
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleAccentColor
+    type: int
+    value: 4
+
+- name: Appearance | Set highlight colour to Green
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleHighlightColor
+    type: string
+    value: "0.752941 0.964706 0.678431 Green"
+
+- name: Appearance | Hide menu bar in fullscreen
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleMenuBarVisibleInFullscreen
+    type: int
+    value: 0
+
+- name: Appearance | Disable minimize on title bar double-click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleMiniaturizeOnDoubleClick
+    type: bool
+    value: false
 
 # ==============================================================================
 # DOCK SETTINGS
@@ -517,6 +625,61 @@
     value: false
   notify: Restart Dock
 
+- name: Dock | Set icon size
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: tilesize
+    type: int
+    value: 52
+  notify: Restart Dock
+
+- name: Dock | Don't group windows by app in Mission Control
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: expose-group-apps
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Enable Mission Control by dragging window to top
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: enterMissionControlByTopWindowDrag
+    type: bool
+    value: true
+  notify: Restart Dock
+
+# ==============================================================================
+# WINDOW MANAGER SETTINGS
+# ==============================================================================
+
+- name: Window Manager | Disable margins between tiled windows
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: EnableTiledWindowMargins
+    type: bool
+    value: false
+
+- name: Window Manager | Hide widgets on desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: StandardHideWidgets
+    type: bool
+    value: true
+
+- name: Window Manager | Group windows by app in Stage Manager
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: AppWindowGroupingBehavior
+    type: int
+    value: 1
+
 # ==============================================================================
 # HOT CORNERS
 # ==============================================================================
@@ -573,6 +736,36 @@
     key: Sound
     type: int
     value: 18
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Show Bluetooth as active-only in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: Bluetooth
+    type: int
+    value: 2
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Always show Display in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: Display
+    type: int
+    value: 8
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Always show Now Playing in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NowPlaying
+    type: int
+    value: 8
     host: currentHost
   notify: Restart SystemUIServer
 
@@ -823,6 +1016,26 @@
     key: SortDirection
     type: int
     value: 0
+
+# ==============================================================================
+# SPACES SETTINGS
+# ==============================================================================
+
+- name: Spaces | Use separate spaces per display
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.spaces
+    key: spans-displays
+    type: bool
+    value: false
+
+- name: Spaces | Switch to app's Space when activated
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleSpacesSwitchOnActivate
+    type: bool
+    value: true
 
 # ==============================================================================
 # APP STORE SETTINGS
