@@ -39,13 +39,13 @@
     value: true
   notify: Restart Dock
 
-- name: Dock | Show only open applications
+- name: Dock | Show pinned and open applications
   tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: static-only
     type: bool
-    value: true
+    value: false
   notify: Restart Dock
 
 - name: Dock | Don't animate opening applications
