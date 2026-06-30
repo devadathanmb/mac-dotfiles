@@ -24,9 +24,6 @@
 - name: Include security settings
   ansible.builtin.include_tasks: mac/security.yml
 
-- name: Include safari settings
-  ansible.builtin.include_tasks: mac/safari.yml
-
 - name: Include spaces settings
   ansible.builtin.include_tasks: mac/spaces.yml
 
