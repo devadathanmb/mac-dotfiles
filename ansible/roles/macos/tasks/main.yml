@@ -3,13 +3,32 @@
 # Manages system defaults via community.general.osx_defaults
 # Each topic is split into a dedicated file under mac/
 
-- ansible.builtin.include_tasks: mac/trackpad.yml
-- ansible.builtin.include_tasks: mac/finder.yml
-- ansible.builtin.include_tasks: mac/keyboard.yml
-- ansible.builtin.include_tasks: mac/appearance.yml
-- ansible.builtin.include_tasks: mac/dock.yml
-- ansible.builtin.include_tasks: mac/system_ui.yml
-- ansible.builtin.include_tasks: mac/security.yml
-- ansible.builtin.include_tasks: mac/safari.yml
-- ansible.builtin.include_tasks: mac/spaces.yml
-- ansible.builtin.include_tasks: mac/apps.yml
+- name: Include trackpad settings
+  ansible.builtin.include_tasks: mac/trackpad.yml
+
+- name: Include finder settings
+  ansible.builtin.include_tasks: mac/finder.yml
+
+- name: Include keyboard settings
+  ansible.builtin.include_tasks: mac/keyboard.yml
+
+- name: Include appearance settings
+  ansible.builtin.include_tasks: mac/appearance.yml
+
+- name: Include dock settings
+  ansible.builtin.include_tasks: mac/dock.yml
+
+- name: Include system UI settings
+  ansible.builtin.include_tasks: mac/system_ui.yml
+
+- name: Include security settings
+  ansible.builtin.include_tasks: mac/security.yml
+
+- name: Include safari settings
+  ansible.builtin.include_tasks: mac/safari.yml
+
+- name: Include spaces settings
+  ansible.builtin.include_tasks: mac/spaces.yml
+
+- name: Include app settings
+  ansible.builtin.include_tasks: mac/apps.yml
