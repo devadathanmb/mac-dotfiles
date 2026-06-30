@@ -1,0 +1,170 @@
+---
+# ==============================================================================
+# DOCK SETTINGS
+# ==============================================================================
+
+- name: Dock | Auto-hide Dock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: autohide
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Change minimize/maximize window effect to scale
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: mineffect
+    type: string
+    value: scale
+  notify: Restart Dock
+
+- name: Dock | Minimize windows into their application icon
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: minimize-to-application
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Show indicator lights for open applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: show-process-indicators
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Show only open applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: static-only
+    type: bool
+    value: true
+  notify: Restart Dock
+
+- name: Dock | Don't animate opening applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: launchanim
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Don't show recently used applications
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: show-recents
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Speed up Mission Control animations
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: expose-animation-duration
+    type: float
+    value: 0.1
+  notify: Restart Dock
+
+- name: Dock | Don't automatically rearrange Spaces
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: mru-spaces
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Set icon size
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: tilesize
+    type: int
+    value: 52
+  notify: Restart Dock
+
+- name: Dock | Don't group windows by app in Mission Control
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: expose-group-apps
+    type: bool
+    value: false
+  notify: Restart Dock
+
+- name: Dock | Enable Mission Control by dragging window to top
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: enterMissionControlByTopWindowDrag
+    type: bool
+    value: true
+  notify: Restart Dock
+
+# ==============================================================================
+# WINDOW MANAGER SETTINGS
+# ==============================================================================
+
+- name: Window Manager | Disable click wallpaper to show desktop (Sonoma+)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: EnableStandardClickToShowDesktop
+    type: bool
+    value: false
+
+- name: Window Manager | Disable margins between tiled windows
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: EnableTiledWindowMargins
+    type: bool
+    value: false
+
+- name: Window Manager | Hide widgets on desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: StandardHideWidgets
+    type: bool
+    value: true
+
+- name: Window Manager | Group windows by app in Stage Manager
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: AppWindowGroupingBehavior
+    type: int
+    value: 1
+
+# ==============================================================================
+# HOT CORNERS
+# ==============================================================================
+
+- name: Hot Corners | Top right screen corner - Disabled
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tr-corner
+    type: int
+    value: 0
+  notify: Restart Dock
+
+- name: Hot Corners | Top right screen corner modifier
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tr-modifier
+    type: int
+    value: 0
+  notify: Restart Dock

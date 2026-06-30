@@ -1,0 +1,44 @@
+---
+# ==============================================================================
+# APPEARANCE SETTINGS
+# ==============================================================================
+
+- name: Appearance | Enable Dark Mode
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleInterfaceStyle
+    type: string
+    value: Dark
+
+- name: Appearance | Set accent colour to Green
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleAccentColor
+    type: int
+    value: 4
+
+- name: Appearance | Set highlight colour to Green
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleHighlightColor
+    type: string
+    value: "0.752941 0.964706 0.678431 Green"
+
+- name: Appearance | Hide menu bar in fullscreen
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleMenuBarVisibleInFullscreen
+    type: int
+    value: 0
+
+- name: Appearance | Disable minimize on title bar double-click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleMiniaturizeOnDoubleClick
+    type: bool
+    value: false

@@ -1,0 +1,139 @@
+---
+# ==============================================================================
+# TERMINAL SETTINGS
+# ==============================================================================
+
+- name: Terminal | Use UTF-8 encoding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.terminal
+    key: StringEncodings
+    type: array
+    value:
+      - 4
+
+# ==============================================================================
+# SYSTEM UI SETTINGS
+# ==============================================================================
+
+- name: System UI | Show battery percentage in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: BatteryShowPercentage
+    type: bool
+    value: true
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Show volume icon in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: Sound
+    type: int
+    value: 18
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Show Bluetooth as active-only in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: Bluetooth
+    type: int
+    value: 2
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Always show Display in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: Display
+    type: int
+    value: 8
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Always show Now Playing in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NowPlaying
+    type: int
+    value: 8
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Beep on moving the slider
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.sound.beep.feedback
+    type: int
+    value: 1
+
+- name: System UI | Use 24-hour time format
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleICUForce24HourTime
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Reduce status item spacing
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSStatusItemSpacing
+    type: int
+    value: 12
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Reduce status item selection padding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSStatusItemSelectionPadding
+    type: int
+    value: 12
+    host: currentHost
+  notify: Restart SystemUIServer
+
+# ==============================================================================
+# SCREENSHOT SETTINGS
+# ==============================================================================
+
+- name: Screenshots | Create Screenshots directory
+  tags: [macos]
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
+    state: directory
+    mode: '0755'
+
+- name: Screenshots | Save screenshots to Screenshots folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: location
+    type: string
+    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
+
+- name: Screenshots | Save screenshots in PNG format
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: type
+    type: string
+    value: png
+
+- name: Screenshots | Disable shadow in screenshots
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: disable-shadow
+    type: bool
+    value: true

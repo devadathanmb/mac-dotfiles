@@ -1,0 +1,69 @@
+---
+# ==============================================================================
+# TEXTEDIT SETTINGS
+# ==============================================================================
+
+- name: TextEdit | Use plain text mode for new documents
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: RichText
+    type: bool
+    value: false
+
+- name: TextEdit | Use UTF-8 encoding
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: PlainTextEncoding
+    type: int
+    value: 4
+
+- name: TextEdit | Use UTF-8 encoding for write
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextEdit
+    key: PlainTextEncodingForWrite
+    type: int
+    value: 4
+
+# ==============================================================================
+# ACTIVITY MONITOR SETTINGS
+# ==============================================================================
+
+- name: Activity Monitor | Show all processes
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: ShowCategory
+    type: int
+    value: 100
+
+- name: Activity Monitor | Sort by CPU usage
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: SortColumn
+    type: string
+    value: CPUUsage
+
+- name: Activity Monitor | Set sort direction
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.ActivityMonitor
+    key: SortDirection
+    type: int
+    value: 0
+
+# ==============================================================================
+# APP STORE SETTINGS
+# ==============================================================================
+
+- name: App Store | Disable automatic downloads
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: /Library/Preferences/com.apple.SoftwareUpdate
+    key: AutomaticDownload
+    type: bool
+    value: false
+  become: true
