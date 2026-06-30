@@ -37,6 +37,7 @@
     ],
     "defaultMode": "plan"
   },
+  "model": "sonnet",
   "hooks": {
     "PreToolUse": []
   },
@@ -72,6 +73,5 @@
   "editorMode": "normal",
   "verbose": true,
   "preferredNotifChannel": "ghostty",
-  "voiceEnabled": true,
-  "model": "opus"
+  "voiceEnabled": true
 }
