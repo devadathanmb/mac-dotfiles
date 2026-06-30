@@ -6,6 +6,8 @@
 	<string>2</string>
 	<key>appearanceStyle</key>
 	<string>2</string>
+	<key>captureWindowsInBackground</key>
+	<string>false</string>
 	<key>cursorFollowFocus</key>
 	<integer>1</integer>
 	<key>hideColoredCircles</key>
@@ -51,7 +53,7 @@
 	<key>updatePolicy</key>
 	<string>2</string>
 	<key>vimKeysEnabled</key>
-	<string>false</string>
+	<string>true</string>
 	<key>windowDisplayDelay</key>
 	<string>0</string>
 </dict>

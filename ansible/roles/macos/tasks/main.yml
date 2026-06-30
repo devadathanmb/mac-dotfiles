@@ -6,6 +6,14 @@
 # TRACKPAD SETTINGS
 # ==============================================================================
 
+- name: Trackpad | Set tracking speed
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.scaling
+    type: float
+    value: 1.5
+
 - name: Trackpad | Enable tap to click
   tags: [macos]
   community.general.osx_defaults:
@@ -31,13 +39,197 @@
     type: bool
     value: true
 
-- name: Trackpad | Enable three-finger drag
+- name: Trackpad | Disable three-finger drag
   tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadThreeFingerDrag
     type: bool
+    value: false
+
+- name: Trackpad | Set click pressure (medium)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: FirstClickThreshold
+    type: int
+    value: 1
+
+- name: Trackpad | Set force click pressure (medium)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: SecondClickThreshold
+    type: int
+    value: 1
+
+- name: Trackpad | Enable force click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: ForceSuppressed
+    type: bool
+    value: false
+
+- name: Trackpad | Enable actuate detents
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: ActuateDetents
+    type: bool
     value: true
+
+- name: Trackpad | Disable drag lock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: DragLock
+    type: int
+    value: 0
+
+- name: Trackpad | Disable dragging
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: Dragging
+    type: int
+    value: 0
+
+- name: Trackpad | Disable corner secondary click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadCornerSecondaryClick
+    type: int
+    value: 0
+
+- name: Trackpad | Enable five-finger pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFiveFingerPinchGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger horizontal swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerHorizSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerPinchGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger vertical swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerVertSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable hand resting
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadHandResting
+    type: int
+    value: 1
+
+- name: Trackpad | Enable horizontal scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadHorizScroll
+    type: int
+    value: 1
+
+- name: Trackpad | Enable momentum scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadMomentumScroll
+    type: bool
+    value: true
+
+- name: Trackpad | Enable pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadPinch
+    type: bool
+    value: true
+
+- name: Trackpad | Enable rotate gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadRotate
+    type: bool
+    value: true
+
+- name: Trackpad | Enable scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadScroll
+    type: int
+    value: 1
+
+- name: Trackpad | Set three-finger horizontal swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerHorizSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Disable three-finger tap gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerTapGesture
+    type: int
+    value: 0
+
+- name: Trackpad | Set three-finger vertical swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerVertSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable two-finger double-tap gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadTwoFingerDoubleTapGesture
+    type: bool
+    value: true
+
+- name: Trackpad | Set two-finger right-edge swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadTwoFingerFromRightEdgeSwipeGesture
+    type: int
+    value: 3
+
+- name: Trackpad | Do not stop trackpad when USB mouse connected
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: USBMouseStopsTrackpad
+    type: int
+    value: 0
 
 # ==============================================================================
 # FINDER SETTINGS
@@ -210,7 +402,7 @@
     domain: NSGlobalDomain
     key: AppleKeyboardUIMode
     type: int
-    value: 3
+    value: 2
 
 # ==============================================================================
 # SAVE DIALOGS
@@ -245,14 +437,13 @@
     value: true
   notify: Restart Dock
 
-- name: Dock | Disable click wallpaper to show desktop
+- name: Dock | Disable click wallpaper to show desktop (Sonoma+)
   tags: [macos]
   community.general.osx_defaults:
-    domain: com.apple.dock
-    key: showDesktop
+    domain: com.apple.WindowManager
+    key: EnableStandardClickToShowDesktop
     type: bool
     value: false
-  notify: Restart Dock
 
 - name: Dock | Change minimize/maximize window effect to scale
   tags: [macos]
@@ -368,7 +559,7 @@
 - name: System UI | Show battery percentage in menu bar
   tags: [macos]
   community.general.osx_defaults:
-    domain: com.apple.controlcenter.plist
+    domain: com.apple.controlcenter
     key: BatteryShowPercentage
     type: bool
     value: true
@@ -378,10 +569,11 @@
 - name: System UI | Show volume icon in menu bar
   tags: [macos]
   community.general.osx_defaults:
-    domain: com.apple.controlcenter.plist
+    domain: com.apple.controlcenter
     key: Sound
     type: int
     value: 18
+    host: currentHost
   notify: Restart SystemUIServer
 
 - name: System UI | Beep on moving the slider
@@ -460,21 +652,17 @@
 # SECURITY SETTINGS
 # ==============================================================================
 
+# NOTE: defaults write to com.apple.screensaver for askForPassword/askForPasswordDelay
+# has been broken since macOS 10.13.4 — Apple moved this into a separate security
+# framework. Use sysadminctl or an MDM profile instead:
+#   sudo sysadminctl -screenLock immediate -adminUser <user> -adminPassword <pass>
 - name: Security | Require password immediately after sleep
   tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screensaver
-    key: askForPassword
-    type: int
-    value: 1
-
-- name: Security | Set password delay to 0 seconds
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screensaver
-    key: askForPasswordDelay
-    type: int
-    value: 0
+  ansible.builtin.command:
+    cmd: sysadminctl -screenLock immediate
+  become: true
+  changed_when: false
+  ignore_errors: true
 
 # ==============================================================================
 # PERFORMANCE SETTINGS
@@ -532,6 +720,14 @@
     type: bool
     value: true
 
+- name: Safari | Enable Develop menu (SandboxBroker — required on Big Sur+)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari.SandboxBroker
+    key: ShowDevelopMenu
+    type: bool
+    value: true
+
 - name: Safari | Enable Web Inspector
   tags: [macos]
   community.general.osx_defaults:
@@ -581,8 +777,8 @@
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: RichText
-    type: int
-    value: 0
+    type: bool
+    value: false
 
 - name: TextEdit | Use UTF-8 encoding
   tags: [macos]
@@ -610,7 +806,7 @@
     domain: com.apple.ActivityMonitor
     key: ShowCategory
     type: int
-    value: 0
+    value: 100
 
 - name: Activity Monitor | Sort by CPU usage
   tags: [macos]
@@ -635,7 +831,8 @@
 - name: App Store | Disable automatic downloads
   tags: [macos]
   community.general.osx_defaults:
-    domain: com.apple.SoftwareUpdate
+    domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticDownload
     type: bool
     value: false
+  become: true
