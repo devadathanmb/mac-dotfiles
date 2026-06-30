@@ -112,7 +112,7 @@ write_default com.apple.dock autohide bool true
 write_default com.apple.dock mineffect string scale
 write_default com.apple.dock minimize-to-application bool true
 write_default com.apple.dock show-process-indicators bool true
-write_default com.apple.dock static-only bool true
+write_default com.apple.dock static-only bool false
 write_default com.apple.dock launchanim bool false
 write_default com.apple.dock show-recents bool false
 write_default com.apple.dock expose-animation-duration float 0.1
@@ -165,6 +165,5 @@ log "Restarting affected services"
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
-killall cfprefsd 2>/dev/null || true
 
 log "Done. Some settings may require logging out or restarting to fully apply."
