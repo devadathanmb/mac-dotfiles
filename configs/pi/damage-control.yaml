@@ -200,7 +200,7 @@ rules:
       path:
         globAny: ["node_modules/**", "**/node_modules/**"]
         operationsAny: ["write", "edit", "delete", "move"]
-    action: block
+    action: ask
     severity: medium
 
   - id: lockfile.readonly
@@ -209,7 +209,7 @@ rules:
       path:
         globAny: ["package-lock.json", "**/package-lock.json"]
         operationsAny: ["write", "edit", "delete", "move"]
-    action: block
+    action: ask
     severity: medium
 
   - id: git-dir.protected
@@ -218,7 +218,7 @@ rules:
       path:
         globAny: [".git/**", "**/.git/**"]
         operationsAny: ["write", "edit", "delete", "move"]
-    action: block
+    action: ask
     severity: critical
 
   - id: infra.aws.manual

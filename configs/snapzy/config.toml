@@ -1,12 +1,12 @@
 schema_version = 1
-snapzy_min_version = "1.21.0"
+snapzy_min_version = "1.26.0"
 
 [general]
 language = "en"
 appearance = "system"
 play_sounds = true
 start_at_login = true
-export_location = "/Users/devadathanmb/Pictures/Screenshots"
+export_location = "~/Pictures/Screenshots"
 
 [updates]
 check_automatically = true
@@ -90,6 +90,8 @@ auto_dismiss_delay = 15.0
 pause_countdown_on_hover = true
 overlay_scale = 1.0
 drag_drop = true
+two_finger_swipe_to_dismiss = true
+swipe_sensitivity = 1.0
 actions_order = ["copy", "saveOrOpen", "dismiss", "delete", "edit", "uploadToCloud", "pinToScreen"]
 enabled_actions = ["copy", "delete", "dismiss", "edit", "pinToScreen", "saveOrOpen", "uploadToCloud"]
 
@@ -149,6 +151,11 @@ enabled = true
 key = "7"
 modifiers = ["command", "shift"]
 
+[shortcuts.global.active_window]
+enabled = true
+key = "9"
+modifiers = ["command", "shift"]
+
 [shortcuts.global.scrolling_capture]
 enabled = true
 key = "6"
@@ -158,6 +165,26 @@ modifiers = ["command", "shift"]
 enabled = true
 key = "5"
 modifiers = ["command", "shift"]
+
+[shortcuts.global.pause_resume_recording]
+enabled = true
+key = ""
+modifiers = []
+
+[shortcuts.global.toggle_pen_recording]
+enabled = true
+key = ""
+modifiers = []
+
+[shortcuts.global.restart_recording]
+enabled = true
+key = ""
+modifiers = []
+
+[shortcuts.global.delete_recording]
+enabled = true
+key = ""
+modifiers = []
 
 [shortcuts.global.annotate]
 enabled = true
@@ -184,6 +211,11 @@ enabled = true
 key = "2"
 modifiers = ["command", "shift"]
 
+[shortcuts.global.smart_element]
+enabled = true
+key = "4"
+modifiers = ["shift", "option"]
+
 [shortcuts.global.object_cutout]
 enabled = true
 key = "1"
@@ -206,8 +238,8 @@ modifiers = []
 
 [shortcuts.annotate_tools]
 disabled = []
-selection = "v"
 crop = "c"
+selection = "v"
 rectangle = "r"
 filledRectangle = "f"
 oval = "o"
@@ -216,6 +248,7 @@ line = "l"
 text = "t"
 highlighter = "h"
 blur = "b"
+spotlight = "s"
 counter = "n"
 watermark = "w"
 pencil = "p"
