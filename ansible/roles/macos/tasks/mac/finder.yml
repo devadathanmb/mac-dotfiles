@@ -1,0 +1,137 @@
+---
+# ==============================================================================
+# FINDER SETTINGS
+# ==============================================================================
+
+- name: Finder | Show all filename extensions
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleShowAllExtensions
+    type: bool
+    value: true
+
+- name: Finder | Show full POSIX path in window title
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: _FXShowPosixPathInTitle
+    type: bool
+    value: true
+
+- name: Finder | Hide all desktop icons
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: CreateDesktop
+    type: bool
+    value: false
+
+- name: Finder | Disable warning before changing file extension
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXEnableExtensionChangeWarning
+    type: bool
+    value: false
+
+- name: Finder | Set default search scope to current folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXDefaultSearchScope
+    type: string
+    value: SCcf
+
+- name: Finder | Show status bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowStatusBar
+    type: bool
+    value: true
+
+- name: Finder | Show path bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowPathbar
+    type: bool
+    value: true
+
+- name: Finder | Use list view as default
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXPreferredViewStyle
+    type: string
+    value: Nlsv
+
+- name: Finder | Disable warning before emptying Trash
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: WarnOnEmptyTrash
+    type: bool
+    value: false
+
+- name: Finder | Open new windows to Home folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: NewWindowTarget
+    type: string
+    value: PfHm
+
+- name: Finder | Don't sync Desktop to iCloud Drive
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXICloudDriveDesktop
+    type: bool
+    value: false
+
+- name: Finder | Don't sync Documents to iCloud Drive
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXICloudDriveDocuments
+    type: bool
+    value: false
+
+- name: Finder | Auto-remove trash items after 30 days
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXRemoveOldTrashItems
+    type: bool
+    value: true
+
+- name: Finder | Hide recent tags in sidebar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowRecentTags
+    type: bool
+    value: false
+
+- name: Finder | Show ~/Library folder
+  tags: [macos]
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/Library"
+    state: directory
+    mode: '0755'
+  register: library_folder
+
+- name: Finder | Check if ~/Library folder is hidden
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: "ls -ldO {{ ansible_facts['env']['HOME'] }}/Library"
+  register: library_chflags
+  changed_when: false
+
+- name: Finder | Remove hidden flag from ~/Library
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: "chflags nohidden {{ ansible_facts['env']['HOME'] }}/Library"
+  when: "'hidden' in library_chflags.stdout"

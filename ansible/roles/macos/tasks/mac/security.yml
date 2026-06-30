@@ -1,0 +1,28 @@
+---
+# ==============================================================================
+# SECURITY SETTINGS
+# ==============================================================================
+
+# NOTE: defaults write to com.apple.screensaver for askForPassword/askForPasswordDelay
+# has been broken since macOS 10.13.4 — Apple moved this into a separate security
+# framework. Use sysadminctl or an MDM profile instead:
+#   sudo sysadminctl -screenLock immediate -adminUser <user> -adminPassword <pass>
+- name: Security | Require auth immediately after sleep
+  tags: [macos]
+  ansible.builtin.command:
+    cmd: sysadminctl -screenLock immediate
+  become: true
+  changed_when: false
+  ignore_errors: true
+
+# ==============================================================================
+# PERFORMANCE SETTINGS
+# ==============================================================================
+
+- name: Performance | Disable automatic termination of inactive apps
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSDisableAutomaticTermination
+    type: bool
+    value: true

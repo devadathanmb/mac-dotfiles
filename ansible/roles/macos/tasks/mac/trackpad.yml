@@ -1,0 +1,253 @@
+---
+# ==============================================================================
+# TRACKPAD SETTINGS
+# ==============================================================================
+
+- name: Trackpad | Set tracking speed
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.scaling
+    type: float
+    value: 1.5
+
+- name: Trackpad | Enable tap to click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: Clicking
+    type: bool
+    value: true
+
+- name: Trackpad | Enable tap behavior globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    host: currentHost
+
+- name: Trackpad | Enable right-click with two fingers
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadRightClick
+    type: bool
+    value: true
+
+- name: Trackpad | Disable three-finger drag
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerDrag
+    type: bool
+    value: false
+
+- name: Trackpad | Set click pressure (medium)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: FirstClickThreshold
+    type: int
+    value: 1
+
+- name: Trackpad | Set force click pressure (medium)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: SecondClickThreshold
+    type: int
+    value: 1
+
+- name: Trackpad | Enable force click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: ForceSuppressed
+    type: bool
+    value: false
+
+- name: Trackpad | Enable actuate detents
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: ActuateDetents
+    type: bool
+    value: true
+
+- name: Trackpad | Disable drag lock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: DragLock
+    type: int
+    value: 0
+
+- name: Trackpad | Disable dragging
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: Dragging
+    type: int
+    value: 0
+
+- name: Trackpad | Disable corner secondary click
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadCornerSecondaryClick
+    type: int
+    value: 0
+
+- name: Trackpad | Enable five-finger pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFiveFingerPinchGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger horizontal swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerHorizSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerPinchGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable four-finger vertical swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadFourFingerVertSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable hand resting
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadHandResting
+    type: int
+    value: 1
+
+- name: Trackpad | Enable horizontal scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadHorizScroll
+    type: int
+    value: 1
+
+- name: Trackpad | Enable momentum scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadMomentumScroll
+    type: bool
+    value: true
+
+- name: Trackpad | Enable pinch gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadPinch
+    type: bool
+    value: true
+
+- name: Trackpad | Enable rotate gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadRotate
+    type: bool
+    value: true
+
+- name: Trackpad | Enable scroll
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadScroll
+    type: int
+    value: 1
+
+- name: Trackpad | Set three-finger horizontal swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerHorizSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Disable three-finger tap gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerTapGesture
+    type: int
+    value: 0
+
+- name: Trackpad | Set three-finger vertical swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadThreeFingerVertSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable two-finger double-tap gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadTwoFingerDoubleTapGesture
+    type: bool
+    value: true
+
+- name: Trackpad | Set two-finger right-edge swipe gesture
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: TrackpadTwoFingerFromRightEdgeSwipeGesture
+    type: int
+    value: 3
+
+- name: Trackpad | Do not stop trackpad when USB mouse connected
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: USBMouseStopsTrackpad
+    type: int
+    value: 0
+
+- name: Trackpad | Enable force click globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.forceClick
+    type: int
+    value: 1
+
+- name: Trackpad | Enable spring-loaded folders
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.enabled
+    type: bool
+    value: true
+
+- name: Trackpad | Set spring-loaded folder delay
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.delay
+    type: float
+    value: 0.5

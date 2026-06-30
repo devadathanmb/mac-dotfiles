@@ -1,0 +1,92 @@
+---
+# ==============================================================================
+# SAFARI & WEBKIT SETTINGS
+# ==============================================================================
+
+- name: Safari | Disable universal search
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: UniversalSearchEnabled
+    type: bool
+    value: false
+
+- name: Safari | Suppress search suggestions
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: SuppressSearchSuggestions
+    type: bool
+    value: true
+
+- name: Safari | Show full URL in address bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: ShowFullURLInSmartSearchField
+    type: bool
+    value: true
+
+- name: Safari | Enable Debug Menu
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: IncludeInternalDebugMenu
+    type: bool
+    value: true
+
+- name: Safari | Enable Develop menu
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: IncludeDevelopMenu
+    type: bool
+    value: true
+
+- name: Safari | Enable Develop menu (SandboxBroker — required on Big Sur+)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari.SandboxBroker
+    key: ShowDevelopMenu
+    type: bool
+    value: true
+
+- name: Safari | Enable Web Inspector
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: WebKitDeveloperExtrasEnabledPreferenceKey
+    type: bool
+    value: true
+
+- name: Safari | Enable Web Inspector (variant 2)
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled
+    type: bool
+    value: true
+
+- name: WebKit | Enable developer extras globally
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: WebKitDeveloperExtras
+    type: bool
+    value: true
+
+- name: Safari | Warn about fraudulent websites
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: WarnAboutFraudulentWebsites
+    type: bool
+    value: true
+
+- name: Safari | Update extensions automatically
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: InstallExtensionUpdatesAutomatically
+    type: bool
+    value: true
