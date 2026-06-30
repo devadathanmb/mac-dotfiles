@@ -72,5 +72,6 @@
   "editorMode": "normal",
   "verbose": true,
   "preferredNotifChannel": "ghostty",
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "model": "opus"
 }
