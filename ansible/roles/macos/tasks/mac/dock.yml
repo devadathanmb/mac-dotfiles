@@ -89,8 +89,8 @@
   community.general.osx_defaults:
     domain: com.apple.dock
     key: tilesize
-    type: int
-    value: 52
+    type: float
+    value: 52.0
   notify: Restart Dock
 
 - name: Dock | Don't group windows by app in Mission Control
