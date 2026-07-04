@@ -1,0 +1,50 @@
+---
+- name: Resolve macOS defaults backup file
+  ansible.builtin.set_fact:
+    macos_defaults_resolved_file: >-
+      {{ macos_defaults_file if macos_defaults_file.startswith('/') else dotfiles_repo ~ '/' ~ macos_defaults_file }}
+
+- name: Load macOS defaults backup
+  ansible.builtin.include_vars:
+    file: "{{ macos_defaults_resolved_file }}"
+
+- name: Validate macOS defaults backup
+  ansible.builtin.assert:
+    that:
+      - macos_defaults is defined
+      - macos_defaults is iterable
+    fail_msg: "{{ macos_defaults_resolved_file }} must define a macos_defaults list."
+
+- name: Apply present macOS defaults from backup
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    host: "{{ item.host | default(omit) }}"
+    state: present
+  become: "{{ item.become | default(false) }}"
+  loop: "{{ macos_defaults }}"
+  loop_control:
+    label: "{{ item.name | default(item.domain ~ ' ' ~ item.key) }}"
+  when: item.state | default('present') == 'present'
+  notify:
+    - Restart Dock
+    - Restart Finder
+    - Restart SystemUIServer
+
+- name: Remove absent macOS defaults from backup
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    host: "{{ item.host | default(omit) }}"
+    state: absent
+  become: "{{ item.become | default(false) }}"
+  loop: "{{ macos_defaults }}"
+  loop_control:
+    label: "{{ item.name | default(item.domain ~ ' ' ~ item.key) }}"
+  when: item.state | default('present') == 'absent'
+  notify:
+    - Restart Dock
+    - Restart Finder
+    - Restart SystemUIServer

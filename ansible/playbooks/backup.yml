@@ -155,6 +155,25 @@
       when: zed_extensions_dir.stat.exists
       tags: zed
 
+    # macOS Defaults Backup
+    - name: Back up managed macOS defaults to timestamped file
+      ansible.builtin.command:
+        argv:
+          - "{{ ansible_playbook_python }}"
+          - "{{ dotfiles_repo }}/ansible/scripts/backup_macos_defaults.py"
+          - --source-dir
+          - "{{ dotfiles_repo }}/ansible/roles/macos/tasks/mac"
+          - --output-dir
+          - "{{ dotfiles_repo }}/configs/macos/backups"
+      register: macos_defaults_backup
+      changed_when: true
+      tags: macos
+
+    - name: Display macOS defaults backup result
+      ansible.builtin.debug:
+        msg: "{{ macos_defaults_backup.stdout }}"
+      tags: macos
+
     # Summary
     - name: Display backup summary
       ansible.builtin.debug:
@@ -167,5 +186,6 @@
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
           Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}
           Zed extensions: {{ zed_extensions.stdout_lines | default([]) | length }}
+          macOS defaults backup: {{ macos_defaults_backup.stdout | default('not run') }}
           ========================================
           Run `git diff` to see changes, then `git add` and `git commit` to save.

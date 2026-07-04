@@ -1,0 +1,603 @@
+---
+macos_defaults:
+- name: Appearance | Enable Dark Mode
+  domain: NSGlobalDomain
+  key: AppleInterfaceStyle
+  type: string
+  state: present
+  value: Dark
+- name: Appearance | Set accent colour to Green
+  domain: NSGlobalDomain
+  key: AppleAccentColor
+  type: int
+  state: present
+  value: 4
+- name: Appearance | Set highlight colour to Green
+  domain: NSGlobalDomain
+  key: AppleHighlightColor
+  type: string
+  state: present
+  value: 0.752941 0.964706 0.678431 Green
+- name: Appearance | Hide menu bar in fullscreen
+  domain: NSGlobalDomain
+  key: AppleMenuBarVisibleInFullscreen
+  type: int
+  state: present
+  value: 0
+- name: Appearance | Disable minimize on title bar double-click
+  domain: NSGlobalDomain
+  key: AppleMiniaturizeOnDoubleClick
+  type: bool
+  state: present
+  value: false
+- name: TextEdit | Use plain text mode for new documents
+  domain: com.apple.TextEdit
+  key: RichText
+  type: bool
+  state: absent
+- name: TextEdit | Use UTF-8 encoding
+  domain: com.apple.TextEdit
+  key: PlainTextEncoding
+  type: int
+  state: absent
+- name: TextEdit | Use UTF-8 encoding for write
+  domain: com.apple.TextEdit
+  key: PlainTextEncodingForWrite
+  type: int
+  state: absent
+- name: Activity Monitor | Show all processes
+  domain: com.apple.ActivityMonitor
+  key: ShowCategory
+  type: int
+  state: absent
+- name: Activity Monitor | Sort by CPU usage
+  domain: com.apple.ActivityMonitor
+  key: SortColumn
+  type: string
+  state: absent
+- name: Activity Monitor | Set sort direction
+  domain: com.apple.ActivityMonitor
+  key: SortDirection
+  type: int
+  state: absent
+- name: App Store | Disable automatic downloads
+  domain: /Library/Preferences/com.apple.SoftwareUpdate
+  key: AutomaticDownload
+  type: bool
+  state: present
+  become: true
+  value: true
+- name: Dock | Auto-hide Dock
+  domain: com.apple.dock
+  key: autohide
+  type: bool
+  state: present
+  value: true
+- name: Dock | Change minimize/maximize window effect to scale
+  domain: com.apple.dock
+  key: mineffect
+  type: string
+  state: absent
+- name: Dock | Minimize windows into their application icon
+  domain: com.apple.dock
+  key: minimize-to-application
+  type: bool
+  state: present
+  value: true
+- name: Dock | Show indicator lights for open applications
+  domain: com.apple.dock
+  key: show-process-indicators
+  type: bool
+  state: absent
+- name: Dock | Show pinned and open applications
+  domain: com.apple.dock
+  key: static-only
+  type: bool
+  state: absent
+- name: Dock | Don't animate opening applications
+  domain: com.apple.dock
+  key: launchanim
+  type: bool
+  state: present
+  value: false
+- name: Dock | Don't show recently used applications
+  domain: com.apple.dock
+  key: show-recents
+  type: bool
+  state: present
+  value: false
+- name: Dock | Speed up Mission Control animations
+  domain: com.apple.dock
+  key: expose-animation-duration
+  type: float
+  state: absent
+- name: Dock | Don't automatically rearrange Spaces
+  domain: com.apple.dock
+  key: mru-spaces
+  type: bool
+  state: present
+  value: false
+- name: Dock | Set icon size
+  domain: com.apple.dock
+  key: tilesize
+  type: float
+  state: present
+  value: 52.0
+- name: Dock | Don't group windows by app in Mission Control
+  domain: com.apple.dock
+  key: expose-group-apps
+  type: bool
+  state: present
+  value: false
+- name: Dock | Enable Mission Control by dragging window to top
+  domain: com.apple.dock
+  key: enterMissionControlByTopWindowDrag
+  type: bool
+  state: present
+  value: true
+- name: Window Manager | Disable click wallpaper to show desktop (Sonoma+)
+  domain: com.apple.WindowManager
+  key: EnableStandardClickToShowDesktop
+  type: bool
+  state: present
+  value: false
+- name: Window Manager | Disable margins between tiled windows
+  domain: com.apple.WindowManager
+  key: EnableTiledWindowMargins
+  type: bool
+  state: present
+  value: false
+- name: Window Manager | Hide widgets on desktop
+  domain: com.apple.WindowManager
+  key: StandardHideWidgets
+  type: bool
+  state: present
+  value: true
+- name: Window Manager | Group windows by app in Stage Manager
+  domain: com.apple.WindowManager
+  key: AppWindowGroupingBehavior
+  type: int
+  state: present
+  value: 1
+- name: Hot Corners | Top right screen corner - Disabled
+  domain: com.apple.dock
+  key: wvous-tr-corner
+  type: int
+  state: absent
+- name: Hot Corners | Top right screen corner modifier
+  domain: com.apple.dock
+  key: wvous-tr-modifier
+  type: int
+  state: absent
+- name: Finder | Show all filename extensions
+  domain: NSGlobalDomain
+  key: AppleShowAllExtensions
+  type: bool
+  state: present
+  value: true
+- name: Finder | Show full POSIX path in window title
+  domain: com.apple.finder
+  key: _FXShowPosixPathInTitle
+  type: bool
+  state: absent
+- name: Finder | Hide all desktop icons
+  domain: com.apple.finder
+  key: CreateDesktop
+  type: bool
+  state: present
+  value: false
+- name: Finder | Disable warning before changing file extension
+  domain: com.apple.finder
+  key: FXEnableExtensionChangeWarning
+  type: bool
+  state: present
+  value: false
+- name: Finder | Set default search scope to current folder
+  domain: com.apple.finder
+  key: FXDefaultSearchScope
+  type: string
+  state: present
+  value: SCcf
+- name: Finder | Show status bar
+  domain: com.apple.finder
+  key: ShowStatusBar
+  type: bool
+  state: present
+  value: false
+- name: Finder | Show path bar
+  domain: com.apple.finder
+  key: ShowPathbar
+  type: bool
+  state: present
+  value: true
+- name: Finder | Use list view as default
+  domain: com.apple.finder
+  key: FXPreferredViewStyle
+  type: string
+  state: absent
+- name: Finder | Disable warning before emptying Trash
+  domain: com.apple.finder
+  key: WarnOnEmptyTrash
+  type: bool
+  state: absent
+- name: Finder | Open new windows to Home folder
+  domain: com.apple.finder
+  key: NewWindowTarget
+  type: string
+  state: present
+  value: PfHm
+- name: Finder | Don't sync Desktop to iCloud Drive
+  domain: com.apple.finder
+  key: FXICloudDriveDesktop
+  type: bool
+  state: present
+  value: false
+- name: Finder | Don't sync Documents to iCloud Drive
+  domain: com.apple.finder
+  key: FXICloudDriveDocuments
+  type: bool
+  state: present
+  value: false
+- name: Finder | Auto-remove trash items after 30 days
+  domain: com.apple.finder
+  key: FXRemoveOldTrashItems
+  type: bool
+  state: present
+  value: true
+- name: Finder | Hide recent tags in sidebar
+  domain: com.apple.finder
+  key: ShowRecentTags
+  type: bool
+  state: present
+  value: false
+- name: Keyboard | Disable automatic spelling correction
+  domain: NSGlobalDomain
+  key: NSAutomaticSpellingCorrectionEnabled
+  type: bool
+  state: present
+  value: false
+- name: Keyboard | Set fast key repeat rate
+  domain: NSGlobalDomain
+  key: KeyRepeat
+  type: int
+  state: present
+  value: 1
+- name: Keyboard | Set fast initial key repeat
+  domain: NSGlobalDomain
+  key: InitialKeyRepeat
+  type: int
+  state: present
+  value: 10
+- name: Keyboard | Disable press and hold for key repeat
+  domain: NSGlobalDomain
+  key: ApplePressAndHoldEnabled
+  type: bool
+  state: present
+  value: false
+- name: Keyboard | Enable automatic capitalization
+  domain: NSGlobalDomain
+  key: NSAutomaticCapitalizationEnabled
+  type: bool
+  state: present
+  value: true
+- name: Keyboard | Enable automatic period substitution
+  domain: NSGlobalDomain
+  key: NSAutomaticPeriodSubstitutionEnabled
+  type: bool
+  state: present
+  value: true
+- name: Keyboard | Disable smart quotes
+  domain: NSGlobalDomain
+  key: NSAutomaticQuoteSubstitutionEnabled
+  type: bool
+  state: absent
+- name: Keyboard | Disable smart dashes
+  domain: NSGlobalDomain
+  key: NSAutomaticDashSubstitutionEnabled
+  type: bool
+  state: absent
+- name: Keyboard | Enable full keyboard access for all controls
+  domain: NSGlobalDomain
+  key: AppleKeyboardUIMode
+  type: int
+  state: absent
+- name: Save Dialogs | Always expand save panel by default
+  domain: NSGlobalDomain
+  key: NSNavPanelExpandedStateForSaveMode
+  type: bool
+  state: present
+  value: true
+- name: Save Dialogs | Always expand save panel (variant 2)
+  domain: NSGlobalDomain
+  key: NSNavPanelExpandedStateForSaveMode2
+  type: bool
+  state: present
+  value: true
+- name: Performance | Disable automatic termination of inactive apps
+  domain: NSGlobalDomain
+  key: NSDisableAutomaticTermination
+  type: bool
+  state: absent
+- name: Spaces | Use separate spaces per display
+  domain: com.apple.spaces
+  key: spans-displays
+  type: bool
+  state: present
+  value: false
+- name: Spaces | Switch to app's Space when activated
+  domain: NSGlobalDomain
+  key: AppleSpacesSwitchOnActivate
+  type: bool
+  state: present
+  value: true
+- name: Terminal | Use UTF-8 encoding
+  domain: com.apple.terminal
+  key: StringEncodings
+  type: array
+  state: present
+  value:
+  - 4
+- name: System UI | Show battery percentage in menu bar
+  domain: com.apple.controlcenter
+  key: BatteryShowPercentage
+  type: bool
+  state: present
+  host: currentHost
+  value: true
+- name: System UI | Show volume icon in menu bar
+  domain: com.apple.controlcenter
+  key: Sound
+  type: int
+  state: present
+  host: currentHost
+  value: 18
+- name: System UI | Show Bluetooth as active-only in menu bar
+  domain: com.apple.controlcenter
+  key: Bluetooth
+  type: int
+  state: present
+  host: currentHost
+  value: 2
+- name: System UI | Always show Display in menu bar
+  domain: com.apple.controlcenter
+  key: Display
+  type: int
+  state: present
+  host: currentHost
+  value: 8
+- name: System UI | Always show Now Playing in menu bar
+  domain: com.apple.controlcenter
+  key: NowPlaying
+  type: int
+  state: present
+  host: currentHost
+  value: 8
+- name: System UI | Beep on moving the slider
+  domain: NSGlobalDomain
+  key: com.apple.sound.beep.feedback
+  type: int
+  state: present
+  value: 1
+- name: System UI | Use 24-hour time format
+  domain: NSGlobalDomain
+  key: AppleICUForce24HourTime
+  type: bool
+  state: present
+  value: true
+- name: System UI | Reduce status item spacing
+  domain: NSGlobalDomain
+  key: NSStatusItemSpacing
+  type: int
+  state: present
+  host: currentHost
+  value: 12
+- name: System UI | Reduce status item selection padding
+  domain: NSGlobalDomain
+  key: NSStatusItemSelectionPadding
+  type: int
+  state: present
+  host: currentHost
+  value: 12
+- name: Screenshots | Save screenshots to Screenshots folder
+  domain: com.apple.screencapture
+  key: location
+  type: string
+  state: present
+  value: /Users/devadathanmb/Pictures/Screenshots
+- name: Screenshots | Save screenshots in PNG format
+  domain: com.apple.screencapture
+  key: type
+  type: string
+  state: absent
+- name: Screenshots | Disable shadow in screenshots
+  domain: com.apple.screencapture
+  key: disable-shadow
+  type: bool
+  state: absent
+- name: Trackpad | Set tracking speed
+  domain: NSGlobalDomain
+  key: com.apple.trackpad.scaling
+  type: float
+  state: present
+  value: 1.5
+- name: Trackpad | Enable tap to click
+  domain: com.apple.AppleMultitouchTrackpad
+  key: Clicking
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Enable tap behavior globally
+  domain: NSGlobalDomain
+  key: com.apple.mouse.tapBehavior
+  type: int
+  state: present
+  host: currentHost
+  value: 1
+- name: Trackpad | Enable right-click with two fingers
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadRightClick
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Disable three-finger drag
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadThreeFingerDrag
+  type: bool
+  state: present
+  value: false
+- name: Trackpad | Set click pressure (medium)
+  domain: com.apple.AppleMultitouchTrackpad
+  key: FirstClickThreshold
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Set force click pressure (medium)
+  domain: com.apple.AppleMultitouchTrackpad
+  key: SecondClickThreshold
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Enable force click
+  domain: com.apple.AppleMultitouchTrackpad
+  key: ForceSuppressed
+  type: bool
+  state: present
+  value: false
+- name: Trackpad | Enable actuate detents
+  domain: com.apple.AppleMultitouchTrackpad
+  key: ActuateDetents
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Disable drag lock
+  domain: com.apple.AppleMultitouchTrackpad
+  key: DragLock
+  type: int
+  state: present
+  value: 0
+- name: Trackpad | Disable dragging
+  domain: com.apple.AppleMultitouchTrackpad
+  key: Dragging
+  type: int
+  state: present
+  value: 0
+- name: Trackpad | Disable corner secondary click
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadCornerSecondaryClick
+  type: int
+  state: present
+  value: 0
+- name: Trackpad | Enable five-finger pinch gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadFiveFingerPinchGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Enable four-finger horizontal swipe gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadFourFingerHorizSwipeGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Enable four-finger pinch gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadFourFingerPinchGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Enable four-finger vertical swipe gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadFourFingerVertSwipeGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Enable hand resting
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadHandResting
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Enable horizontal scroll
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadHorizScroll
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Enable momentum scroll
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadMomentumScroll
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Enable pinch gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadPinch
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Enable rotate gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadRotate
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Enable scroll
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadScroll
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Set three-finger horizontal swipe gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadThreeFingerHorizSwipeGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Disable three-finger tap gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadThreeFingerTapGesture
+  type: int
+  state: present
+  value: 0
+- name: Trackpad | Set three-finger vertical swipe gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadThreeFingerVertSwipeGesture
+  type: int
+  state: present
+  value: 2
+- name: Trackpad | Enable two-finger double-tap gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadTwoFingerDoubleTapGesture
+  type: int
+  state: present
+  value: 1
+- name: Trackpad | Set two-finger right-edge swipe gesture
+  domain: com.apple.AppleMultitouchTrackpad
+  key: TrackpadTwoFingerFromRightEdgeSwipeGesture
+  type: int
+  state: present
+  value: 3
+- name: Trackpad | Do not stop trackpad when USB mouse connected
+  domain: com.apple.AppleMultitouchTrackpad
+  key: USBMouseStopsTrackpad
+  type: int
+  state: present
+  value: 0
+- name: Trackpad | Enable force click globally
+  domain: NSGlobalDomain
+  key: com.apple.trackpad.forceClick
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Enable spring-loaded folders
+  domain: NSGlobalDomain
+  key: com.apple.springing.enabled
+  type: bool
+  state: present
+  value: true
+- name: Trackpad | Set spring-loaded folder delay
+  domain: NSGlobalDomain
+  key: com.apple.springing.delay
+  type: float
+  state: present
+  value: 0.5

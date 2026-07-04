@@ -1,0 +1,2 @@
+---
+dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"

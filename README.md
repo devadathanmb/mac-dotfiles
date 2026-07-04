@@ -52,9 +52,15 @@ ansible-playbook playbooks/main.yml --check --diff    # dry run
 ```bash
 cd ~/.mac-dots/ansible
 ansible-playbook playbooks/backup.yml
+
+# Back up only managed macOS defaults.
+ansible-playbook playbooks/backup.yml --tags macos
+
+# Apply one timestamped macOS defaults backup.
+ansible-playbook playbooks/macos.yml -e macos_defaults_file=configs/macos/backups/macos-defaults-YYYYMMDD-HHMMSS.yml
 ```
 
-This reads installed Homebrew formulae, casks, and VSCode/Cursor/Zed extensions off the current machine and writes them into the repo. Check `git diff` before committing.
+This reads installed Homebrew formulae, casks, VSCode/Cursor/Zed extensions, and managed macOS defaults off the current machine and writes them into the repo. macOS defaults backups are timestamped under `configs/macos/backups/`; check `git diff` before committing.
 
 ## Layout
 
