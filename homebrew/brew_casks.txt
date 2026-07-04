@@ -1,9 +1,11 @@
 alt-tab
 antigravity
+antigravity-cli
 arc
 balenaetcher
 burp-suite
 calibre
+chatgpt
 claude
 claude-code@latest
 codex
@@ -13,6 +15,7 @@ discord
 font-commit-mono-nerd-font
 font-fira-code
 font-fontawesome
+font-geist-mono-nerd-font
 font-ibm-plex-mono
 font-jetbrains-mono
 font-jetbrains-mono-nerd-font
@@ -42,7 +45,6 @@ spotify
 stats
 superwhisper
 tailscale-app
-telegram-desktop
 visual-studio-code
 zed
 zen
