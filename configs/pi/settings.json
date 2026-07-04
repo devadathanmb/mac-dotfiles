@@ -1,9 +1,9 @@
 {
-  "lastChangelogVersion": "0.80.2",
+  "lastChangelogVersion": "0.80.3",
   "theme": "pi-github-dark",
-  "defaultProvider": "opencode-go",
-  "defaultModel": "glm-5.2",
-  "defaultThinkingLevel": "high",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
+  "defaultThinkingLevel": "medium",
   "packages": [
     "npm:pi-mcp-adapter"
   ],

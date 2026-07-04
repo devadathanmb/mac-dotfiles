@@ -13,7 +13,7 @@ alias lgit="lazygit"
 alias ldocker="lazydocker"
 alias down="cd ~/Downloads"
 alias mv="mv -i"
-alias brewup="echo 'Brewing...' && brew update && brew upgrade && brew cleanup && clear && echo 'Brew complete'"
+alias brewup="echo 'Brewing...' && brew update && yes | brew upgrade && yes | brew cleanup && clear && echo 'Brew complete'"
 
 
 # Vim Aliases

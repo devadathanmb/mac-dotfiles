@@ -56,5 +56,3 @@ export PATH=$PATH:/Users/devadathanmb/.spicetify
 # Added by Antigravity
 export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
 
-# Amp CLI
-export PATH="/Users/devadathanmb/.amp/bin:$PATH"
