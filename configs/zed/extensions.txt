@@ -1,3 +1,6 @@
+astro
+dockerfile
 github-dark-default
 html
 make
+mdx

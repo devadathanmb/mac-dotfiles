@@ -11,14 +11,14 @@
 
   tasks:
     # Homebrew Formulae Backup
-    - name: Get installed Homebrew formulae
+    - name: Get top-level Homebrew formulae
       ansible.builtin.command:
-        cmd: brew list --formula
+        cmd: brew leaves
       register: installed_formulae
       changed_when: false
       tags: formulae
 
-    - name: Write installed formulae to file
+    - name: Write top-level formulae to file
       ansible.builtin.copy:
         content: "{{ installed_formulae.stdout | trim }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
@@ -28,7 +28,7 @@
 
     - name: Display formulae backup result
       ansible.builtin.debug:
-        msg: "Backed up {{ installed_formulae.stdout_lines | length }} Homebrew formulae to brew_packages.txt"
+        msg: "Backed up {{ installed_formulae.stdout_lines | length }} top-level Homebrew formulae to brew_packages.txt"
       tags: formulae
 
     # Homebrew Casks Backup
@@ -162,7 +162,7 @@
           ========================================
           Backup Complete!
           ========================================
-          Homebrew formulae: {{ installed_formulae.stdout_lines | default([]) | length }}
+          Homebrew formulae (leaves): {{ installed_formulae.stdout_lines | default([]) | length }}
           Homebrew casks: {{ installed_casks.stdout_lines | default([]) | length }}
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
           Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}

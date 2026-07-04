@@ -12,7 +12,6 @@ dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 foxundermoon.shell-format
-github.copilot-chat
 github.github-vscode-theme
 github.vscode-pull-request-github
 golang.go
@@ -50,7 +49,9 @@ sst-dev.opencode
 subframe7536.custom-ui-style
 sumneko.lua
 swiftlang.swift-vscode
+typescriptteam.native-preview
 uberkael.context-link
+unifiedjs.vscode-mdx
 uniquevision.vscode-plpgsql-lsp
 upstash.context7-mcp
 usernamehw.errorlens
