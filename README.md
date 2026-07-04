@@ -1,70 +1,69 @@
-# Dotfiles
+# mac-dots
 
 > Hello, welcome $HOME
 
-Personal dotfiles repository for macOS, managed with [Ansible](https://docs.ansible.com/) orchestrating [Dotbot](https://github.com/anishathalye/dotbot) for symlinks.
+My macOS setup, managed with [Ansible](https://docs.ansible.com/). Ansible orchestrates [Dotbot](https://github.com/anishathalye/dotbot), which does the symlinking.
 
-## Quick Start
+## What's managed
 
-### Full setup
+- **Shell**: zsh (zap, powerlevel10k), fish
+- **Terminal**: Ghostty, Kitty, iTerm2
+- **Editors**: VSCode, Cursor, Zed, Vim. Extension lists are tracked and reinstalled on setup.
+- **AI coding tools**: Claude Code (settings, agents, hooks, skills), Codex, OpenCode, Pi, shared MCP config
+- **CLI tools**: tmux, git, gh, curl, wget, atuin, pgcli, psql, htop, btop, mpv, and a few more in `configs/` and the top-level dotfiles
+- **macOS system defaults**: dock, Finder, keyboard, trackpad, security, spaces, appearance. No sudo needed.
+- **Homebrew**: formulae and casks, tracked in `homebrew/`, reinstalled on setup
+
+## Setup
+
 ```bash
-git clone https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
+git clone --recursive https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
 cd ~/.mac-dots
 ./ansible/bootstrap.sh
 ```
 
-### Selective execution
+`bootstrap.sh` installs Homebrew and Ansible if missing, then runs the full playbook.
+
+Dotbot is a git submodule. If you clone without `--recursive`, pull it in with:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Running things selectively
+
 ```bash
 cd ~/.mac-dots/ansible
 
-# Run all roles
-ansible-playbook playbooks/main.yml
+ansible-playbook playbooks/main.yml                   # everything
 
-# Run specific roles
-ansible-playbook playbooks/main.yml --tags dotbot     # Symlinks
-ansible-playbook playbooks/main.yml --tags homebrew   # Homebrew packages
-ansible-playbook playbooks/main.yml --tags macos      # macOS defaults
-ansible-playbook playbooks/main.yml --tags zsh      # ZSH (Zap ZSH)
-ansible-playbook playbooks/main.yml --tags editors    # Editor extensions
-ansible-playbook playbooks/asdf.yml                   # ASDF (Python + Node.js)
+ansible-playbook playbooks/main.yml --tags dotbot     # symlinks
+ansible-playbook playbooks/main.yml --tags homebrew   # packages
+ansible-playbook playbooks/main.yml --tags macos      # system defaults
+ansible-playbook playbooks/main.yml --tags zsh        # zap zsh
+ansible-playbook playbooks/main.yml --tags editors    # editor extensions
+ansible-playbook playbooks/asdf.yml                   # asdf (Python + Node.js)
 
-# Dry-run (preview changes)
-ansible-playbook playbooks/main.yml --check --diff
+ansible-playbook playbooks/main.yml --check --diff    # dry run
 ```
 
-### Backup
+## Pulling live state back into the repo
+
 ```bash
 cd ~/.mac-dots/ansible
 ansible-playbook playbooks/backup.yml
 ```
 
-## Structure
+This reads installed Homebrew formulae, casks, and VSCode/Cursor/Zed extensions off the current machine and writes them into the repo. Check `git diff` before committing.
+
+## Layout
 
 ```
-ansible/
-├── ansible.cfg              # Ansible configuration
-├── requirements.yml         # Ansible collections
-├── bootstrap.sh             # Fresh install entry point
-├── inventory/
-│   └── localhost.yml        # Localhost inventory
-├── group_vars/
-│   └── all.yml              # Shared variables
-├── playbooks/
-│   ├── main.yml             # Orchestrates all roles
-│   ├── dotbot.yml           # Dotbot symlinks
-│   ├── packages.yml         # Homebrew packages
-│   ├── macos.yml            # macOS defaults
-│   ├── zsh.yml              # Zap ZSH shell
-│   ├── editors.yml          # VSCode + Cursor + Zed extensions
-│   ├── asdf.yml             # ASDF version manager
-│   └── backup.yml           # Backup packages/extensions
-└── roles/
-    ├── dotbot/              # Orchestrates ./install
-    ├── homebrew/            # Homebrew packages
-    ├── macos/               # System defaults
-    ├── zsh/                 # Zap ZSH
-    ├── editors/             # Editor extensions
-    └── asdf/                # ASDF
+ansible/            # Playbooks and roles
+configs/             # App configs, symlinked by Dotbot
+homebrew/            # Tracked formulae and casks
+scripts/             # Standalone scripts, symlinked to ~/.local/bin
+install.conf.yaml    # Dotbot's symlink map
 ```
 
 ## License
