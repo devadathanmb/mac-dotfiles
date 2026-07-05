@@ -1,10 +1,11 @@
 schema_version = 1
-snapzy_min_version = "1.26.0"
+snapzy_min_version = "1.27.0"
 
 [general]
 language = "en"
 appearance = "system"
 play_sounds = true
+url_scheme_enabled = true
 start_at_login = true
 export_location = "~/Pictures/Screenshots"
 
@@ -235,6 +236,11 @@ modifiers = []
 enabled = true
 key = "A"
 modifiers = []
+
+[shortcuts.quick_access.edit_latest_capture]
+enabled = false
+key = "↩"
+modifiers = ["command"]
 
 [shortcuts.annotate_tools]
 disabled = []
