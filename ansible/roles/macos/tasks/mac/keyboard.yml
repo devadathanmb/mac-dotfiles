@@ -35,6 +35,66 @@
     type: bool
     value: false
 
+- name: Keyboard | Read Caps Lock modifier key mapping
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - -currentHost
+      - read
+      - NSGlobalDomain
+      - com.apple.keyboard.modifiermapping.0-0-0
+  register: caps_lock_modifier_mapping
+  changed_when: false
+  failed_when: false
+  vars:
+    macos_defaults_backup:
+      domain: NSGlobalDomain
+      key: com.apple.keyboard.modifiermapping.0-0-0
+      type: plist
+      host: currentHost
+
+- name: Keyboard | Persist Caps Lock to Escape modifier key mapping
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - -currentHost
+      - write
+      - NSGlobalDomain
+      - com.apple.keyboard.modifiermapping.0-0-0
+      - -array
+      - "{HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771113;}"
+  when: >-
+    caps_lock_modifier_mapping.rc != 0
+    or 'HIDKeyboardModifierMappingSrc = 30064771129' not in caps_lock_modifier_mapping.stdout
+    or 'HIDKeyboardModifierMappingDst = 30064771113' not in caps_lock_modifier_mapping.stdout
+
+- name: Keyboard | Read active HID key mapping
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - hidutil
+      - property
+      - --get
+      - UserKeyMapping
+  register: active_hid_key_mapping
+  changed_when: false
+  failed_when: false
+
+- name: Keyboard | Apply active Caps Lock to Escape HID key mapping
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - hidutil
+      - property
+      - --set
+      - '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
+  when: >-
+    active_hid_key_mapping.rc != 0
+    or ('0x700000039' not in active_hid_key_mapping.stdout and '30064771129' not in active_hid_key_mapping.stdout)
+    or ('0x700000029' not in active_hid_key_mapping.stdout and '30064771113' not in active_hid_key_mapping.stdout)
+
 - name: Keyboard | Enable automatic capitalization
   tags: [macos]
   community.general.osx_defaults:

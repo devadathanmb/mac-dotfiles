@@ -13,6 +13,11 @@ from typing import Any
 import yaml
 
 
+class IndentedSafeDumper(yaml.SafeDumper):
+    def increase_indent(self, flow: bool = False, indentless: bool = False) -> None:
+        return super().increase_indent(flow, False)
+
+
 def managed_defaults(source_dir: Path) -> list[dict[str, Any]]:
     defaults: list[dict[str, Any]] = []
 
@@ -23,24 +28,43 @@ def managed_defaults(source_dir: Path) -> list[dict[str, Any]]:
                 continue
 
             osx_default = task.get("community.general.osx_defaults")
-            if not isinstance(osx_default, dict):
+            if isinstance(osx_default, dict):
+                entry = {
+                    "name": task.get("name"),
+                    "domain": osx_default["domain"],
+                    "key": osx_default["key"],
+                    "type": osx_default["type"],
+                    "state": "present",
+                }
+
+                if "host" in osx_default:
+                    entry["host"] = osx_default["host"]
+
+                if task.get("become") is True:
+                    entry["become"] = True
+
+                defaults.append(entry)
                 continue
 
-            entry = {
-                "name": task.get("name"),
-                "domain": osx_default["domain"],
-                "key": osx_default["key"],
-                "type": osx_default["type"],
-                "state": "present",
-            }
+            raw_default = task.get("macos_defaults_backup")
+            if raw_default is None and isinstance(task.get("vars"), dict):
+                raw_default = task["vars"].get("macos_defaults_backup")
+            if isinstance(raw_default, dict):
+                entry = {
+                    "name": task.get("name"),
+                    "domain": raw_default["domain"],
+                    "key": raw_default["key"],
+                    "type": raw_default.get("type", "plist"),
+                    "state": "present",
+                }
 
-            if "host" in osx_default:
-                entry["host"] = osx_default["host"]
+                if "host" in raw_default:
+                    entry["host"] = raw_default["host"]
 
-            if task.get("become") is True:
-                entry["become"] = True
+                if task.get("become") is True:
+                    entry["become"] = True
 
-            defaults.append(entry)
+                defaults.append(entry)
 
     return defaults
 
@@ -80,6 +104,9 @@ def read_type(entry: dict[str, Any]) -> str:
 
 
 def parse_value(raw_value: str, value_type: str) -> Any:
+    if value_type == "plist":
+        return raw_value
+
     if value_type == "bool":
         return raw_value.lower() in {"1", "true", "yes"}
 
@@ -119,7 +146,7 @@ def backup_defaults(source_dir: Path) -> list[dict[str, Any]]:
         backed_up_entry = dict(entry)
 
         if exists:
-            actual_type = read_type(entry)
+            actual_type = "plist" if entry.get("type") == "plist" else read_type(entry)
             backed_up_entry["type"] = actual_type
             backed_up_entry["state"] = "present"
             backed_up_entry["value"] = parse_value(raw_value, actual_type)
@@ -136,8 +163,9 @@ def write_backup(output_dir: Path, defaults: list[dict[str, Any]]) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     output_file = output_dir / f"macos-defaults-{timestamp}.yml"
-    content = yaml.safe_dump(
+    content = yaml.dump(
         {"macos_defaults": defaults},
+        Dumper=IndentedSafeDumper,
         default_flow_style=False,
         sort_keys=False,
         width=120,
