@@ -59,3 +59,6 @@ export PATH=$PATH:/Users/devadathanmb/.spicetify
 # Added by Antigravity
 export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
 
+
+# Pi
+export PATH="/Users/devadathanmb/.local/share/mise/installs/node/26.4.0/bin:$PATH"

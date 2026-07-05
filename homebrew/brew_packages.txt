@@ -3,7 +3,6 @@ anomalyco/tap/opencode
 ansible
 ansible-lint
 asciinema
-mise
 ast-grep
 atuin
 awscli
@@ -49,6 +48,7 @@ kustomize
 lazydocker
 lazygit
 minikube
+mise
 mole
 mpv
 neofetch
@@ -81,12 +81,12 @@ trufflehog
 tty-clock
 typst
 uv
-yamllint
 vhs
 vim
 virtualenv
 watch
 wget
+yamllint
 yazi
 yq
 zoxide
