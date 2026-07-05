@@ -61,12 +61,15 @@ parallel
 poppler
 postgresql@17
 pre-commit
+prettier
 procs
 qpdf
 qrencode
 redis
 ripgrep-all
 rsync
+shellcheck
+shfmt
 shuffledns
 spicetify-cli
 swift-format
@@ -78,6 +81,7 @@ trufflehog
 tty-clock
 typst
 uv
+yamllint
 vhs
 vim
 virtualenv
