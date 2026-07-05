@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+# Keep the Mac awake for the whole provision. Homebrew/asdf installs can take a
+# long time, and idle sleep partway through leaves the machine half-configured.
+# Re-exec ourselves once under caffeinate so every step below (brew, ansible,
+# the playbook) runs inside a single sleep assertion that is released
+# automatically when this script exits.
+#   -i prevent idle sleep (works on battery)  -m keep disk spun up
+#   -s prevent full system sleep (honored on AC power only)
+if [ -z "${BOOTSTRAP_CAFFEINATED:-}" ] && command -v caffeinate &>/dev/null; then
+    export BOOTSTRAP_CAFFEINATED=1
+    exec caffeinate -ims "$0" "$@"
+fi
 
 echo "🚀 Ansible Dotfiles Bootstrap"
 echo "=============================="
