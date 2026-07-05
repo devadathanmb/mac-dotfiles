@@ -6,7 +6,7 @@ language = "en"
 appearance = "system"
 play_sounds = true
 url_scheme_enabled = true
-start_at_login = true
+start_at_login = false
 export_location = "~/Pictures/Screenshots"
 
 [updates]
