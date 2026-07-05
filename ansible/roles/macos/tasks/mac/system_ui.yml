@@ -16,6 +16,15 @@
 # SYSTEM UI SETTINGS
 # ==============================================================================
 
+- name: System UI | Show Wi-Fi in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NSStatusItem VisibleCC WiFi
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
 - name: System UI | Show battery percentage in menu bar
   tags: [macos]
   community.general.osx_defaults:
@@ -24,6 +33,15 @@
     type: bool
     value: true
     host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Show Battery in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NSStatusItem VisibleCC Battery
+    type: bool
+    value: true
   notify: Restart SystemUIServer
 
 - name: System UI | Show volume icon in menu bar
@@ -36,6 +54,15 @@
     host: currentHost
   notify: Restart SystemUIServer
 
+- name: System UI | Show Sound in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NSStatusItem VisibleCC Sound
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
 - name: System UI | Show Bluetooth as active-only in menu bar
   tags: [macos]
   community.general.osx_defaults:
@@ -46,7 +73,16 @@
     host: currentHost
   notify: Restart SystemUIServer
 
-- name: System UI | Always show Display in menu bar
+- name: System UI | Show Bluetooth in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NSStatusItem VisibleCC Bluetooth
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Hide Display in menu bar
   tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
@@ -56,7 +92,7 @@
     host: currentHost
   notify: Restart SystemUIServer
 
-- name: System UI | Always show Now Playing in menu bar
+- name: System UI | Hide Now Playing in menu bar
   tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
@@ -64,6 +100,43 @@
     type: int
     value: 8
     host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Hide Now Playing status item
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.controlcenter
+    key: NSStatusItem Visible NowPlaying
+    type: bool
+    value: false
+  notify: Restart SystemUIServer
+
+- name: System UI | Hide Spotlight in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.Spotlight
+    key: MenuItemHidden
+    type: bool
+    value: true
+    host: currentHost
+  notify: Restart SystemUIServer
+
+- name: System UI | Hide Text Input in menu bar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextInputMenu
+    key: visible
+    type: bool
+    value: false
+  notify: Restart SystemUIServer
+
+- name: System UI | Hide Text Input status item
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.TextInputMenuAgent
+    key: NSStatusItem Visible Item-0
+    type: bool
+    value: false
   notify: Restart SystemUIServer
 
 - name: System UI | Beep on moving the slider
@@ -81,6 +154,42 @@
     key: AppleICUForce24HourTime
     type: bool
     value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Use 24-hour menu bar clock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.menuextra.clock
+    key: Show24Hour
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Show date in menu bar clock when space allows
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.menuextra.clock
+    key: ShowDate
+    type: int
+    value: 0
+  notify: Restart SystemUIServer
+
+- name: System UI | Show day of week in menu bar clock
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.menuextra.clock
+    key: ShowDayOfWeek
+    type: bool
+    value: true
+  notify: Restart SystemUIServer
+
+- name: System UI | Disable menu bar clock time announcements
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.menuextra.clock
+    key: TimeAnnouncementsEnabled
+    type: bool
+    value: false
   notify: Restart SystemUIServer
 
 - name: System UI | Reduce status item spacing
@@ -112,7 +221,7 @@
   ansible.builtin.file:
     path: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Screenshots | Save screenshots to Screenshots folder
   tags: [macos]
@@ -129,6 +238,14 @@
     key: type
     type: string
     value: png
+
+- name: Screenshots | Disable HDR screenshots
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: captureHDR
+    type: bool
+    value: false
 
 - name: Screenshots | Disable shadow in screenshots
   tags: [macos]

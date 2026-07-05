@@ -49,7 +49,7 @@
     domain: com.apple.finder
     key: ShowStatusBar
     type: bool
-    value: true
+    value: false
 
 - name: Finder | Show path bar
   tags: [macos]
@@ -99,6 +99,62 @@
     type: bool
     value: false
 
+- name: Finder | Show external drives on Desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowExternalHardDrivesOnDesktop
+    type: bool
+    value: true
+
+- name: Finder | Hide internal hard drives on Desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowHardDrivesOnDesktop
+    type: bool
+    value: false
+
+- name: Finder | Show removable media on Desktop
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowRemovableMediaOnDesktop
+    type: bool
+    value: true
+
+- name: Finder | Show sidebar
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: ShowSidebar
+    type: bool
+    value: true
+
+- name: Finder | Set sidebar width
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: SidebarWidth
+    type: float
+    value: 139.0
+
+- name: Finder | Set secondary sidebar width
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: SidebarWidth2
+    type: float
+    value: 164.0
+
+- name: Finder | Group icon view by name
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXArrangeGroupViewBy
+    type: string
+    value: Name
+
 - name: Finder | Auto-remove trash items after 30 days
   tags: [macos]
   community.general.osx_defaults:
@@ -120,7 +176,7 @@
   ansible.builtin.file:
     path: "{{ ansible_facts['env']['HOME'] }}/Library"
     state: directory
-    mode: '0755'
+    mode: "0755"
   register: library_folder
 
 - name: Finder | Check if ~/Library folder is hidden
