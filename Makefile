@@ -7,7 +7,7 @@ CAFFEINATE  := caffeinate -ims
 play = cd $(ANSIBLE_DIR) && $(CAFFEINATE) $(PLAYBOOK) playbooks/$(1).yml $(ARGS)
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap all packages macos dotfiles zsh editors asdf backup
+.PHONY: help bootstrap all packages macos dotfiles zsh editors mise backup
 
 help:        ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -34,8 +34,8 @@ zsh:         ## Set up zsh
 editors:     ## Install editor extensions (VSCode/Cursor/Zed)
 	$(call play,editors)
 
-asdf:        ## Install asdf + latest Python/Node
-	$(call play,asdf)
+mise:        ## Install mise + latest Python/Node
+	$(call play,mise)
 
 backup:      ## Back up installed packages/extensions/macOS defaults into the repo
 	$(call play,backup)

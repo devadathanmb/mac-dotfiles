@@ -41,7 +41,7 @@ make macos            # system defaults
 make dotfiles         # symlinks
 make zsh              # zap zsh
 make editors          # editor extensions
-make asdf             # asdf (Python + Node.js)
+make mise             # mise (Python + Node.js)
 
 make packages ARGS="--check --diff"   # pass extra flags through to ansible
 ```
@@ -58,7 +58,7 @@ ansible-playbook playbooks/main.yml --tags homebrew   # packages
 ansible-playbook playbooks/main.yml --tags macos      # system defaults
 ansible-playbook playbooks/main.yml --tags zsh        # zap zsh
 ansible-playbook playbooks/main.yml --tags editors    # editor extensions
-ansible-playbook playbooks/asdf.yml                   # asdf (Python + Node.js)
+ansible-playbook playbooks/mise.yml                   # mise (Python + Node.js)
 
 ansible-playbook playbooks/main.yml --check --diff    # dry run
 ```

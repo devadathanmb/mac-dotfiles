@@ -1,0 +1,22 @@
+---
+# Mise Version Manager Role
+# Installs mise and latest stable Python/Node.js.
+
+- name: Install mise via Homebrew
+  community.general.homebrew:
+    name: mise
+    state: present
+  become: false
+
+- name: Install and set latest stable Python and Node.js globally
+  ansible.builtin.command:
+    cmd: "mise use --global --yes python@{{ mise_python_version }} node@{{ mise_node_version }}"
+  register: mise_use_result
+  changed_when: "'installed' in (mise_use_result.stdout + mise_use_result.stderr)"
+
+- name: Display installed versions
+  ansible.builtin.debug:
+    msg: |
+      Mise setup complete!
+      {{ mise_use_result.stdout | default('') }}
+      {{ mise_use_result.stderr | default('') }}

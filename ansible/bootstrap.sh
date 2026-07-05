@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Keep the Mac awake for the whole provision. Homebrew/asdf installs can take a
+# Keep the Mac awake for the whole provision. Homebrew/mise installs can take a
 # long time, and idle sleep partway through leaves the machine half-configured.
 # Re-exec ourselves once under caffeinate so every step below (brew, ansible,
 # the playbook) runs inside a single sleep assertion that is released
