@@ -10,6 +10,8 @@
       tags: [dotbot, symlinks]
     - role: homebrew
       tags: [homebrew, packages]
+    - role: mise
+      tags: [mise, python, node]
     - role: macos
       tags: [macos, defaults]
     - role: zsh

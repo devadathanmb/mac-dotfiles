@@ -3,7 +3,7 @@ anomalyco/tap/opencode
 ansible
 ansible-lint
 asciinema
-asdf
+mise
 ast-grep
 atuin
 awscli

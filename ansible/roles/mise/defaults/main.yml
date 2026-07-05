@@ -1,0 +1,4 @@
+---
+# Mise role defaults
+mise_python_version: latest
+mise_node_version: latest

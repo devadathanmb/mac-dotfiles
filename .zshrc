@@ -37,6 +37,9 @@ plug "thirteen37/fzf-brew"
 plug ~/.config/zsh/init.zsh
 
 # Initialize Tools
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 eval "$(zoxide init zsh)"
 
 # Powerlevel10k Configuration

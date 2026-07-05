@@ -181,9 +181,9 @@
         "basedpyright": {
             "settings": {
                 "python": {
-                    // Prefer the real interpreter path over asdf shims so the LS matches `python --version`.
-                    "pythonPath": "/Users/devadathanmb/.asdf/installs/python/3.12.8/bin/python",
-                    "defaultInterpreterPath": "/Users/devadathanmb/.asdf/installs/python/3.12.8/bin/python",
+                    // Prefer the real interpreter path over shims so the LS matches `python --version`.
+                    "pythonPath": "/Users/devadathanmb/.local/share/mise/installs/python/latest/bin/python",
+                    "defaultInterpreterPath": "/Users/devadathanmb/.local/share/mise/installs/python/latest/bin/python",
                 },
                 "basedpyright.analysis": {
                     "autoImportCompletions": true,
