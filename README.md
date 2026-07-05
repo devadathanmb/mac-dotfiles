@@ -19,10 +19,10 @@ My macOS setup, managed with [Ansible](https://docs.ansible.com/). Ansible orche
 ```bash
 git clone --recursive https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
 cd ~/.mac-dots
-./ansible/bootstrap.sh
+make bootstrap        # or: ./ansible/bootstrap.sh
 ```
 
-`bootstrap.sh` installs Homebrew and Ansible if missing, then runs the full playbook.
+`bootstrap.sh` installs Homebrew and Ansible if missing, then runs the full playbook. Re-run it any time; it keeps the Mac awake during long installs.
 
 Dotbot is a git submodule. If you clone without `--recursive`, pull it in with:
 
@@ -31,6 +31,22 @@ git submodule update --init --recursive
 ```
 
 ## Running things selectively
+
+`make` (run from the repo root) is the friendly frontend. Each target wraps the matching playbook, runs under `caffeinate`, and can be chained (`make backup macos`). `make` on its own lists everything.
+
+```bash
+make all              # everything (brew + ansible already present)
+make packages         # Homebrew formulae + casks
+make macos            # system defaults
+make dotfiles         # symlinks
+make zsh              # zap zsh
+make editors          # editor extensions
+make asdf             # asdf (Python + Node.js)
+
+make packages ARGS="--check --diff"   # pass extra flags through to ansible
+```
+
+Or drive Ansible directly for finer control:
 
 ```bash
 cd ~/.mac-dots/ansible
@@ -50,6 +66,9 @@ ansible-playbook playbooks/main.yml --check --diff    # dry run
 ## Pulling live state back into the repo
 
 ```bash
+make backup           # from the repo root
+
+# Or directly, for tag-level control:
 cd ~/.mac-dots/ansible
 ansible-playbook playbooks/backup.yml
 
@@ -65,7 +84,8 @@ This reads installed Homebrew formulae, casks, VSCode/Cursor/Zed extensions, and
 ## Layout
 
 ```
-ansible/            # Playbooks and roles
+Makefile             # Friendly frontend over the playbooks (make help)
+ansible/             # Playbooks and roles
 configs/             # App configs, symlinked by Dotbot
 homebrew/            # Tracked formulae and casks
 scripts/             # Standalone scripts, symlinked to ~/.local/bin
