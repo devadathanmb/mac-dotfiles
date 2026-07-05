@@ -17,11 +17,31 @@
 	<key>LaunchAtLoginNext</key>
 	<true/>
 	<key>NSNavPanelExpandedSizeForSaveMode</key>
-	<string>{800, 448}</string>
+	<string>{881, 448}</string>
+	<key>NSOSPLastRootDirectory</key>
+	<data>
+	Ym9va0ADAAAAAAQQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAIA
+	AAQAAAADAwAAAAQAAAUAAAABAQAAVXNlcnMAAAAMAAAAAQEAAGRldmFkYXRoYW5tYgkA
+	AAABAQAALm1hYy1kb3RzAAAABwAAAAEBAABjb25maWdzAAUAAAABAQAAc3RhdHMAAAAU
+	AAAAAQYAABAAAAAgAAAANAAAAEgAAABYAAAACAAAAAQDAAAvQwAAAAAAAAgAAAAEAwAA
+	gzgEAAAAAAAIAAAABAMAAIvkFgAAAAAACAAAAAQDAAAN5hYAAAAAAAgAAAAEAwAAtTdU
+	AAAAAAAUAAAAAQYAAIQAAACUAAAApAAAALQAAADEAAAACAAAAAAEAABBx1srARGC6xgA
+	AAABAgAAAgAAAAAAAAAfAgAAAAAAAB8CAAAAAAAAAAAAAAEFAAAIAAAABAMAAAMAAAAA
+	AAAABAAAAAMDAAD1AQAACAAAAAEJAABmaWxlOi8vLwwAAAABAQAATWFjaW50b3NoIEhE
+	CAAAAAQDAAAAUKEbcwAAAAgAAAAABAAAQcdCkGIAAAAkAAAAAQEAADdENUEzNzk3LUQ0
+	NTUtNEI4Qi1BOTk5LUFDREIxOThEQTY3QxgAAAABAgAAgQAAAAEAAADvEwAAAQAAAO8T
+	AAABAAAAAQAAAAEBAAAvAAAAMAAAAAECAABkbmliAAAAAAEAAAAAAAAAAAAAAAAAAAAA
+	AAAAAAAAAAAAAAByZGxmAgAAAAAAAADwAAAA/v///wEAAAAAAAAAEwAAAAQQAABoAAAA
+	AAAAAAUQAADUAAAAAAAAABAQAAAAAQAAAAAAAEAQAADwAAAAAAAAAAIgAADUAQAAAAAA
+	AAUgAABEAQAAAAAAABAgAABUAQAAAAAAABEgAACIAQAAAAAAABIgAABoAQAAAAAAABMg
+	AAB4AQAAAAAAACAgAAC0AQAAAAAAADAgAAAgAQAAAAAAAAHAAAAoAQAAAAAAABHAAAAg
+	AAAAAAAAABLAAAA4AQAAAAAAAAHQAAAgAQAAAAAAABDQAAAEAAAAAAAAABfwAABYAAAA
+	AAAAACLwAADgAQAAAAAAAA==
+	</data>
 	<key>NSStatusItem Preferred Position CPU</key>
 	<real>348</real>
 	<key>NSStatusItem Preferred Position CombinedModules</key>
-	<real>301</real>
+	<real>297</real>
 	<key>NSStatusItem Preferred Position Network</key>
 	<real>273</real>
 	<key>NSStatusItem Preferred Position RAM</key>
@@ -49,6 +69,8 @@
 	</dict>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
 	<string>356 375 800 448 0 0 1512 948 </string>
+	<key>NSWindow Frame eu.exelban.Stats.Settings.WindowFrame</key>
+	<string>396 286 728 480 0 0 1512 949 </string>
 	<key>Network_label_position</key>
 	<integer>1</integer>
 	<key>Network_networkChart_position</key>
@@ -77,17 +99,21 @@
 	<string>center</string>
 	<key>RAM_mini_label</key>
 	<true/>
+	<key>remote_tokens_migrated_to_keychain</key>
+	<true/>
 	<key>runAtLoginInitialized</key>
 	<true/>
 	<key>setupProcess</key>
 	<true/>
 	<key>support_ts</key>
-	<integer>1759245090</integer>
+	<integer>1783148955</integer>
 	<key>telemetry</key>
 	<false/>
 	<key>updater_check_ts</key>
-	<integer>1762008650</integer>
+	<integer>1783148955</integer>
+	<key>updater_install_ts</key>
+	<integer>1780779323</integer>
 	<key>version</key>
-	<string>2.11.58</string>
+	<string>3.0.5</string>
 </dict>
 </plist>
