@@ -7,7 +7,7 @@ CAFFEINATE  := caffeinate -ims
 play = cd $(ANSIBLE_DIR) && $(CAFFEINATE) $(PLAYBOOK) playbooks/$(1).yml $(ARGS)
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap all packages macos dotfiles zsh editors mise backup
+.PHONY: help bootstrap all packages macos dotfiles zsh editors mise backup hooks hooks-run
 
 help:        ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -39,3 +39,9 @@ mise:        ## Install mise + latest Python/Node
 
 backup:      ## Back up installed packages/extensions/macOS defaults into the repo
 	$(call play,backup)
+
+hooks:       ## Install repo-managed pre-commit hooks into .git/hooks
+	pre-commit install --install-hooks
+
+hooks-run:   ## Run all pre-commit hooks against the full repo
+	pre-commit run --all-files

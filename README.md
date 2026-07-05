@@ -46,6 +46,22 @@ make mise             # mise (Python + Node.js)
 make packages ARGS="--check --diff"   # pass extra flags through to ansible
 ```
 
+## Git hooks
+
+Hooks are configured in `.pre-commit-config.yaml` and installed locally into `.git/hooks/` by `pre-commit`; do not edit `.git/hooks/` or `.git/info/` by hand. Install them with:
+
+```bash
+make hooks
+```
+
+Run the full hook set manually with:
+
+```bash
+make hooks-run
+```
+
+The hook suite scans staged changes for sensitive keywords, formats YAML with Prettier, lints YAML with `yamllint`, formats Bash/sh scripts with `shfmt`, lints them with `shellcheck`, formats fish files, checks fish/zsh syntax, and runs Ansible validation when `ansible/` files are staged. Tooling is tracked in `homebrew/brew_packages.txt`; run `make packages` if a hook command is missing.
+
 Or drive Ansible directly for finer control:
 
 ```bash

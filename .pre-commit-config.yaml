@@ -1,0 +1,61 @@
+default_stages: [pre-commit]
+exclude: ^dotbot/
+
+repos:
+  - repo: local
+    hooks:
+      - id: secret-scan
+        name: Scan staged changes for sensitive keywords
+        entry: scripts/git-hooks/secret-scan.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+
+      - id: format-yaml
+        name: Format YAML with Prettier
+        entry: prettier --write --ignore-unknown
+        language: system
+        types_or: [yaml]
+
+      - id: lint-yaml
+        name: Lint YAML with yamllint
+        entry: yamllint
+        language: system
+        types_or: [yaml]
+
+      - id: format-shell
+        name: Format Bash/sh scripts with shfmt
+        entry: shfmt -w -i 4 -ci -sr
+        language: system
+        files: \.(sh|bash)$
+
+      - id: lint-shell
+        name: Lint Bash/sh scripts with shellcheck
+        entry: shellcheck
+        language: system
+        files: \.(sh|bash)$
+
+      - id: format-fish
+        name: Format fish scripts
+        entry: fish_indent -w
+        language: system
+        files: \.fish$
+
+      - id: check-fish-syntax
+        name: Check fish syntax
+        entry: scripts/git-hooks/check-fish-syntax.sh
+        language: script
+        files: \.fish$
+
+      - id: check-zsh-syntax
+        name: Check zsh syntax
+        entry: scripts/git-hooks/check-zsh-syntax.sh
+        language: script
+        files: (^|/)(\.zshrc|.*\.zsh)$
+
+      - id: ansible-validation
+        name: Validate Ansible changes
+        entry: scripts/git-hooks/validate-ansible.sh
+        language: script
+        pass_filenames: false
+        files: ^ansible/
