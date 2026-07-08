@@ -1,29 +1,36 @@
-# Repository Guidelines
+# Agent Notes
 
-## Project Structure & Module Organization
+## Shape
 
-This repository manages a macOS environment with Ansible and Dotbot. Use `Makefile` from the repository root as the main entry point. Ansible playbooks live in `ansible/playbooks/`, shared variables in `ansible/group_vars/`, inventory in `ansible/inventory/`, and roles in `ansible/roles/`. Application and shell configuration files live under `configs/` and are linked by Dotbot through `install.conf.yaml`. Homebrew package manifests are in `homebrew/`. Standalone helper scripts belong in `scripts/`; Ansible-specific scripts belong in `ansible/scripts/`. `dotbot/` is a submodule and should not be edited unless intentionally updating Dotbot itself.
+- Personal macOS dotfiles/provisioning repo; use `Makefile` as the main interface.
+- Dotbot links `configs/` and top-level dotfiles into `$HOME` from `install.conf.yaml`.
+- Ansible is rooted at `ansible/`; run direct `ansible-playbook` commands there so `ansible.cfg` loads `inventory/localhost.yml` and `roles_path = roles`.
+- `dotbot/` is a vendored submodule (`ignore = dirty`); do not edit it for repo behavior changes.
+- No root npm workspace. Package manifests are under `configs/pi/npm` and `configs/pi/extensions/*`; run npm commands inside the relevant package directory.
 
-## Build, Test, and Development Commands
+## Commands
 
-- `make`: show available targets.
-- `make bootstrap`: first-time setup; installs prerequisites and runs the full setup.
-- `make all`: run the main Ansible playbook.
-- `make packages`, `make macos`, `make dotfiles`, `make zsh`, `make editors`, `make mise`: run focused playbooks.
-- `make backup`: pull current package, editor, and macOS defaults state back into the repo.
-- `make macos ARGS="--check --diff"`: dry-run a target with extra Ansible flags.
-- `make hooks`: install repo-managed pre-commit hooks into `.git/hooks/`.
-- `make hooks-run`: run all hooks against the repository.
-- `cd ansible && ./scripts/validate.sh`: run syntax, lint, and deprecation checks.
+- `make`: list supported targets.
+- `make bootstrap`: first-time/full setup; may install Homebrew/Ansible and changes the live Mac.
+- `make all`: run the full main playbook after prerequisites exist.
+- Focused targets: `make packages`, `make macos`, `make dotfiles`, `make zsh`, `make editors`, `make mise`.
+- Dry-run focused Ansible through Make with `ARGS`, e.g. `make macos ARGS="--check --diff"`.
+- Direct tagged run from `ansible/`: `ansible-playbook playbooks/main.yml --tags dotbot`.
+- Restore a macOS defaults snapshot from `ansible/`: `ansible-playbook playbooks/macos.yml -e macos_defaults_file=configs/macos/backups/macos-defaults-YYYYMMDD-HHMMSS.yml`.
 
-## Coding Style & Naming Conventions
+## Validation
 
-Write YAML with two-space indentation, explicit task names, and clear role or tag names such as `homebrew`, `macos`, or `editors`. Keep playbooks small and delegate reusable behavior to roles or scripts. Shell scripts should be Bash-compatible, use `set -e` when appropriate, and prefer readable variable names. Let pre-commit run Prettier, `yamllint`, `shfmt`, `shellcheck`, `fish_indent`, and syntax checks before committing.
+- Install hooks once: `make hooks`; run all hooks: `make hooks-run`.
+- Validate Ansible only from `ansible/`: `./scripts/validate.sh`.
+- Hooks require `prettier`, `yamllint`, `shfmt`, `shellcheck`, `fish`, `zsh`, and `ansible-lint`; `homebrew/brew_packages.txt` tracks all except system `zsh`.
+- Pre-commit excludes `dotbot/` and runs the local staged-change scanner before formatting/lint hooks.
+- No `.github/workflows` are present currently; do not assume CI will catch issues.
 
-## Testing Guidelines
+## Gotchas
 
-There is no general unit test suite. Validate Ansible changes with `ansible-playbook playbooks/<name>.yml --syntax-check` and `ansible-lint playbooks/*.yml` from `ansible/`, or run `ansible/scripts/validate.sh`. For machine-affecting changes, prefer `--check --diff` first. Confirm symlink changes with `make dotfiles ARGS="--check --diff"` before applying.
-
-## Commit & Pull Request Guidelines
-
-Recent history uses concise Conventional Commit-style messages, for example `feat: add ...`, `fix: align ...`, `chore: migrate ...`, plus occasional `backup` snapshots. Prefer a scoped, imperative summary. Pull requests should explain the affected area, include validation output or dry-run notes, and call out any macOS defaults, package installs, or destructive changes. Include screenshots only for visible editor or terminal UI changes.
+- `install.conf.yaml` uses Dotbot `force: true`, `relink: true`, and `clean: ["~"]`; `make dotfiles`/`./install` can replace existing files in `$HOME` with symlinks.
+- `make backup` writes current machine state into tracked files: Homebrew lists, VSCode/Cursor/Zed extension lists, and timestamped `configs/macos/backups/`; inspect `git diff` after it.
+- The Homebrew and editor roles use `ignore_errors: true` for package/extension installs, so a playbook can finish while individual installs failed; read the debug output.
+- `DOTFILES_REPO` overrides the repo path for most playbooks, but some role defaults hard-code `/Users/devadathanmb/.mac-dots`; prefer this checkout unless testing path overrides.
+- `make bootstrap` and Make playbook targets wrap long runs with `caffeinate -ims`; direct `ansible-playbook` commands do not.
+- The macOS role restarts Finder, Dock, and SystemUIServer through handlers after relevant defaults changes.
