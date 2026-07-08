@@ -34,7 +34,6 @@ ollama-app
 onlyoffice
 opencode-desktop
 paper
-pearcleaner
 postman
 protonvpn
 raspberry-pi-imager

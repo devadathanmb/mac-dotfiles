@@ -1,12 +1,13 @@
 schema_version = 1
-snapzy_min_version = "1.27.0"
+snapzy_min_version = "1.28.2"
 
 [general]
 language = "en"
 appearance = "system"
 play_sounds = true
 url_scheme_enabled = true
-start_at_login = false
+show_menu_bar_icon = true
+start_at_login = true
 export_location = "~/Pictures/Screenshots"
 
 [updates]
@@ -29,6 +30,9 @@ recording_template = "Snapzy_Recording_{datetime}"
 format = "png"
 include_snapzy = false
 show_cursor = false
+freeze_area = false
+show_selection_area_overlay = true
+reverse_magnifier_zoom_direction = false
 
 [capture.scrolling]
 show_hints = true
@@ -66,6 +70,7 @@ include_snapzy = false
 show_cursor = true
 highlight_clicks = false
 show_keystrokes = false
+video_editor_zoom_transition_duration = 0.4
 
 [recording.mouse_highlight]
 size = 50.0
@@ -93,6 +98,11 @@ overlay_scale = 1.0
 drag_drop = true
 two_finger_swipe_to_dismiss = true
 swipe_sensitivity = 1.0
+trackpad_swipe_mode = "inverted"
+swipe_left_action = "dismiss"
+swipe_right_action = "dismiss"
+hide_card_when_window_open = true
+animation_style = "slide"
 actions_order = ["copy", "saveOrOpen", "dismiss", "delete", "edit", "uploadToCloud", "pinToScreen"]
 enabled_actions = ["copy", "delete", "dismiss", "edit", "pinToScreen", "saveOrOpen", "uploadToCloud"]
 
