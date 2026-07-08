@@ -1,3 +1,0 @@
-# Keep the plaintext Raycast export local-only. Commit the encrypted .gpg file instead.
-*.rayconfig
-!*.rayconfig.gpg
