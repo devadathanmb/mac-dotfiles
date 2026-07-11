@@ -1,5 +1,5 @@
 schema_version = 1
-snapzy_min_version = "1.28.2"
+snapzy_min_version = "1.29.0"
 
 [general]
 language = "en"
@@ -13,6 +13,7 @@ export_location = "~/Pictures/Screenshots"
 [updates]
 check_automatically = true
 download_automatically = true
+channel = "stable"
 
 [diagnostics]
 enabled = false
