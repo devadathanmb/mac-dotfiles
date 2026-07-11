@@ -1429,7 +1429,7 @@
   // Other
   "contextLink.pathType": "relative",
   "diffEditor.maxComputationTime": 0,
-  "errorLens.delay": 50,
+  "errorLens.delay": 10,
   "errorLens.delayMode": "debounce",
   "errorLens.enabled": true,
   "json.schemaDownload.enable": true,
