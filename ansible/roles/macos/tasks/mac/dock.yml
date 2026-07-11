@@ -12,6 +12,15 @@
     value: true
   notify: Restart Dock
 
+- name: Dock | Set auto-hide animation speed
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: autohide-time-modifier
+    type: float
+    value: 0.7
+  notify: Restart Dock
+
 - name: Dock | Change minimize/maximize window effect to scale
   tags: [macos]
   community.general.osx_defaults:
