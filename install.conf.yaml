@@ -32,6 +32,9 @@
     ~/.config/zed: configs/zed
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.codex/config.toml: configs/codex/config.toml
+    ~/.codex/AGENTS.md: configs/agents/AGENTS.md
+    ~/.config/opencode/AGENTS.md: configs/agents/AGENTS.md
+    ~/.claude/CLAUDE.md: configs/agents/AGENTS.md
     ~/.claude/:
       glob: true
       path: configs/claude/*
