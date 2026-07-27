@@ -1,0 +1,41 @@
+---
+- name: Check for Mole installation
+  ansible.builtin.command:
+    cmd: brew --prefix mole
+  register: mole_prefix
+  changed_when: false
+  failed_when: false
+
+- name: Check for Markdown mo installation
+  ansible.builtin.command:
+    cmd: brew --prefix mo
+  register: markdown_mo_prefix
+  changed_when: false
+  failed_when: false
+
+- name: Unlink Mole's conflicting mo command
+  ansible.builtin.command:
+    cmd: brew unlink mole
+  when: mole_prefix.rc == 0
+  changed_when: false
+
+- name: Link the Markdown mo command
+  ansible.builtin.command:
+    cmd: brew link --overwrite mo
+  when: markdown_mo_prefix.rc == 0
+  changed_when: false
+
+- name: Ensure user-local executable directory exists
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.local/bin"
+    state: directory
+    mode: "0755"
+  when: mole_prefix.rc == 0
+
+- name: Expose Mole under its unambiguous command name
+  ansible.builtin.file:
+    src: "{{ mole_prefix.stdout | trim }}/bin/mole"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/mole"
+    state: link
+    force: true
+  when: mole_prefix.rc == 0

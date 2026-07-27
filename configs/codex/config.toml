@@ -1,28 +1,59 @@
 personality = "pragmatic"
-model = "gpt-5.5"
+model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
+
+notify = ["/Users/devadathanmb/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+plan_mode_reasoning_effort = "high"
 
 [mcp_servers.context7-mcp]
 url = "https://mcp.context7.com/mcp"
 
-[mcp_servers.grep]
-url = "https://mcp.grep.app"
+# [mcp_servers.grep]
+# url = "https://mcp.grep.app"
 
 [mcp_servers.deepwiki]
 url = "https://mcp.deepwiki.com/mcp"
 
 [mcp_servers.exa]
 url = "https://mcp.exa.ai/mcp"
+#
+# [mcp_servers.playwright]
+# command = "npx"
+# args = ["-y", "@playwright/mcp@latest"]
 
-[mcp_servers.playwright]
-command = "npx"
-args = ["-y", "@playwright/mcp@latest"]
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/devadathanmb/.codex"
+CODEX_HOME = "/Users/devadathanmb/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,d0b55a8f9e8e7e9c88421416ea4ce9542c302abf43aa7fc871be4553ea70dd26"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.715.72359"
+SKY_CUA_SERVICE_PATH = "/Users/devadathanmb/.codex/plugins/cache/openai-bundled/computer-use/1.0.1000451/Codex Computer Use.app"
+CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+
+[mcp_servers.computer-use]
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+args = ["mcp"]
+cwd = "."
+enabled = false
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir", "git-branch", "five-hour-limit", "weekly-limit", "context-window-size", "used-tokens"]
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
+"gpt-5.6-sol" = 2
 
 [projects."/Users/devadathanmb/repos/raycast-smithery"]
 trust_level = "trusted"
@@ -48,7 +79,128 @@ trust_level = "trusted"
 [projects."/Users/devadathanmb/repos/opencode-minimax-easy-vision"]
 trust_level = "trusted"
 
+[projects."/Users/devadathanmb/repos/pulse"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/pi-opencode-go"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/.pi"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/starfolio"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/personal-blog-v2"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/pgcli"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/Codex/2026-07-10/i-n"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/Codex/2026-07-10/review"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/Codex/2026-07-10/review-2"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/ktu-bot"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/FluidVoice"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/repos/resume"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/gradient-wallpaper-generator"]
+trust_level = "trusted"
+
+[projects."/private/tmp/flight-search"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/Codex/2026-07-22/chrome-plugin-chrome-openai-bundled-file"]
+trust_level = "trusted"
+
+[projects."/Users/devadathanmb/Documents/testing"]
+trust_level = "trusted"
+
 [features]
-js_repl = true
+js_repl = false
 multi_agent = true
 prevent_idle_sleep = true
+
+[marketplaces.openai-bundled]
+last_updated = "2026-07-22T11:35:36Z"
+source_type = "local"
+source = "/Users/devadathanmb/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-07-17T14:01:59Z"
+source_type = "local"
+source = "/Users/devadathanmb/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."google-calendar@openai-curated"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[desktop]
+sansFontSize = 13
+codeFontSize = 13
+keepRemoteControlAwakeWhilePluggedIn = true
+followUpQueueMode = "queue"
+dock-icon-preference = "codex-system"
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = true
+mac-menu-bar-enabled = false
+
+[desktop.open-in-target-preferences]
+global = "zed"
+
+[desktop.open-in-target-preferences.perPath]
+"/Users/devadathanmb/repos/personal-blog" = "zed"
+
+[shell_environment_policy.set]
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,d0b55a8f9e8e7e9c88421416ea4ce9542c302abf43aa7fc871be4553ea70dd26"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/devadathanmb/.codex"
