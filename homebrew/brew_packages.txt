@@ -21,6 +21,7 @@ docker
 docker-compose
 duti
 eza
+fastfetch
 fd
 fish
 fontforge
@@ -35,14 +36,17 @@ gitleaks
 glab
 glow
 gnu-sed
+gogcli
 golangci-lint
 gum
+htmlq
 htop
 httpie
+hunk
 hyperfine
 imagemagick
 jq
-k6
+k1low/tap/mo
 k9s
 kustomize
 lazydocker
@@ -51,9 +55,7 @@ minikube
 mise
 mole
 mpv
-neofetch
 neovim
-nerdfetch
 nmap
 oven-sh/bun/bun
 pandoc
@@ -71,8 +73,8 @@ rsync
 shellcheck
 shfmt
 shuffledns
-spicetify-cli
-swift-format
+swiftformat
+swiftlint
 tabiew
 tailscale
 tgpt

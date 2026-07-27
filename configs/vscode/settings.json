@@ -236,6 +236,7 @@
   "gitlens.virtualRepositories.enabled": false,
   // Terminal
   "terminal.integrated.allowChords": false,
+  "terminal.integrated.stickyScroll.enabled": false,
   "terminal.integrated.suggest.enabled": false,
   "terminal.integrated.enableKittyKeyboardProtocol": true,
   "terminal.integrated.confirmOnExit": "never",

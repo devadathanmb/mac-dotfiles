@@ -57,3 +57,6 @@
   ansible.builtin.debug:
     msg: "Some Homebrew casks failed to install: {{ brew_casks_result.results | selectattr('failed', 'true') | map(attribute='item') | list }}"
   when: brew_casks_result.results is defined and (brew_casks_result.results | selectattr('failed', 'true') | list | length) > 0
+
+- name: Resolve Homebrew command conflicts
+  ansible.builtin.import_tasks: command_conflicts.yml
