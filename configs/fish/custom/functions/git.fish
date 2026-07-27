@@ -54,10 +54,6 @@ function ga
     git add $argv
 end
 
-function gs
-    git status
-end
-
 function gg
     git log --oneline --graph --decorate --all
 end
@@ -146,6 +142,10 @@ function gcb
 end
 
 function gs
+    git status
+end
+
+function gsw
     git switch $argv
 end
 

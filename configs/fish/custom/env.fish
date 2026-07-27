@@ -1,38 +1,23 @@
-# Environment Variables
-set -gx GPG_TTY (tty)
+# Environment variables
+if status is-interactive
+    set -gx GPG_TTY (tty)
+end
 set -gx FZF_DEFAULT_OPTS "--bind=tab:down,shift-tab:up,ctrl-space:toggle,ctrl-u:preview-up,ctrl-d:preview-down --height=50%"
 set -gx PGTZ Asia/Kolkata
-set -gx PATH $PATH ~/go/bin
-set -gx LANG 'en_US.UTF-8'
+set -gx LANG en_US.UTF-8
 set -gx KEYTIMEOUT 50
 set -gx EDITOR nvim
+set -gx PNPM_HOME "$HOME/Library/pnpm"
 
-# PostgreSQL
-set -gx PATH "/opt/homebrew/opt/postgresql@17/bin" $PATH
-
-# Pnpm
-set -x _PNPM_HOME ~/Library/pnpm
-if not contains $_PNPM_HOME $PATH
-    set -x PATH $_PNPM_HOME $PATH
-end
-
-# Local bin
-set -x _LOCAL_BIN_PATH ~/.local/bin
-if not contains $_LOCAL_BIN_PATH $PATH
-    set -x PATH $_LOCAL_BIN_PATH $PATH
-end
-
-# Spicetify
-set -x _SPICETIFY_PATH ~/.spicetify
-if not contains $_SPICETIFY_PATH $PATH
-    set -x PATH $_SPICETIFY_PATH $PATH
-end
-
-# AMP
-set -gx PATH ~/.amp/bin $PATH
-
-# Antigravity
-set -gx PATH ~/.antigravity/antigravity/bin $PATH
-
-# Bun
-set -gx PATH ~/.bun/bin $PATH
+# PATH entries are kept global so sourcing this file does not persist universal variables.
+fish_add_path --global --path --prepend \
+    /opt/homebrew/opt/postgresql@17/bin \
+    $PNPM_HOME \
+    ~/.local/bin \
+    ~/.spicetify \
+    ~/.amp/bin \
+    ~/.antigravity/antigravity/bin \
+    ~/.bun/bin
+fish_add_path --global --path --append \
+    ~/go/bin \
+    ~/Library/Python/3.9/bin
