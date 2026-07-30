@@ -3,7 +3,7 @@
 # Script to install Cursor extensions from a backup file
 # Usage: ./install-cursor-extensions.sh [extensions-file]
 
-set -e  # Exit on any error
+set -e # Exit on any error
 
 EXTENSIONS_FILE="${1:-extensions.txt}"
 FAILED_EXTENSIONS=()
@@ -25,7 +25,7 @@ if [ ! -f "$EXTENSIONS_FILE" ]; then
 fi
 
 # Count total extensions
-total_extensions=$(grep -v '^$\|^#' "$EXTENSIONS_FILE" | wc -l)
+total_extensions=$(grep -cv '^$\|^#' "$EXTENSIONS_FILE")
 current=0
 
 echo "📦 Found $total_extensions extensions to install"
@@ -37,17 +37,17 @@ while IFS= read -r extension; do
     if [[ -z "$extension" || "$extension" =~ ^#.* ]]; then
         continue
     fi
-    
+
     current=$((current + 1))
     echo "[$current/$total_extensions] Installing: $extension"
-    
+
     if cursor --install-extension "$extension" --force > /dev/null 2>&1; then
         echo "✅ Successfully installed: $extension"
     else
         echo "❌ Failed to install: $extension"
         FAILED_EXTENSIONS+=("$extension")
     fi
-    
+
     echo ""
 done < "$EXTENSIONS_FILE"
 

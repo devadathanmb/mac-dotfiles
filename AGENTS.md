@@ -1,36 +1,29 @@
-# Agent Notes
+# Repository Instructions
 
-## Shape
+## Sources Of Truth
 
-- Personal macOS dotfiles/provisioning repo; use `Makefile` as the main interface.
-- Dotbot links `configs/` and top-level dotfiles into `$HOME` from `install.conf.yaml`.
-- Ansible is rooted at `ansible/`; run direct `ansible-playbook` commands there so `ansible.cfg` loads `inventory/localhost.yml` and `roles_path = roles`.
-- `dotbot/` is a vendored submodule (`ignore = dirty`); do not edit it for repo behavior changes.
-- No root npm workspace. Package manifests are under `configs/pi/npm` and `configs/pi/extensions/*`; run npm commands inside the relevant package directory.
+- This repository provisions the current Mac. `Makefile` drives Ansible; `install.conf.yaml` defines Dotbot links into `$HOME`.
+- Edit tracked sources, usually under `configs/`, rather than their linked copies in `$HOME`. Change `install.conf.yaml` when adding or removing managed paths.
+- Run direct Ansible commands from `ansible/` so its inventory and role paths load from `ansible.cfg`.
+- Do not edit `dotbot/`; it is an ignored-dirty submodule. Change `install`, `install.conf.yaml`, or `ansible/roles/dotbot/` instead.
+- `configs/agents/AGENTS.md` is symlinked globally for OpenCode, Codex, and Claude; reserve it for cross-repository rules.
 
-## Commands
+## Working Standard
 
-- `make`: list supported targets.
-- `make bootstrap`: first-time/full setup; may install Homebrew/Ansible and changes the live Mac.
-- `make all`: run the full main playbook after prerequisites exist.
-- Focused targets: `make packages`, `make macos`, `make dotfiles`, `make zsh`, `make editors`, `make mise`.
-- Dry-run focused Ansible through Make with `ARGS`, e.g. `make macos ARGS="--check --diff"`.
-- Direct tagged run from `ansible/`: `ansible-playbook playbooks/main.yml --tags dotbot`.
-- Restore a macOS defaults snapshot from `ansible/`: `ansible-playbook playbooks/macos.yml -e macos_defaults_file=configs/macos/backups/macos-defaults-YYYYMMDD-HHMMSS.yml`.
+- Keep changes scoped to one provisioning concern. Do not mix machine-state backups with unrelated config edits.
+- Keep Ansible idempotent: prefer modules to `command`/`shell`, set accurate `changed_when`, and use focused task names and tags.
+- Ignore failures only for optional work; register and report them.
+- Do not run provisioning targets as validation. Preview applicable changes with `ARGS="--check --diff"`; macOS tasks may restart Finder, Dock, and SystemUIServer.
+- Dotbot uses `force: true`, `relink: true`, and `clean: ["~"]`; `make dotfiles` and `./install` can replace files and remove stale links in `$HOME`.
+- `make backup` rewrites tracked package and editor lists and creates a macOS defaults snapshot. Review its entire diff.
 
-## Validation
+## Verification
 
-- Install hooks once: `make hooks`; run all hooks: `make hooks-run`.
-- Validate Ansible only from `ansible/`: `./scripts/validate.sh`.
-- Hooks require `prettier`, `yamllint`, `shfmt`, `shellcheck`, `fish`, `zsh`, and `ansible-lint`; `homebrew/brew_packages.txt` tracks all except system `zsh`.
-- Pre-commit excludes `dotbot/` and runs the local staged-change scanner before formatting/lint hooks.
-- No `.github/workflows` are present currently; do not assume CI will catch issues.
+- Run a focused hook with `pre-commit run <hook-id> --files <paths>`; formatting hooks modify files. Use `make hooks-run` only when the full repository check is warranted.
+- Validate Ansible with `cd ansible && ./scripts/validate.sh`. If modules are missing, first run `ansible-galaxy collection install -r requirements.yml` there.
+- CI validates only Ansible. Use local hooks for shell, fish, repository-level YAML, and application config.
 
-## Gotchas
+## Known Constraints
 
-- `install.conf.yaml` uses Dotbot `force: true`, `relink: true`, and `clean: ["~"]`; `make dotfiles`/`./install` can replace existing files in `$HOME` with symlinks.
-- `make backup` writes current machine state into tracked files: Homebrew lists, VSCode/Cursor/Zed extension lists, and timestamped `configs/macos/backups/`; inspect `git diff` after it.
-- The Homebrew and editor roles use `ignore_errors: true` for package/extension installs, so a playbook can finish while individual installs failed; read the debug output.
-- `DOTFILES_REPO` overrides the repo path for most playbooks, but some role defaults hard-code `/Users/devadathanmb/.mac-dots`; prefer this checkout unless testing path overrides.
-- `make bootstrap` and Make playbook targets wrap long runs with `caffeinate -ims`; direct `ansible-playbook` commands do not.
-- The macOS role restarts Finder, Dock, and SystemUIServer through handlers after relevant defaults changes.
+- `DOTFILES_REPO` does not make every playbook portable: Homebrew and editor role defaults hard-code `/Users/devadathanmb/.mac-dots`.
+- OpenCode keys belong in untracked `~/.secrets/*` files, never `configs/opencode/opencode.jsonc`. Restart OpenCode after changing that config.

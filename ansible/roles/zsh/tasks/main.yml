@@ -8,14 +8,14 @@
   ansible.builtin.file:
     path: "{{ ansible_facts['env']['HOME'] }}/.local/share/zap"
     state: directory
-    mode: '0755'
+    mode: "0755"
   when: not zap_installed.stat.exists
 
 - name: Download Zap ZSH installer
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/share/zap/install.zsh"
-    mode: '0755'
+    mode: "0755"
   when: not zap_installed.stat.exists
 
 - name: Install Zap ZSH
