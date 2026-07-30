@@ -7,11 +7,17 @@
     "exa": {
       "type": "remote",
       "url": "https://mcp.exa.ai/mcp?tools=web_search_exa,get_code_context_exa,crawling_exa",
-      "enabled": true
+      "enabled": true,
+      "headers": {
+        "x-api-key": "{file:~/.secrets/exa-api-key}"
+      }
     },
     "context7": {
       "type": "remote",
-      "url": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{file:~/.secrets/context7-api-key}"
+      }
     },
     "gh_grep": {
       "type": "remote",

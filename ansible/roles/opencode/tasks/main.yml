@@ -1,0 +1,16 @@
+---
+- name: Ensure private OpenCode secret directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.secrets"
+    state: directory
+    mode: "0700"
+
+- name: Ensure OpenCode API key files exist
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ ansible_facts['env']['HOME'] }}/.secrets/{{ item }}"
+    force: false
+    mode: "0600"
+  loop:
+    - exa-api-key
+    - context7-api-key
