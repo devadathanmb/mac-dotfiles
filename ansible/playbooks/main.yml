@@ -6,6 +6,8 @@
   become: false
 
   roles:
+    - role: opencode
+      tags: [opencode, secrets]
     - role: dotbot
       tags: [dotbot, symlinks]
     - role: homebrew

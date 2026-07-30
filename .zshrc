@@ -62,3 +62,11 @@ export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
 
 # Pi
 export PATH="/Users/devadathanmb/.local/share/mise/installs/node/26.4.0/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/devadathanmb/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
