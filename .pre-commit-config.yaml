@@ -28,12 +28,14 @@ repos:
         entry: shfmt -w -i 4 -ci -sr
         language: system
         files: \.(sh|bash)$
+        exclude: ^configs/fish/conf\.d/fzf-git\.sh$
 
       - id: lint-shell
         name: Lint Bash/sh scripts with shellcheck
         entry: shellcheck
         language: system
         files: \.(sh|bash)$
+        exclude: ^configs/fish/conf\.d/fzf-git\.sh$
 
       - id: format-fish
         name: Format fish scripts

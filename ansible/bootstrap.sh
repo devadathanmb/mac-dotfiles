@@ -8,7 +8,7 @@ set -euo pipefail
 # automatically when this script exits.
 #   -i prevent idle sleep (works on battery)  -m keep disk spun up
 #   -s prevent full system sleep (honored on AC power only)
-if [ -z "${BOOTSTRAP_CAFFEINATED:-}" ] && command -v caffeinate &>/dev/null; then
+if [ -z "${BOOTSTRAP_CAFFEINATED:-}" ] && command -v caffeinate &> /dev/null; then
     export BOOTSTRAP_CAFFEINATED=1
     exec caffeinate -ims "$0" "$@"
 fi
@@ -17,7 +17,7 @@ echo "🚀 Ansible Dotfiles Bootstrap"
 echo "=============================="
 
 # Check for Homebrew
-if ! command -v brew &>/dev/null; then
+if ! command -v brew &> /dev/null; then
     echo "📦 Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -30,7 +30,7 @@ if ! command -v brew &>/dev/null; then
 fi
 
 # Check for Ansible
-if ! command -v ansible-playbook &>/dev/null; then
+if ! command -v ansible-playbook &> /dev/null; then
     echo "📦 Installing Ansible via Homebrew..."
     brew install ansible
 fi

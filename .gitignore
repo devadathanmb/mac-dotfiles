@@ -8,6 +8,8 @@ untracked/*
 **/history
 .cursor/*
 .claude/*
+.commandcode/
 .sisyphus/*
+configs/codex/config.toml
 configs/pgcli/log
 configs/zoxide/db.zo

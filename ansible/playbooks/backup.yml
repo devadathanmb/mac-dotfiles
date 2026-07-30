@@ -22,7 +22,7 @@
       ansible.builtin.copy:
         content: "{{ installed_formulae.stdout | trim }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
-        mode: '0644'
+        mode: "0644"
       when: installed_formulae.stdout | trim | length > 0
       tags: formulae
 
@@ -43,7 +43,7 @@
       ansible.builtin.copy:
         content: "{{ installed_casks.stdout | trim }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_casks.txt"
-        mode: '0644'
+        mode: "0644"
       when: installed_casks.stdout | trim | length > 0
       tags: casks
 
@@ -73,7 +73,7 @@
       ansible.builtin.copy:
         content: "{{ vscode_extensions.stdout | trim }}"
         dest: "{{ dotfiles_repo }}/configs/vscode/extensions.txt"
-        mode: '0644'
+        mode: "0644"
       when: code_check.rc == 0 and vscode_extensions.stdout | trim | length > 0
       tags: vscode
 
@@ -104,7 +104,7 @@
       ansible.builtin.copy:
         content: "{{ cursor_extensions.stdout | trim }}"
         dest: "{{ dotfiles_repo }}/configs/cursor/extensions.txt"
-        mode: '0644'
+        mode: "0644"
       when: cursor_check.rc == 0 and cursor_extensions.stdout | trim | length > 0
       tags: cursor
 
@@ -145,7 +145,7 @@
       ansible.builtin.copy:
         content: "{{ zed_extensions.stdout_lines | sort | join('\n') }}\n"
         dest: "{{ dotfiles_repo }}/configs/zed/extensions.txt"
-        mode: '0644'
+        mode: "0644"
       when: zed_extensions_dir.stat.exists and zed_extensions.stdout_lines | default([]) | length > 0
       tags: zed
 

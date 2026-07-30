@@ -36,7 +36,7 @@ if [ -n "$COMPILE_OUTPUT" ]; then
 fi
 
 # Step 2: flake8 lint (find repo root for project .flake8 config)
-REPO_ROOT=$(git -C "$(dirname "$FILE_PATH")" rev-parse --show-toplevel 2>/dev/null || true)
+REPO_ROOT=$(git -C "$(dirname "$FILE_PATH")" rev-parse --show-toplevel 2> /dev/null || true)
 
 if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/.flake8" ]; then
     FLAKE8_OUTPUT=$(flake8 --config="$REPO_ROOT/.flake8" "$FILE_PATH" 2>&1 || true)

@@ -13,10 +13,10 @@ pager:
 
 # Aliases allow you to create nicknames for gh commands
 aliases:
-  co: pr checkout           # checkout a PR
+  co: pr checkout # checkout a PR
   prs: pr list --state=open # list open PRs
-  prc: "!f() { gh pr create --title \"$(git log --reverse --format=%s | head -n1)\" --body \"$(git log --reverse --format=%b | head -n1)\"; }; f"
-  prd: "!f() { gh pr create --draft --title \"$(git log --reverse --format=%s | head -n1)\" --body \"$(git log --reverse --format=%b | head -n1)\"; }; f"
+  prc: '!f() { gh pr create --title "$(git log --reverse --format=%s | head -n1)" --body "$(git log --reverse --format=%b | head -n1)"; }; f'
+  prd: '!f() { gh pr create --draft --title "$(git log --reverse --format=%s | head -n1)" --body "$(git log --reverse --format=%b | head -n1)"; }; f'
   myissues: issue list --assignee @me --state=open
   mergepr: pr merge $1 --squash --delete-branch
 

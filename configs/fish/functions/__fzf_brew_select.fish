@@ -77,7 +77,7 @@ function __fzf_brew_select --argument-names kind action --description "Select br
         set height $FZF_BREW_HEIGHT
     end
 
-    set -l home_bind "ctrl-o"
+    set -l home_bind ctrl-o
     if set -q FZF_BREW_HOME_BIND
         set home_bind $FZF_BREW_HOME_BIND
     end

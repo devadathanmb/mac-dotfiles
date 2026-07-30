@@ -24,17 +24,17 @@ cycleModes:
   - yolo
 
 keymaps:
-  cycleMode: shift+tab       # cycle through cycleModes
-  toggleYolo: ctrl+shift+y   # jump to YOLO and back
+  cycleMode: shift+tab # cycle through cycleModes
+  toggleYolo: ctrl+shift+y # jump to YOLO and back
 
 ui:
-  footerStatus: true         # show "DC <mode>" in the footer
-  notifyOnBlock: true        # toast when a call is blocked
-  notifyOnAsk: false         # toast when a call needs approval
-  showChatMessages: true     # render block decisions inline in the transcript
+  footerStatus: true # show "DC <mode>" in the footer
+  notifyOnBlock: true # toast when a call is blocked
+  notifyOnAsk: false # toast when a call needs approval
+  showChatMessages: true # render block decisions inline in the transcript
 
 feedback:
-  blockedToolResult: continue  # continue = tell the agent and keep going; abort = stop the turn
+  blockedToolResult: continue # continue = tell the agent and keep going; abort = stop the turn
   includeAdaptationHints: true # add "if destructive, stop and ask" guidance for the agent
 
 # Rule ids to drop after merging (handy in a project config to relax a global rule).

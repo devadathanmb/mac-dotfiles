@@ -6,16 +6,16 @@ on:
       - main
       - develop
     paths:
-      - 'ansible/**/*.yml'
-      - 'ansible/**/*.yaml'
-      - 'ansible/.ansible-lint'
-      - '.github/workflows/ansible-validate.yml'
+      - "ansible/**/*.yml"
+      - "ansible/**/*.yaml"
+      - "ansible/.ansible-lint"
+      - ".github/workflows/ansible-validate.yml"
   pull_request:
     paths:
-      - 'ansible/**/*.yml'
-      - 'ansible/**/*.yaml'
-      - 'ansible/.ansible-lint'
-      - '.github/workflows/ansible-validate.yml'
+      - "ansible/**/*.yml"
+      - "ansible/**/*.yaml"
+      - "ansible/.ansible-lint"
+      - ".github/workflows/ansible-validate.yml"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install Ansible and dependencies
         run: |

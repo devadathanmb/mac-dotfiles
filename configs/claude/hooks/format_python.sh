@@ -36,16 +36,16 @@ fi
 # Get changed line ranges from git diff
 # -U0 means no context lines, so we only get the changed lines
 # Format: @@ -old_start,old_count +new_start,new_count @@
-DIFF_OUTPUT=$(git diff --no-color -U0 -- "$FILE_PATH" 2>/dev/null || true)
+DIFF_OUTPUT=$(git diff --no-color -U0 -- "$FILE_PATH" 2> /dev/null || true)
 
 if [ -z "$DIFF_OUTPUT" ]; then
     # No uncommitted changes, try comparing with HEAD
-    DIFF_OUTPUT=$(git diff --no-color -U0 HEAD -- "$FILE_PATH" 2>/dev/null || true)
+    DIFF_OUTPUT=$(git diff --no-color -U0 HEAD -- "$FILE_PATH" 2> /dev/null || true)
 fi
 
 if [ -z "$DIFF_OUTPUT" ]; then
     # Still no diff output - file might be new/untracked, format the whole file
-    black --quiet "$FILE_PATH" 2>/dev/null || true
+    black --quiet "$FILE_PATH" 2> /dev/null || true
     exit 0
 fi
 
@@ -55,7 +55,7 @@ LINE_RANGES=""
 while IFS= read -r line; do
     if [[ "$line" =~ ^@@.*\+([0-9]+)(,([0-9]+))?.* ]]; then
         START_LINE="${BASH_REMATCH[1]}"
-        COUNT="${BASH_REMATCH[3]:-1}"  # Default to 1 if no count specified
+        COUNT="${BASH_REMATCH[3]:-1}" # Default to 1 if no count specified
 
         # Skip if count is 0 (deletion only)
         if [ "$COUNT" = "0" ]; then
@@ -74,7 +74,7 @@ done <<< "$DIFF_OUTPUT"
 # If we found line ranges, format only those lines
 if [ -n "$LINE_RANGES" ]; then
     # shellcheck disable=SC2086
-    black --quiet $LINE_RANGES "$FILE_PATH" 2>/dev/null || true
+    black --quiet $LINE_RANGES "$FILE_PATH" 2> /dev/null || true
 fi
 
 exit 0
