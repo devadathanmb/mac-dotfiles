@@ -66,6 +66,7 @@
   loop: "{{ plist_macos_defaults.results | default([]) }}"
   loop_control:
     label: "{{ item.item.name | default(item.item.domain ~ ' ' ~ item.item.key) }}"
+  changed_when: true
   when:
     - not item.skipped | default(false)
     - item.rc != 0 or item.stdout | trim != item.item.value | string | trim
