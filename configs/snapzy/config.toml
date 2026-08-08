@@ -1,5 +1,5 @@
 schema_version = 1
-snapzy_min_version = "1.29.0"
+snapzy_min_version = "1.30.1"
 
 [general]
 language = "en"
@@ -8,7 +8,7 @@ play_sounds = true
 url_scheme_enabled = true
 show_menu_bar_icon = true
 start_at_login = true
-export_location = "~/Pictures/Screenshots"
+export_location = "~/Pictures/Snapzy"
 
 [updates]
 check_automatically = true
@@ -17,7 +17,7 @@ channel = "stable"
 
 [diagnostics]
 enabled = false
-retention_days = 3
+retention_days = 1
 
 [capture]
 hide_desktop_icons = false
@@ -49,14 +49,12 @@ save = true
 quick_access = true
 copy_file = true
 open_annotate = false
-upload_to_cloud = false
 
 [capture.after.recording]
 save = true
 quick_access = true
 copy_file = true
 open_annotate = false
-upload_to_cloud = false
 
 [recording]
 format = "mov"
@@ -69,6 +67,7 @@ microphone_device_id = "system-default"
 remember_last_area = true
 include_snapzy = false
 show_cursor = true
+dim_non_selected_area = true
 highlight_clicks = false
 show_keystrokes = false
 video_editor_zoom_transition_duration = 0.4
@@ -93,7 +92,7 @@ hold_duration = 0.3
 enabled = true
 position = "bottomRight"
 auto_dismiss = false
-auto_dismiss_delay = 15.0
+auto_dismiss_delay = 3.0
 pause_countdown_on_hover = true
 overlay_scale = 1.0
 drag_drop = true
@@ -101,11 +100,11 @@ two_finger_swipe_to_dismiss = true
 swipe_sensitivity = 1.0
 trackpad_swipe_mode = "inverted"
 swipe_left_action = "dismiss"
-swipe_right_action = "dismiss"
+swipe_right_action = "delete"
 hide_card_when_window_open = true
 animation_style = "slide"
 actions_order = ["copy", "saveOrOpen", "dismiss", "delete", "edit", "uploadToCloud", "pinToScreen"]
-enabled_actions = ["copy", "delete", "dismiss", "edit", "pinToScreen", "saveOrOpen", "uploadToCloud"]
+enabled_actions = ["copy", "delete", "dismiss", "edit", "pinToScreen", "saveOrOpen"]
 
 [quick_access.slots]
 center_top = "copy"
@@ -113,11 +112,11 @@ center_bottom = "saveOrOpen"
 top_trailing = "dismiss"
 top_leading = "delete"
 bottom_leading = "edit"
-bottom_trailing = "uploadToCloud"
+bottom_trailing = "pinToScreen"
 
 [history]
 enabled = true
-retention_days = 30
+retention_days = 7
 max_count = 500
 background_style = "hud"
 open_on_launch = false
@@ -144,13 +143,14 @@ clipboard_image_open_behavior = "ask"
 close_after_drag = true
 bring_forward_after_drag = false
 quick_properties_sync = true
+combine_save_as_edit = true
 
 [shortcuts]
 enabled = true
 
 [shortcuts.global.fullscreen]
 enabled = true
-key = "]"
+key = "F"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.area]
@@ -209,12 +209,12 @@ key = "E"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.cloud_uploads]
-enabled = false
+enabled = true
 key = "L"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.shortcut_list]
-enabled = false
+enabled = true
 key = "K"
 modifiers = ["command", "shift"]
 
@@ -234,8 +234,8 @@ key = "1"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.history]
-enabled = false
-key = "H"
+enabled = true
+key = "O"
 modifiers = ["command", "shift"]
 
 [shortcuts.overlay.area_application_capture]
@@ -290,8 +290,8 @@ modifiers = ["command", "control"]
 
 [shortcuts.annotate_actions.cloud_upload]
 enabled = true
-key = "U"
-modifiers = ["command"]
+key = ""
+modifiers = []
 
 [shortcuts.annotate_actions.auto_redact_sensitive_data]
 enabled = true
