@@ -10,5 +10,6 @@ end
 
 # mise manages language/tool versions.
 if command -q mise
+    set -gx MISE_ACTIVATE_AGGRESSIVE 1
     mise activate fish | source
 end
