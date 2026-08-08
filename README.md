@@ -65,6 +65,7 @@ make macos ARGS="--check --diff"
 Makefile             command entry point
 ansible/             playbooks, roles, inventory, and validation scripts
 configs/             application configuration linked into $HOME
+exports/             application exports and preference snapshots; not applied automatically
 homebrew/            tracked Homebrew package lists
 scripts/             helper scripts linked into ~/.local/bin
 install.conf.yaml    Dotbot symlink map

@@ -14,15 +14,10 @@ codexbar
 copilot-cli
 discord
 fluidvoice
-font-commit-mono-nerd-font
 font-fira-code
 font-fontawesome
-font-geist-mono-nerd-font
 font-ibm-plex-mono
-font-jetbrains-mono
-font-jetbrains-mono-nerd-font
 font-maple-mono
-font-maple-mono-nf
 font-symbols-only-nerd-font
 ghostty
 gimp
@@ -42,7 +37,6 @@ raspberry-pi-imager
 raycast
 slack
 snapzy
-spotify
 stats
 tailscale-app
 telegram-desktop

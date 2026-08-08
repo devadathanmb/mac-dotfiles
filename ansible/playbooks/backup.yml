@@ -20,10 +20,9 @@
 
     - name: Write top-level formulae to file
       ansible.builtin.copy:
-        content: "{{ installed_formulae.stdout | trim }}"
+        content: "{{ installed_formulae.stdout_lines | sort | join('\n') }}{{ '\n' if installed_formulae.stdout_lines | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
         mode: "0644"
-      when: installed_formulae.stdout | trim | length > 0
       tags: formulae
 
     - name: Display formulae backup result
@@ -32,24 +31,37 @@
       tags: formulae
 
     # Homebrew Casks Backup
-    - name: Get installed Homebrew casks
+    - name: Discover Homebrew casks
       ansible.builtin.command:
         cmd: brew list --cask
-      register: installed_casks
+      register: discovered_casks
       changed_when: false
+      tags: casks
+
+    - name: Verify Homebrew casks have an installed version
+      ansible.builtin.command:
+        cmd: "brew list --cask --versions {{ item }}"
+      loop: "{{ discovered_casks.stdout_lines | sort }}"
+      register: cask_version_checks
+      changed_when: false
+      failed_when: false
+      tags: casks
+
+    - name: Collect installed Homebrew casks
+      ansible.builtin.set_fact:
+        installed_casks: "{{ cask_version_checks.results | selectattr('rc', 'equalto', 0) | map(attribute='item') | sort | list }}"
       tags: casks
 
     - name: Write installed casks to file
       ansible.builtin.copy:
-        content: "{{ installed_casks.stdout | trim }}"
+        content: "{{ installed_casks | join('\n') }}{{ '\n' if installed_casks | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_casks.txt"
         mode: "0644"
-      when: installed_casks.stdout | trim | length > 0
       tags: casks
 
     - name: Display casks backup result
       ansible.builtin.debug:
-        msg: "Backed up {{ installed_casks.stdout_lines | length }} Homebrew casks to brew_casks.txt"
+        msg: "Backed up {{ installed_casks | length }} Homebrew casks to brew_casks.txt"
       tags: casks
 
     # VSCode Extensions Backup
@@ -71,10 +83,10 @@
 
     - name: Write VSCode extensions to file
       ansible.builtin.copy:
-        content: "{{ vscode_extensions.stdout | trim }}"
+        content: "{{ vscode_extensions.stdout_lines | sort | join('\n') }}{{ '\n' if vscode_extensions.stdout_lines | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/configs/vscode/extensions.txt"
         mode: "0644"
-      when: code_check.rc == 0 and vscode_extensions.stdout | trim | length > 0
+      when: code_check.rc == 0
       tags: vscode
 
     - name: Display VSCode extensions backup result
@@ -102,10 +114,10 @@
 
     - name: Write Cursor extensions to file
       ansible.builtin.copy:
-        content: "{{ cursor_extensions.stdout | trim }}"
+        content: "{{ cursor_extensions.stdout_lines | sort | join('\n') }}{{ '\n' if cursor_extensions.stdout_lines | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/configs/cursor/extensions.txt"
         mode: "0644"
-      when: cursor_check.rc == 0 and cursor_extensions.stdout | trim | length > 0
+      when: cursor_check.rc == 0
       tags: cursor
 
     - name: Display Cursor extensions backup result
@@ -143,10 +155,10 @@
 
     - name: Write Zed extensions to file
       ansible.builtin.copy:
-        content: "{{ zed_extensions.stdout_lines | sort | join('\n') }}\n"
+        content: "{{ zed_extensions.stdout_lines | sort | join('\n') }}{{ '\n' if zed_extensions.stdout_lines | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/configs/zed/extensions.txt"
         mode: "0644"
-      when: zed_extensions_dir.stat.exists and zed_extensions.stdout_lines | default([]) | length > 0
+      when: zed_extensions_dir.stat.exists
       tags: zed
 
     - name: Display Zed extensions backup result
@@ -182,7 +194,7 @@
           Backup Complete!
           ========================================
           Homebrew formulae (leaves): {{ installed_formulae.stdout_lines | default([]) | length }}
-          Homebrew casks: {{ installed_casks.stdout_lines | default([]) | length }}
+          Homebrew casks: {{ installed_casks | default([]) | length }}
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
           Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}
           Zed extensions: {{ zed_extensions.stdout_lines | default([]) | length }}
