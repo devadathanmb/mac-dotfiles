@@ -3,7 +3,7 @@ PLAYBOOK    := ansible-playbook
 # prevent idle/disk/system sleep during long installs
 CAFFEINATE  := caffeinate -ims
 
-RAYCAST_CONFIG_DIR        := configs/raycast
+RAYCAST_CONFIG_DIR        := exports/raycast
 RAYCAST_BACKUP_DEST       := $(RAYCAST_CONFIG_DIR)/raycast-x-backup.rayconfig
 RAYCAST_BACKUP_SOURCE_DIR ?= $(HOME)
 RAYCAST_EXPORT_DEEPLINK   := raycast://extensions/raycast/raycast/export-settings-data?launchType=userInitiated

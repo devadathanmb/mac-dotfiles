@@ -1,3 +1,4 @@
+agavra/tap/tuicr
 ampcode/tap/ampcode
 anomalyco/tap/opencode
 ansible
@@ -28,7 +29,6 @@ fontforge
 fselect
 fzf
 gawk
-gemini-cli
 gh
 git-delta
 git-filter-repo
@@ -45,6 +45,7 @@ httpie
 hunk
 hyperfine
 imagemagick
+iperf3
 jq
 k1low/tap/mo
 k9s

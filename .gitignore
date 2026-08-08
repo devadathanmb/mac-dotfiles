@@ -6,10 +6,10 @@ untracked/*
 **/log
 **/log/
 **/history
+*.log
 .cursor/*
 .claude/*
 .commandcode/
 .sisyphus/*
 configs/codex/config.toml
-configs/pgcli/log
 configs/zoxide/db.zo

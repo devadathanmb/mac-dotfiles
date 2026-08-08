@@ -24,6 +24,7 @@
     ~/.config/zsh: configs/zsh
     ~/.config/cvim: configs/cvim
     ~/.config/ghostty: configs/ghostty
+    ~/.config/kitty: configs/kitty
     ~/.config/atuin: configs/atuin
     ~/.config/pgcli: configs/pgcli
     ~/.config/htop: configs/htop
@@ -45,13 +46,12 @@
     ~/.local/bin/:
       glob: true
       path: scripts/*/*
-    # ~/Library/Preferences/com.googlecode.iterm2.plist: configs/iterm2/com.googlecode.iterm2.plist
-
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
     "~/Library/Application Support/Code/User/keybindings.json": configs/vscode/keybindings.json
 
     "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
     "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
+    "~/Library/Application Support/Cursor/User/mcp.json": configs/cursor/mcp.json
 
     # Pi Coding Agent
     ~/.pi/agent/settings.json: configs/pi/settings.json
@@ -62,6 +62,7 @@
     ~/.pi/agent/themes: configs/pi/themes
     ~/.pi/agent/npm/package.json: configs/pi/npm/package.json
     ~/.pi/agent/npm/package-lock.json: configs/pi/npm/package-lock.json
+    ~/.pi/agent/damage-control.yaml: configs/pi/damage-control.yaml
     ~/.pi/agent/damage-control-rules.yaml: configs/pi/damage-control-rules.yaml
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
