@@ -180,11 +180,6 @@
     "lsp": {
         "basedpyright": {
             "settings": {
-                "python": {
-                    // Prefer the real interpreter path over shims so the LS matches `python --version`.
-                    "pythonPath": "/Users/devadathanmb/.local/share/mise/installs/python/latest/bin/python",
-                    "defaultInterpreterPath": "/Users/devadathanmb/.local/share/mise/installs/python/latest/bin/python",
-                },
                 "basedpyright.analysis": {
                     "autoImportCompletions": true,
                     "diagnosticSeverityOverrides": {
