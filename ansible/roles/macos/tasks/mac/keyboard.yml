@@ -65,6 +65,7 @@
       - com.apple.keyboard.modifiermapping.0-0-0
       - -array
       - "{HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771113;}"
+  changed_when: true
   when: >-
     caps_lock_modifier_mapping.rc != 0
     or 'HIDKeyboardModifierMappingSrc = 30064771129' not in caps_lock_modifier_mapping.stdout
@@ -90,6 +91,7 @@
       - property
       - --set
       - '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
+  changed_when: true
   when: >-
     active_hid_key_mapping.rc != 0
     or ('0x700000039' not in active_hid_key_mapping.stdout and '30064771129' not in active_hid_key_mapping.stdout)

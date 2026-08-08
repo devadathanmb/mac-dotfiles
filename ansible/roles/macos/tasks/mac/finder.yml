@@ -190,4 +190,5 @@
   tags: [macos]
   ansible.builtin.command:
     cmd: "chflags nohidden {{ ansible_facts['env']['HOME'] }}/Library"
+  changed_when: true
   when: "'hidden' in library_chflags.stdout"
