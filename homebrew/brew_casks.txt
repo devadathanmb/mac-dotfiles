@@ -18,6 +18,7 @@ font-fira-code
 font-fontawesome
 font-ibm-plex-mono
 font-maple-mono
+font-maple-mono-nf
 font-symbols-only-nerd-font
 ghostty
 gimp
