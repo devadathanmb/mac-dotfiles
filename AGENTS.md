@@ -25,5 +25,5 @@
 
 ## Known Constraints
 
-- `DOTFILES_REPO` does not make every playbook portable: Homebrew and editor role defaults hard-code `/Users/devadathanmb/.mac-dots`.
+- `DOTFILES_REPO` resolves Ansible role paths; application settings may still contain user-specific paths.
 - OpenCode keys belong in untracked `~/.secrets/*` files, never `configs/opencode/opencode.jsonc`. Restart OpenCode after changing that config.

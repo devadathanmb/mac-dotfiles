@@ -74,7 +74,7 @@ end
 
 **Solution Applied:**
 
-Added to `/Users/devadathanmb/.config/fish/conf.d/fifc.fish`:
+Added to `~/.config/fish/conf.d/fifc.fish`:
 
 ```fish
 # Ensure fifc tab binding persists even when other plugins rebind keys

@@ -1413,7 +1413,7 @@
 
   // Lua
   "Lua.workspace.library": [
-    "/Users/devadathanmb/Library/Application Support/wezterm/wezterm-types"
+    "${env:HOME}/Library/Application Support/wezterm/wezterm-types"
   ],
   "Lua.diagnostics.globals": ["wezterm"],
   "[yaml]": {

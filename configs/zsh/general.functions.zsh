@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Custom Functions
-__DOTFILES_PATH="$HOME/.mac-dots/"
+__DOTFILES_PATH="${DOTFILES_REPO:-$HOME/.mac-dots}/"
 
 # Alias listing function
 function _alias_ls(){
