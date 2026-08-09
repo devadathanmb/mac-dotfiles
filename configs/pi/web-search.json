@@ -1,0 +1,43 @@
+{
+  "exaApiKey": "$EXA_API_KEY",
+  "searchRouting": {
+    "providers": [
+      "openai",
+      "exa"
+    ],
+    "fallbackOn": [
+      "transient",
+      "quota",
+      "network"
+    ]
+  },
+  "workflow": "none",
+  "summaryModel": "openai-codex/gpt-5.6-luna",
+  "autoOpenBrowser": false,
+  "allowBrowserCookies": false,
+  "webSearch": {
+    "enabled": true
+  },
+  "fetchRouting": {
+    "providers": [
+      "http"
+    ],
+    "allowRemoteHostedProviders": false
+  },
+  "githubClone": {
+    "enabled": false
+  },
+  "youtube": {
+    "enabled": false
+  },
+  "video": {
+    "enabled": false
+  },
+  "pdf": {
+    "provider": "unpdf",
+    "maxSizeMB": 20
+  },
+  "ssrf": {
+    "trustEnvProxy": false
+  }
+}
