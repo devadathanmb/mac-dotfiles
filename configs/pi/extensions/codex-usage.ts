@@ -1,8 +1,6 @@
 // Local copy of @narumitw/pi-codex-usage, patched for this config.
 // Upstream: https://github.com/narumiruna/pi-extensions/blob/main/extensions/pi-codex-usage/src/codex-usage.ts
 
-import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
-import { createInterface } from "node:readline";
 import type {
   ExtensionAPI,
   ExtensionCommandContext,
@@ -23,7 +21,7 @@ const LIMIT_VALUE_COLUMN = 29;
 const MAX_ERROR_BODY_CHARS = 600;
 const RESET_FOREGROUND = "\x1b[39m";
 
-type UsageSource = "pi-auth" | "codex-app-server";
+type UsageSource = "pi-auth";
 type PiModel = NonNullable<ExtensionContext["model"]>;
 export type CodexUsageModel = Pick<PiModel, "id" | "name" | "provider">;
 
@@ -42,6 +40,7 @@ type CachedReport = {
 type UsageUpdateEvent = {
   report: CodexUsageReport;
   snapshot?: NormalizedRateLimitSnapshot;
+  planType?: string;
   statusText: string;
   model?: CodexUsageModel;
   capturedAt: number;
@@ -78,7 +77,10 @@ type NormalizedRateLimitSnapshot = {
 
 type NormalizedRateLimitWindow = {
   usedPercent: number;
+  used?: number;
+  limit?: number;
   windowMinutes?: number;
+  windowLabel?: string;
   resetsAt?: number;
 };
 
@@ -91,6 +93,9 @@ type NormalizedCredits = {
 type RateLimitStatusPayload = {
   plan_type?: unknown;
   rate_limit?: unknown;
+  individual_limit?: unknown;
+  individualLimit?: unknown;
+  spend_control?: unknown;
   additional_rate_limits?: unknown;
   credits?: unknown;
 };
@@ -98,6 +103,8 @@ type RateLimitStatusPayload = {
 type BackendRateLimitDetails = {
   primary_window?: unknown;
   secondary_window?: unknown;
+  individual_limit?: unknown;
+  individualLimit?: unknown;
 };
 
 type BackendWindowSnapshot = {
@@ -118,43 +125,6 @@ type BackendCreditsSnapshot = {
   balance?: unknown;
 };
 
-type AppServerRateLimitResponse = {
-  rateLimits?: unknown;
-  rateLimitsByLimitId?: unknown;
-};
-
-type AppServerRateLimitSnapshot = {
-  limitId?: unknown;
-  limitName?: unknown;
-  primary?: unknown;
-  secondary?: unknown;
-  credits?: unknown;
-  planType?: unknown;
-};
-
-type AppServerWindowSnapshot = {
-  usedPercent?: unknown;
-  windowDurationMins?: unknown;
-  resetsAt?: unknown;
-};
-
-type AppServerCreditsSnapshot = {
-  hasCredits?: unknown;
-  unlimited?: unknown;
-  balance?: unknown;
-};
-
-type RpcResponse = {
-  id?: unknown;
-  result?: unknown;
-  error?: { message?: unknown; code?: unknown };
-};
-
-type PendingRpc = {
-  resolve: (value: unknown) => void;
-  reject: (error: Error) => void;
-};
-
 export default function codexUsage(pi: ExtensionAPI) {
   let cache: CachedReport | undefined;
   let statuslineClearTimer: ReturnType<typeof setTimeout> | undefined;
@@ -169,6 +139,7 @@ export default function codexUsage(pi: ExtensionAPI) {
     const payload: UsageUpdateEvent = {
       report,
       snapshot: selectSnapshotForModel(report, model),
+      planType: report.planType,
       statusText,
       model,
       capturedAt: Date.now(),
@@ -401,27 +372,15 @@ async function queryUsage(
   ctx: ExtensionContext,
   options: Pick<QueryUsageOptions, "timeoutMs">,
 ): Promise<QueryUsageResult> {
-  const errors: UsageQueryError[] = [];
-
   try {
     const report = await queryViaPiAuth(ctx, options.timeoutMs);
     return { ok: true, report };
   } catch (cause) {
-    errors.push({ source: "pi-auth", message: errorMessage(cause), cause });
+    return {
+      ok: false,
+      errors: [{ source: "pi-auth", message: errorMessage(cause), cause }],
+    };
   }
-
-  try {
-    const report = await queryViaCodexAppServer(options.timeoutMs);
-    return { ok: true, report };
-  } catch (cause) {
-    errors.push({
-      source: "codex-app-server",
-      message: errorMessage(cause),
-      cause,
-    });
-  }
-
-  return { ok: false, errors };
 }
 
 async function queryViaPiAuth(ctx: ExtensionContext, timeoutMs: number): Promise<CodexUsageReport> {
@@ -513,175 +472,6 @@ async function fetchWithTimeout(
   }
 }
 
-async function queryViaCodexAppServer(timeoutMs: number): Promise<CodexUsageReport> {
-  const client = new CodexAppServerClient(timeoutMs);
-  try {
-    await client.start();
-    await client.request("initialize", {
-      clientInfo: {
-        name: "pi_codex_usage",
-        title: "Pi Codex Usage",
-        version: "0.1.0",
-      },
-      capabilities: {
-        experimentalApi: false,
-        requestAttestation: false,
-        optOutNotificationMethods: [],
-      },
-    });
-    client.notify("initialized");
-    const result = await client.request("account/rateLimits/read", undefined);
-    return normalizeAppServerResponse(
-      assertObject(result, "account/rateLimits/read result") as AppServerRateLimitResponse,
-      Date.now(),
-    );
-  } finally {
-    client.dispose();
-  }
-}
-
-class CodexAppServerClient {
-  private child?: ChildProcessWithoutNullStreams;
-  private nextId = 1;
-  private stderr = "";
-  private readonly pending = new Map<number, PendingRpc>();
-  private startPromise?: Promise<void>;
-  private exitError?: Error;
-  private readonly timeoutMs: number;
-
-  constructor(timeoutMs: number) {
-    this.timeoutMs = timeoutMs;
-  }
-
-  start(): Promise<void> {
-    if (this.startPromise) return this.startPromise;
-
-    this.startPromise = new Promise((resolve, reject) => {
-      const child = spawn("codex", ["app-server", "--listen", "stdio://"], {
-        stdio: ["pipe", "pipe", "pipe"],
-      });
-      this.child = child;
-
-      const startupTimeout = setTimeout(() => {
-        reject(
-          new Error(
-            `Timed out after ${Math.round(this.timeoutMs / 1000)}s starting codex app-server.`,
-          ),
-        );
-      }, this.timeoutMs);
-
-      child.once("spawn", () => {
-        clearTimeout(startupTimeout);
-        resolve();
-      });
-
-      child.once("error", (error) => {
-        clearTimeout(startupTimeout);
-        reject(new Error(`Failed to start codex app-server: ${error.message}`));
-        this.rejectAll(error);
-      });
-
-      child.once("exit", (code, signal) => {
-        const suffix = this.stderr ? ` stderr: ${redactErrorBody(this.stderr)}` : "";
-        this.exitError = new Error(
-          `codex app-server exited before completing the request (code ${code ?? "unknown"}, signal ${signal ?? "none"}).${suffix}`,
-        );
-        this.rejectAll(this.exitError);
-      });
-
-      child.stderr.setEncoding("utf8");
-      child.stderr.on("data", (chunk: string) => {
-        this.stderr = truncateEnd(this.stderr + chunk, MAX_ERROR_BODY_CHARS);
-      });
-
-      const lines = createInterface({ input: child.stdout });
-      lines.on("line", (line) => this.handleLine(line));
-    });
-
-    return this.startPromise;
-  }
-
-  request(method: string, params: unknown): Promise<unknown> {
-    const child = this.child;
-    if (!child?.stdin.writable) {
-      throw new Error("codex app-server is not running.");
-    }
-    if (this.exitError) throw this.exitError;
-
-    const id = this.nextId++;
-    const payload = params === undefined ? { method, id } : { method, id, params };
-    const response = new Promise<unknown>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.pending.delete(id);
-        reject(
-          new Error(`Timed out after ${Math.round(this.timeoutMs / 1000)}s waiting for ${method}.`),
-        );
-      }, this.timeoutMs);
-
-      this.pending.set(id, {
-        resolve: (value) => {
-          clearTimeout(timeout);
-          resolve(value);
-        },
-        reject: (error) => {
-          clearTimeout(timeout);
-          reject(error);
-        },
-      });
-    });
-
-    child.stdin.write(`${JSON.stringify(payload)}\n`);
-    return response;
-  }
-
-  notify(method: string): void {
-    const child = this.child;
-    if (!child?.stdin.writable) return;
-    child.stdin.write(`${JSON.stringify({ method })}\n`);
-  }
-
-  dispose(): void {
-    for (const [id, pending] of this.pending) {
-      pending.reject(new Error(`codex app-server request ${id} cancelled.`));
-    }
-    this.pending.clear();
-
-    const child = this.child;
-    if (!child) return;
-    child.stdin.end();
-    if (!child.killed) child.kill();
-    this.child = undefined;
-  }
-
-  private handleLine(line: string): void {
-    let parsed: RpcResponse;
-    try {
-      parsed = JSON.parse(line) as RpcResponse;
-    } catch {
-      return;
-    }
-
-    if (typeof parsed.id !== "number") return;
-    const pending = this.pending.get(parsed.id);
-    if (!pending) return;
-    this.pending.delete(parsed.id);
-
-    if (parsed.error) {
-      const message =
-        typeof parsed.error.message === "string" ? parsed.error.message : "unknown error";
-      pending.reject(new Error(`codex app-server request failed: ${message}`));
-      return;
-    }
-
-    pending.resolve(parsed.result);
-  }
-
-  private rejectAll(error: Error): void {
-    for (const pending of this.pending.values()) pending.reject(error);
-    this.pending.clear();
-  }
-}
-
 function normalizeBackendPayload(
   payload: RateLimitStatusPayload,
   capturedAt: number,
@@ -690,6 +480,19 @@ function normalizeBackendPayload(
   const snapshots: NormalizedRateLimitSnapshot[] = [];
   const planType = asString(payload.plan_type);
   const primary = normalizeBackendSnapshot("codex", undefined, payload.rate_limit, payload.credits);
+  const spendControl =
+    payload.spend_control && typeof payload.spend_control === "object" && !Array.isArray(payload.spend_control)
+      ? (payload.spend_control as Record<string, unknown>)
+      : undefined;
+  const individualLimit = normalizeIndividualLimit(
+    payload.individual_limit ??
+      payload.individualLimit ??
+      spendControl?.individual_limit ??
+      spendControl?.individualLimit,
+  );
+  if (primary && individualLimit && !primary.primary) {
+    primary.primary = individualLimit;
+  }
   if (primary) snapshots.push(primary);
 
   const additional = Array.isArray(payload.additional_rate_limits)
@@ -731,12 +534,31 @@ function normalizeBackendSnapshot(
   }
 
   const details = assertObject(rateLimit, "rate limit") as BackendRateLimitDetails;
-  const primary = normalizeBackendWindow(details.primary_window);
+  const individualLimit = normalizeIndividualLimit(
+    details.individual_limit ?? details.individualLimit,
+  );
+  const primary = normalizeBackendWindow(details.primary_window) ?? individualLimit;
   const secondary = normalizeBackendWindow(details.secondary_window);
   const normalizedCredits = normalizeBackendCredits(credits);
 
   if (!primary && !secondary && !normalizedCredits) return undefined;
   return { limitId, limitName, primary, secondary, credits: normalizedCredits };
+}
+
+function normalizeIndividualLimit(value: unknown): NormalizedRateLimitWindow | undefined {
+  if (value === null || value === undefined) return undefined;
+  const limit = assertObject(value, "individual limit");
+  const remainingPercent = asNumber(limit.remaining_percent ?? limit.remainingPercent);
+  const usedPercent = asNumber(limit.used_percent ?? limit.usedPercent) ??
+    (remainingPercent === undefined ? undefined : 100 - clampPercent(remainingPercent));
+  if (usedPercent === undefined) return undefined;
+  return {
+    usedPercent: clampPercent(usedPercent),
+    used: asNumber(limit.used),
+    limit: asNumber(limit.limit),
+    windowLabel: "individual",
+    resetsAt: asNumber(limit.reset_at ?? limit.resetAt),
+  };
 }
 
 function normalizeBackendWindow(value: unknown): NormalizedRateLimitWindow | undefined {
@@ -762,96 +584,6 @@ function normalizeBackendCredits(value: unknown): NormalizedCredits | undefined 
   return { hasCredits, unlimited, balance: asString(credits.balance) };
 }
 
-function normalizeAppServerResponse(
-  response: AppServerRateLimitResponse,
-  capturedAt: number,
-): CodexUsageReport {
-  const snapshots: NormalizedRateLimitSnapshot[] = [];
-  const addSnapshot = (raw: unknown, fallbackId: string) => {
-    const snapshot = normalizeAppServerSnapshot(raw, fallbackId);
-    if (!snapshot) return;
-    const existingIndex = snapshots.findIndex((item) => item.limitId === snapshot.limitId);
-    if (existingIndex >= 0)
-      snapshots[existingIndex] = mergeSnapshot(snapshots[existingIndex], snapshot);
-    else snapshots.push(snapshot);
-  };
-
-  addSnapshot(response.rateLimits, "codex");
-  if (response.rateLimitsByLimitId && typeof response.rateLimitsByLimitId === "object") {
-    for (const [limitId, raw] of Object.entries(response.rateLimitsByLimitId)) {
-      addSnapshot(raw, limitId);
-    }
-  }
-
-  if (snapshots.length === 0) {
-    throw new Error("codex app-server returned no displayable rate-limit windows.");
-  }
-
-  const planType = asAppServerPlanType(response.rateLimits);
-  return { source: "codex-app-server", capturedAt, planType, snapshots };
-}
-
-function asAppServerPlanType(raw: unknown): string | undefined {
-  if (raw === null || raw === undefined) return undefined;
-  const snapshot = assertObject(
-    raw,
-    "app-server rate-limit snapshot",
-  ) as AppServerRateLimitSnapshot;
-  return asString(snapshot.planType);
-}
-
-function normalizeAppServerSnapshot(
-  raw: unknown,
-  fallbackId: string,
-): NormalizedRateLimitSnapshot | undefined {
-  if (raw === null || raw === undefined) return undefined;
-  const snapshot = assertObject(
-    raw,
-    "app-server rate-limit snapshot",
-  ) as AppServerRateLimitSnapshot;
-  const limitId = asString(snapshot.limitId) ?? fallbackId;
-  const limitName = asString(snapshot.limitName);
-  const primary = normalizeAppServerWindow(snapshot.primary);
-  const secondary = normalizeAppServerWindow(snapshot.secondary);
-  const credits = normalizeAppServerCredits(snapshot.credits);
-  if (!primary && !secondary && !credits) return undefined;
-  return { limitId, limitName, primary, secondary, credits };
-}
-
-function normalizeAppServerWindow(value: unknown): NormalizedRateLimitWindow | undefined {
-  if (value === null || value === undefined) return undefined;
-  const window = assertObject(value, "app-server rate-limit window") as AppServerWindowSnapshot;
-  const usedPercent = asNumber(window.usedPercent);
-  if (usedPercent === undefined) return undefined;
-  return {
-    usedPercent,
-    windowMinutes: asNumber(window.windowDurationMins),
-    resetsAt: asNumber(window.resetsAt),
-  };
-}
-
-function normalizeAppServerCredits(value: unknown): NormalizedCredits | undefined {
-  if (value === null || value === undefined) return undefined;
-  const credits = assertObject(value, "app-server credits") as AppServerCreditsSnapshot;
-  const hasCredits = asBoolean(credits.hasCredits);
-  const unlimited = asBoolean(credits.unlimited);
-  if (hasCredits === undefined || unlimited === undefined) return undefined;
-  return { hasCredits, unlimited, balance: asString(credits.balance) };
-}
-
-function mergeSnapshot(
-  left: NormalizedRateLimitSnapshot,
-  right: NormalizedRateLimitSnapshot,
-): NormalizedRateLimitSnapshot {
-  return {
-    limitId: right.limitId || left.limitId,
-    limitName: right.limitName ?? left.limitName,
-    primary: right.primary ?? left.primary,
-    secondary: right.secondary ?? left.secondary,
-    credits: right.credits ?? left.credits,
-  };
-}
-
 function formatCodexUsageReport(report: CodexUsageReport, _cacheAgeMs?: number): string {
   const lines = [
     "  >_ OpenAI Codex Usage",
@@ -866,8 +598,8 @@ function formatCodexUsageReport(report: CodexUsageReport, _cacheAgeMs?: number):
     if (!isPrimaryCodexSnapshot(snapshot)) {
       lines.push(`  ${label} limit:`);
     }
-    if (snapshot.primary) lines.push(formatWindowLine("5h limit:", snapshot.primary));
-    if (snapshot.secondary) lines.push(formatWindowLine("Weekly limit:", snapshot.secondary));
+    if (snapshot.primary) lines.push(formatWindowLine(`${formatWindowLabel(snapshot.primary)} limit:`, snapshot.primary));
+    if (snapshot.secondary) lines.push(formatWindowLine(`${formatWindowLabel(snapshot.secondary)} limit:`, snapshot.secondary));
     if (!snapshot.primary && !snapshot.secondary) {
       lines.push("  Limits unavailable for this account");
     }
@@ -881,8 +613,8 @@ function formatCodexUsageStatusline(report: CodexUsageReport, model?: CodexUsage
   if (!snapshot) return "📊 usage unavailable";
 
   const parts = [`📊 ${formatStatuslinePrefix(snapshot)}`];
-  if (snapshot.primary) parts.push(`${formatRemainingPercent(snapshot.primary)} 5h`);
-  if (snapshot.secondary) parts.push(`${formatRemainingPercent(snapshot.secondary)} wk`);
+  if (snapshot.primary) parts.push(formatWindowStatus(snapshot.primary));
+  if (snapshot.secondary) parts.push(formatWindowStatus(snapshot.secondary));
   if (parts.length === 1 && snapshot.credits) parts.push(formatCredits(snapshot.credits));
   return parts.join(" ");
 }
@@ -976,8 +708,21 @@ function compactLimitLabel(label: string): string {
   return compact.toLowerCase().replace(/\s+/g, " ");
 }
 
+function formatWindowStatus(window: NormalizedRateLimitWindow): string {
+  const parts = [formatRemainingPercent(window), formatWindowLabel(window)];
+  const requestUsage = formatRequestUsage(window);
+  if (requestUsage) parts.unshift(`${requestUsage} requests`);
+  if (window.resetsAt) parts.push(`resets ${formatReset(window.resetsAt)}`);
+  return parts.join(" ");
+}
+
 function formatRemainingPercent(window: NormalizedRateLimitWindow): string {
   return `${(100 - clampPercent(window.usedPercent)).toFixed(0)}%`;
+}
+
+function formatRequestUsage(window: NormalizedRateLimitWindow): string | undefined {
+  if (window.used === undefined || window.limit === undefined) return undefined;
+  return `${formatNumber(window.used, "?")}/${formatNumber(window.limit, "?")}`;
 }
 
 function showReport(
@@ -1003,14 +748,29 @@ function isPrimaryCodexSnapshot(snapshot: NormalizedRateLimitSnapshot): boolean 
   );
 }
 
+function formatWindowLabel(window: NormalizedRateLimitWindow): string {
+  if (window.windowLabel) return window.windowLabel;
+  if (window.windowMinutes === 5 * 60) return "5h";
+  if (window.windowMinutes === 7 * 24 * 60) return "Weekly";
+  if (window.windowMinutes && window.windowMinutes % (24 * 60) === 0) {
+    return `${window.windowMinutes / (24 * 60)}d`;
+  }
+  if (window.windowMinutes && window.windowMinutes % 60 === 0) {
+    return `${window.windowMinutes / 60}h`;
+  }
+  return "window";
+}
+
 function formatWindowLine(label: string, window: NormalizedRateLimitWindow): string {
   return `  ${label.padEnd(LIMIT_VALUE_COLUMN)}${formatWindow(window)}`;
 }
 
 function formatWindow(window: NormalizedRateLimitWindow): string {
   const remaining = 100 - clampPercent(window.usedPercent);
+  const requestUsage = formatRequestUsage(window);
+  const usage = requestUsage ? `${requestUsage} requests, ` : "";
   const reset = window.resetsAt ? ` (resets ${formatReset(window.resetsAt)})` : "";
-  return `${progressBar(remaining)} ${remaining.toFixed(0)}% left${reset}`;
+  return `${progressBar(remaining)} ${usage}${remaining.toFixed(0)}% left${reset}`;
 }
 
 function progressBar(percentRemaining: number): string {
@@ -1044,13 +804,10 @@ function formatReset(epochSeconds: number): string {
 function formatQueryErrors(errors: UsageQueryError[]): string {
   const lines = ["Unable to read Codex usage."];
   for (const error of errors) {
-    const source = error.source === "pi-auth" ? "Pi auth direct" : "Codex app-server fallback";
-    lines.push(`- ${source}: ${error.message}`);
+    lines.push(`- Pi auth direct: ${error.message}`);
   }
   lines.push("");
-  lines.push(
-    "Tip: use a Pi OpenAI Codex model or run /login for OpenAI ChatGPT Plus/Pro. If Pi auth is unavailable, install Codex CLI and run codex login for the fallback.",
-  );
+  lines.push("Tip: use a Pi OpenAI Codex model or run /login to configure Codex subscription auth.");
   return lines.join("\n");
 }
 

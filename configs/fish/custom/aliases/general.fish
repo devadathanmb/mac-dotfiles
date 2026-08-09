@@ -16,6 +16,5 @@ alias mv="mv -i"
 alias brewup="echo 'Brewing...' && brew update && brew upgrade --no-ask && brew cleanup && echo 'Brew complete'"
 
 # Vim Aliases
-alias vim="nvim -u ~/.config/cvim/init.lua"
-alias lvim="nvim -u ~/.config/nvim/init.lua"
-alias nvim="nvim -u ~/.config/cvim/init.lua"
+alias vim="nvim"
+alias lvim="env NVIM_APPNAME=lvim nvim"

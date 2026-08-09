@@ -22,7 +22,7 @@
     ~/.zprofile: .zprofile
     ~/.config/gh: configs/gh
     ~/.config/zsh: configs/zsh
-    ~/.config/cvim: configs/cvim
+    ~/.config/nvim: configs/nvim
     ~/.config/ghostty: configs/ghostty
     ~/.config/kitty: configs/kitty
     ~/.config/atuin: configs/atuin

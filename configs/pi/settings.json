@@ -1,21 +1,10 @@
 {
-  "lastChangelogVersion": "0.82.1",
-  "theme": "pi-github-dark",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-terra",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "high",
+  "lastChangelogVersion": "0.84.1",
+  "theme": "custom-github-dark",
   "packages": [
     "npm:pi-mcp-adapter"
-  ],
-  "hideThinkingBlock": false,
-  "extensions": [],
-  "terminal": {
-    "showTerminalProgress": true
-  },
-  "enableInstallTelemetry": false,
-  "editorPaddingX": 1,
-  "showHardwareCursor": false,
-  "quietStartup": true,
-  "treeFilterMode": "default",
-  "doubleEscapeAction": "none"
+  ]
 }

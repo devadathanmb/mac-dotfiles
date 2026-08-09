@@ -2,7 +2,8 @@
  * Footer — minimal workspace status.
  *
  * Line 1: context on the left, YOLO on the right when enabled.
- * Line 2: folder/git on the left, Codex quota on the right when active.
+ * Line 2: folder/git on the left, provider quota on the right when active
+ * (Codex rate-limit windows, or Copilot premium quota).
  */
 import type { ExtensionAPI, Theme } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
@@ -18,6 +19,10 @@ type FooterModel = {
 
 type CodexUsageWindow = {
   usedPercent: number;
+  used?: number;
+  limit?: number;
+  windowMinutes?: number;
+  windowLabel?: string;
   resetsAt?: number;
 };
 
@@ -28,6 +33,27 @@ type CodexUsageSnapshot = {
 
 type CodexUsageUpdate = {
   snapshot?: CodexUsageSnapshot;
+  planType?: string;
+};
+
+type CopilotQuotaCategory = {
+  entitlement?: number;
+  remaining?: number;
+  percentRemaining?: number;
+  unlimited?: boolean;
+  overagePermitted?: boolean;
+};
+
+type CopilotQuotaReport = {
+  capturedAt: number;
+  resetDate?: string;
+  chat?: CopilotQuotaCategory;
+  completions?: CopilotQuotaCategory;
+  premiumInteractions?: CopilotQuotaCategory;
+};
+
+type CopilotUsageUpdate = {
+  report: CopilotQuotaReport;
 };
 
 type GitInfo = {
@@ -47,6 +73,9 @@ type DamageControlStatus = {
 const CODEX_PROVIDER_ID = "openai-codex";
 const CODEX_USAGE_UPDATE_EVENT = "codex-usage:update";
 const CODEX_USAGE_REQUEST_EVENT = "codex-usage:request";
+const COPILOT_PROVIDER_ID = "github-copilot";
+const COPILOT_USAGE_UPDATE_EVENT = "copilot-usage:update";
+const COPILOT_USAGE_REQUEST_EVENT = "copilot-usage:request";
 const DAMAGE_CONTROL_STATUS_EVENT = "damage-control:status";
 const DAMAGE_CONTROL_STATUS_REQUEST_EVENT = "damage-control:status-request";
 const execFileAsync = promisify(execFile);
@@ -58,6 +87,10 @@ function clampPercent(value: number): number {
 
 function isCodexModel(model: FooterModel | undefined): boolean {
   return model?.provider === CODEX_PROVIDER_ID;
+}
+
+function isCopilotModel(model: FooterModel | undefined): boolean {
+  return model?.provider === COPILOT_PROVIDER_ID;
 }
 
 function hyperlink(url: string, text: string): string {
@@ -176,12 +209,53 @@ function buildGitDisplay(cwd: string, gitInfo: GitInfo | undefined, theme: Theme
   return parts.join(sep);
 }
 
-function buildCodexDisplay(snapshot: CodexUsageSnapshot | undefined, theme: Theme): string | undefined {
+function buildCodexDisplay(
+  snapshot: CodexUsageSnapshot | undefined,
+  planType: string | undefined,
+  theme: Theme,
+): string | undefined {
   if (!snapshot) return undefined;
   const parts: string[] = [];
-  if (snapshot.primary) parts.push(formatLimitItem("5h", snapshot.primary, theme));
-  if (snapshot.secondary) parts.push(formatLimitItem("wk", snapshot.secondary, theme));
+  if (snapshot.primary) parts.push(formatLimitItem("5h", snapshot.primary, planType, theme));
+  if (snapshot.secondary) parts.push(formatLimitItem("wk", snapshot.secondary, undefined, theme));
   return parts.length > 0 ? parts.join(theme.fg("dim", "  ")) : undefined;
+}
+
+// resetDateIso is attached to the premium_interactions line, which is the
+// quota relevant to premium model usage.
+function formatCopilotCategory(
+  label: string,
+  category: CopilotQuotaCategory,
+  theme: Theme,
+  resetDateIso?: string,
+): string | undefined {
+  if (category.unlimited) return theme.fg("muted", `${label} `) + theme.fg("success", "unlimited");
+  if (category.percentRemaining == null) return undefined;
+  const percent = clampPercent(category.percentRemaining);
+  return (
+    theme.fg("muted", `${label} `) +
+    theme.fg(limitThemeColor(percent), `${percent.toFixed(0)}%`) +
+    formatCopilotReset(resetDateIso, theme)
+  );
+}
+
+function formatCopilotReset(resetDateIso: string | undefined, theme: Theme): string {
+  if (!resetDateIso) return "";
+  const epochMs = Date.parse(resetDateIso);
+  if (Number.isNaN(epochMs)) return "";
+  return formatReset(Math.floor(epochMs / 1000), theme);
+}
+
+function buildCopilotDisplay(report: CopilotQuotaReport | undefined, theme: Theme): string | undefined {
+  if (!report) return undefined;
+  const parts: string[] = [];
+  // Only premium interactions consume the quota relevant to premium models.
+  if (report.premiumInteractions) {
+    const item = formatCopilotCategory("prem", report.premiumInteractions, theme, report.resetDate);
+    if (item) parts.push(item);
+  }
+  if (parts.length === 0) return undefined;
+  return parts.join(theme.fg("dim", "  "));
 }
 
 function buildDamageControlDisplay(status: DamageControlStatus | undefined, fallback: string | undefined, theme: Theme): string {
@@ -222,6 +296,8 @@ export default function (pi: ExtensionAPI) {
       let gitInfo: GitInfo | undefined;
       let gitRefreshInFlight = false;
       let codexUsageSnapshot: CodexUsageSnapshot | undefined;
+      let codexUsagePlanType: string | undefined;
+      let copilotUsageReport: CopilotQuotaReport | undefined;
       let damageControlStatus: DamageControlStatus | undefined;
       let disposed = false;
 
@@ -243,7 +319,13 @@ export default function (pi: ExtensionAPI) {
 
       const unsubBranch = footerData.onBranchChange(() => refreshGitInfo?.(true));
       const unsubUsage = pi.events.on(CODEX_USAGE_UPDATE_EVENT, (data) => {
-        codexUsageSnapshot = isCodexUsageUpdate(data) ? data.snapshot : undefined;
+        const update = isCodexUsageUpdate(data) ? data : undefined;
+        codexUsageSnapshot = update?.snapshot;
+        codexUsagePlanType = update?.planType;
+        tui.requestRender();
+      });
+      const unsubCopilotUsage = pi.events.on(COPILOT_USAGE_UPDATE_EVENT, (data) => {
+        copilotUsageReport = isCopilotUsageUpdate(data) ? data.report : undefined;
         tui.requestRender();
       });
       const unsubDamageControl = pi.events.on(DAMAGE_CONTROL_STATUS_EVENT, (data) => {
@@ -252,6 +334,7 @@ export default function (pi: ExtensionAPI) {
       });
 
       pi.events.emit(CODEX_USAGE_REQUEST_EVENT, { model: ctx.model });
+      pi.events.emit(COPILOT_USAGE_REQUEST_EVENT, { model: ctx.model });
       pi.events.emit(DAMAGE_CONTROL_STATUS_REQUEST_EVENT, {});
 
       return {
@@ -259,6 +342,7 @@ export default function (pi: ExtensionAPI) {
           disposed = true;
           unsubBranch();
           unsubUsage();
+          unsubCopilotUsage();
           unsubDamageControl();
           if (requestFooterRender === renderCurrentFooter) requestFooterRender = undefined;
           if (refreshGitInfo) refreshGitInfo = undefined;
@@ -271,8 +355,12 @@ export default function (pi: ExtensionAPI) {
           const line1 = composeLeftRight(contextDisplay, modeDisplay, width);
 
           const gitDisplay = theme.fg("muted", " ") + buildGitDisplay(ctx.cwd, gitInfo, theme);
-          const codexDisplay = isCodexModel(ctx.model) ? buildCodexDisplay(codexUsageSnapshot, theme) : undefined;
-          const line2 = composeLeftRight(gitDisplay, codexDisplay ?? "", width);
+          const quotaDisplay = isCodexModel(ctx.model)
+            ? buildCodexDisplay(codexUsageSnapshot, codexUsagePlanType, theme)
+            : isCopilotModel(ctx.model)
+              ? buildCopilotDisplay(copilotUsageReport, theme)
+              : undefined;
+          const line2 = composeLeftRight(gitDisplay, quotaDisplay ?? "", width);
 
           return [line1, "", line2];
         },
@@ -303,17 +391,65 @@ function formatReset(epochSeconds: number | undefined, theme: Theme): string {
   return theme.fg("muted", `  ${reset}`);
 }
 
-function formatLimitItem(label: string, window: CodexUsageWindow, theme: Theme): string {
+function formatLimitItem(
+  label: string,
+  window: CodexUsageWindow,
+  planType: string | undefined,
+  theme: Theme,
+): string {
   const percent = 100 - clampPercent(window.usedPercent);
+  const isIndividualLimit = window.windowLabel === "individual";
+  const actualLabel =
+    (isIndividualLimit ? formatCodexPlanType(planType) : undefined) ??
+    formatCodexWindowLabel(window) ??
+    label;
+  if (isIndividualLimit) {
+    return (
+      theme.fg("muted", `${actualLabel} `) +
+      theme.fg(limitThemeColor(percent), `${percent.toFixed(0)}%`) +
+      formatReset(window.resetsAt, theme)
+    );
+  }
+
+  const requestUsage =
+    window.used !== undefined && window.limit !== undefined
+      ? `${formatFooterNumber(window.used)}/${formatFooterNumber(window.limit)} `
+      : "";
   return (
-    theme.fg("muted", `${label} `) +
+    theme.fg("muted", `${actualLabel} ${requestUsage}`) +
     theme.fg(limitThemeColor(percent), `${percent.toFixed(0)}%`) +
     formatReset(window.resetsAt, theme)
   );
 }
 
+function formatFooterNumber(value: number): string {
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
+}
+
+function formatCodexPlanType(planType: string | undefined): string | undefined {
+  const normalized = planType?.trim().toLowerCase();
+  return normalized || undefined;
+}
+
+function formatCodexWindowLabel(window: CodexUsageWindow): string | undefined {
+  if (window.windowLabel) return window.windowLabel;
+  if (window.windowMinutes === 5 * 60) return "5h";
+  if (window.windowMinutes === 7 * 24 * 60) return "wk";
+  if (window.windowMinutes && window.windowMinutes % (24 * 60) === 0) {
+    return `${window.windowMinutes / (24 * 60)}d`;
+  }
+  if (window.windowMinutes && window.windowMinutes % 60 === 0) {
+    return `${window.windowMinutes / 60}h`;
+  }
+  return undefined;
+}
+
 function isCodexUsageUpdate(data: unknown): data is CodexUsageUpdate {
   return !!data && typeof data === "object" && !Array.isArray(data);
+}
+
+function isCopilotUsageUpdate(data: unknown): data is CopilotUsageUpdate {
+  return !!data && typeof data === "object" && !Array.isArray(data) && "report" in data;
 }
 
 function isDamageControlStatus(data: unknown): data is DamageControlStatus {

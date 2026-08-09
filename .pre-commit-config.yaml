@@ -22,6 +22,7 @@ repos:
         entry: yamllint
         language: system
         types_or: [yaml]
+        exclude: (^|/)pnpm-lock\.yaml$
 
       - id: format-shell
         name: Format Bash/sh scripts with shfmt

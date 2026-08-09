@@ -34,7 +34,7 @@ theme = GitHub Dark High Contrast
 palette = 0=#000000
 palette = 8=#6e7681
 
-keybind = shift+enter=text:\x1b\r
+# keybind = shift+enter=text:\x1b\r
 
 
 clipboard-paste-protection = false
