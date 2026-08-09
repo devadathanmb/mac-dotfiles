@@ -10,6 +10,5 @@ alias down="cd ~/Downloads"
 alias mv="mv -i"
 
 # Vim Aliases
-alias vim="nvim -u ~/.config/cvim/init.lua"
-alias lvim="nvim -u ~/.config/nvim/init.lua"
-alias nvim="nvim -u ~/.config/cvim/init.lua"
+alias vim="nvim"
+alias lvim="NVIM_APPNAME=lvim nvim"
