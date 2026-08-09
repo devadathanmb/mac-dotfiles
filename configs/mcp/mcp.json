@@ -1,12 +1,5 @@
 {
   "mcpServers": {
-    "exa": {
-      "url": "https://mcp.exa.ai/mcp",
-      "headers": {
-        "x-api-key": "${EXA_API_KEY}"
-      },
-      "directTools": ["web_search_exa"]
-    },
     "context7": {
       "url": "https://mcp.context7.com/mcp"
     },
