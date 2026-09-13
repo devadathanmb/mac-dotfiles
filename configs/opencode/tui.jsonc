@@ -13,11 +13,12 @@
   "attention": {
     "enabled": true,
     "notifications": true,
-    "sound": true
+    "sound": false
   },
   // OpenCode Quota: tuiCommandDisplay chooses whether native TUI command output appears in the session transcript or a local popup dialog.
   // OpenCode Quota: loads the TUI sidebar, compact status, and local commands.
   "plugin": [
-    "@slkiser/opencode-quota"
+    "@slkiser/opencode-quota@latest"
+    
   ]
 }
