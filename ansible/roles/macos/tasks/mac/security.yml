@@ -1,7 +1,5 @@
 ---
-# ==============================================================================
 # SECURITY SETTINGS
-# ==============================================================================
 
 # NOTE: defaults write to com.apple.screensaver for askForPassword/askForPasswordDelay
 # has been broken since macOS 10.13.4 — Apple moved this into a separate security
@@ -15,9 +13,7 @@
   changed_when: false
   ignore_errors: true
 
-# ==============================================================================
 # PERFORMANCE SETTINGS
-# ==============================================================================
 
 - name: Performance | Disable automatic termination of inactive apps
   tags: [macos]

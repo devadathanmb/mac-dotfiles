@@ -1,7 +1,5 @@
 ---
-# ==============================================================================
 # KEYBOARD AND TEXT INPUT SETTINGS
-# ==============================================================================
 
 - name: Keyboard | Disable automatic spelling correction
   tags: [macos]
@@ -75,9 +73,7 @@
     type: int
     value: 2
 
-# ==============================================================================
 # SAVE DIALOGS
-# ==============================================================================
 
 - name: Save Dialogs | Always expand save panel by default
   tags: [macos]
