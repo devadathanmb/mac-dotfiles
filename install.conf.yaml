@@ -37,7 +37,6 @@
     ~/.config/opencode/opencode.jsonc: configs/opencode/opencode.jsonc
     ~/.config/opencode/themes/github-dark-default.json: configs/opencode/themes/github-dark-default.json
     ~/.config/opencode/tui.jsonc: configs/opencode/tui.jsonc
-    ~/.codex/config.toml: configs/codex/config.toml
     ~/.claude/:
       glob: true
       path: configs/claude/*
@@ -50,15 +49,10 @@
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
     "~/Library/Application Support/Code/User/keybindings.json": configs/vscode/keybindings.json
 
-    "~/Library/Application Support/Cursor/User/settings.json": configs/cursor/settings.json
-    "~/Library/Application Support/Cursor/User/keybindings.json": configs/cursor/keybindings.json
-    "~/Library/Application Support/Cursor/User/mcp.json": configs/cursor/mcp.json
-
     # Pi Coding Agent
     ~/.pi/agent/settings.json: configs/pi/settings.json
     ~/.pi/agent/keybindings.json: configs/pi/keybindings.json
     ~/.pi/agent/APPEND_SYSTEM.md: configs/pi/APPEND_SYSTEM.md
-    ~/.pi/agent/mcp.json.disabled: configs/pi/mcp.json.disabled
     ~/.pi/web-search.json: configs/pi/web-search.json
     ~/.pi/agent/extensions: configs/pi/extensions
     ~/.pi/agent/themes: configs/pi/themes

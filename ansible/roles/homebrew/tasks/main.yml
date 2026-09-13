@@ -46,3 +46,10 @@
 
 - name: Resolve Homebrew command conflicts
   ansible.builtin.import_tasks: command_conflicts.yml
+
+- name: Configure default applications
+  ansible.builtin.command:
+    argv:
+      - duti
+      - "{{ dotfiles_repo }}/configs/duti/defaults.duti"
+  changed_when: false

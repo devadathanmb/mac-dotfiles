@@ -38,4 +38,6 @@
     dest: "{{ lookup('env', 'HOME') }}/.local/bin/mole"
     state: link
     force: true
-  when: mole_prefix.rc == 0
+  when:
+    - mole_prefix.rc == 0
+    - not ansible_check_mode

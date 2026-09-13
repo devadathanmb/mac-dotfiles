@@ -42,6 +42,6 @@ ansible-galaxy collection install -r requirements.yml
 
 # Run the main playbook
 echo "🚀 Running Ansible playbook..."
-ansible-playbook playbooks/main.yml "$@"
+ansible-playbook playbooks/main.yml --ask-become-pass "$@"
 
 echo "✅ Bootstrap complete!"

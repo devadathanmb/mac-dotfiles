@@ -1,6 +1,6 @@
 ---
 # Mise Version Manager Role
-# Installs mise and latest stable Python/Node.js.
+# Installs mise and the configured development runtimes.
 
 - name: Install mise via Homebrew
   community.general.homebrew:
@@ -8,11 +8,25 @@
     state: present
   become: false
 
-- name: Install and set latest stable Python and Node.js globally
+- name: Install and set development runtimes globally
   ansible.builtin.command:
-    cmd: "mise use --global --yes python@{{ mise_python_version }} node@{{ mise_node_version }}"
+    cmd: >-
+      mise use --global --yes
+      python@{{ mise_python_version }}
+      node@{{ mise_node_version }}
+      bun@{{ mise_bun_version }}
+      deno@{{ mise_deno_version }}
+      go@{{ mise_go_version }}
+      rust@{{ mise_rust_version }}
   register: mise_use_result
   changed_when: "'installed' in (mise_use_result.stdout + mise_use_result.stderr)"
+
+- name: Install Pi coding agent globally
+  community.general.npm:
+    name: "@earendil-works/pi-coding-agent"
+    global: true
+    state: present
+    executable: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/shims/npm"
 
 - name: Display installed versions
   ansible.builtin.debug:

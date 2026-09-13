@@ -1,0 +1,34 @@
+---
+- name: Login Items | Read configured applications
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - osascript
+      - -e
+      - 'tell application "System Events" to get the name of every login item'
+  register: login_items
+  changed_when: false
+  check_mode: false
+
+- name: Login Items | Remove stale Raycast Beta entry
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - osascript
+      - -e
+      - 'tell application "System Events" to delete login item "Raycast Beta"'
+  when: "'Raycast Beta' in login_items.stdout.split(', ')"
+  changed_when: true
+
+- name: Login Items | Add applications
+  tags: [macos]
+  ansible.builtin.command:
+    argv:
+      - osascript
+      - -e
+      - 'tell application "System Events" to make login item at end with properties {name:"{{ item.name }}", path:"{{ item.path }}", hidden:false}'
+  loop: "{{ macos_login_items }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name not in login_items.stdout.split(', ')
+  changed_when: true

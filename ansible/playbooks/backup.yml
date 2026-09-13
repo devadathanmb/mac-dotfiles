@@ -95,37 +95,6 @@
       when: code_check.rc == 0
       tags: vscode
 
-    # Cursor Extensions Backup
-    - name: Check if Cursor is installed
-      ansible.builtin.command:
-        cmd: which cursor
-      register: cursor_check
-      ignore_errors: true
-      changed_when: false
-      tags: cursor
-
-    - name: Get installed Cursor extensions
-      ansible.builtin.command:
-        cmd: cursor --list-extensions
-      register: cursor_extensions
-      changed_when: false
-      when: cursor_check.rc == 0
-      tags: cursor
-
-    - name: Write Cursor extensions to file
-      ansible.builtin.copy:
-        content: "{{ cursor_extensions.stdout_lines | sort | join('\n') }}{{ '\n' if cursor_extensions.stdout_lines | length > 0 else '' }}"
-        dest: "{{ dotfiles_repo }}/configs/cursor/extensions.txt"
-        mode: "0644"
-      when: cursor_check.rc == 0
-      tags: cursor
-
-    - name: Display Cursor extensions backup result
-      ansible.builtin.debug:
-        msg: "Backed up {{ cursor_extensions.stdout_lines | length }} Cursor extensions to extensions.txt"
-      when: cursor_check.rc == 0
-      tags: cursor
-
     # Zed Extensions Backup
     - name: Check if Zed extensions directory exists
       ansible.builtin.stat:
@@ -167,6 +136,25 @@
       when: zed_extensions_dir.stat.exists
       tags: zed
 
+    - name: Back up application preferences
+      ansible.builtin.command:
+        argv:
+          - defaults
+          - export
+          - "{{ item.domain }}"
+          - "{{ dotfiles_repo }}/{{ item.path }}"
+      loop:
+        - domain: com.lwouis.alt-tab-macos
+          path: exports/alt-tab/com.lwouis.alt-tab-macos.plist
+        - domain: eu.exelban.Stats
+          path: exports/stats/Stats.plist
+        - domain: com.googlecode.iterm2
+          path: exports/iterm2/com.googlecode.iterm2.plist
+      loop_control:
+        label: "{{ item.domain }}"
+      changed_when: true
+      tags: apps
+
     # macOS Defaults Backup
     - name: Back up managed macOS defaults to timestamped file
       ansible.builtin.command:
@@ -196,8 +184,8 @@
           Homebrew formulae (leaves): {{ installed_formulae.stdout_lines | default([]) | length }}
           Homebrew casks: {{ installed_casks | default([]) | length }}
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
-          Cursor extensions: {{ cursor_extensions.stdout_lines | default([]) | length }}
           Zed extensions: {{ zed_extensions.stdout_lines | default([]) | length }}
+          Application preferences: AltTab, Stats, iTerm2
           macOS defaults backup: {{ macos_defaults_backup.stdout | default('not run') }}
           ========================================
           Run `git diff` to see changes, then `git add` and `git commit` to save.

@@ -1,0 +1,26 @@
+company.thebrowser.Browser public.html all
+company.thebrowser.Browser http
+company.thebrowser.Browser https
+com.microsoft.VSCode public.c-source all
+com.microsoft.VSCode public.c-plus-plus-source all
+com.microsoft.VSCode public.data all
+com.microsoft.VSCode public.json all
+com.microsoft.VSCode public.plain-text all
+com.microsoft.VSCode public.python-script all
+com.microsoft.VSCode public.shell-script all
+com.microsoft.VSCode public.source-code all
+com.microsoft.VSCode public.text all
+com.microsoft.VSCode public.yaml all
+com.microsoft.VSCode com.netscape.javascript-source all
+com.microsoft.VSCode com.sun.java-source all
+com.microsoft.VSCode cfg all
+com.microsoft.VSCode conf all
+com.microsoft.VSCode cs all
+com.microsoft.VSCode go all
+com.microsoft.VSCode jsx all
+com.microsoft.VSCode less all
+com.microsoft.VSCode lua all
+com.microsoft.VSCode sass all
+com.microsoft.VSCode scss all
+com.microsoft.VSCode toml all
+com.microsoft.VSCode tsx all

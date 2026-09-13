@@ -11,13 +11,12 @@ claude-code@latest
 codex
 codexbar
 discord
+docker-desktop
 fluidvoice
-font-fira-code
-font-fontawesome
-font-ibm-plex-mono
+font-jetbrains-mono
+font-jetbrains-mono-nerd-font
 font-maple-mono
 font-maple-mono-nf
-font-symbols-only-nerd-font
 ghostty
 gimp
 google-chrome

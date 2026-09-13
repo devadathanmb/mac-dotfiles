@@ -25,6 +25,9 @@
     - name: Include dock settings
       ansible.builtin.include_tasks: mac/dock.yml
 
+    - name: Include login item settings
+      ansible.builtin.include_tasks: mac/login_items.yml
+
     - name: Include system UI settings
       ansible.builtin.include_tasks: mac/system_ui.yml
 

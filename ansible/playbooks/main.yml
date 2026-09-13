@@ -19,4 +19,4 @@
     - role: zsh
       tags: [zsh]
     - role: editors
-      tags: [editors, vscode, cursor, zed]
+      tags: [editors, vscode, zed]
