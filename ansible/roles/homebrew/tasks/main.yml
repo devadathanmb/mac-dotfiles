@@ -7,6 +7,8 @@
     - ansible_facts['os_family'] == "Darwin"
     - ansible_facts['architecture'] == "arm64"
   become: false
+  environment:
+    NONINTERACTIVE: "1"
 
 - name: Ensure Homebrew is installed (Intel)
   ansible.builtin.command:
@@ -16,6 +18,8 @@
     - ansible_facts['os_family'] == "Darwin"
     - ansible_facts['architecture'] != "arm64"
   become: false
+  environment:
+    NONINTERACTIVE: "1"
 
 - name: Update Homebrew
   community.general.homebrew:
@@ -37,10 +41,16 @@
   loop: "{{ brew_formulae }}"
   become: false
 
+- name: Validate sudo before installing privileged casks
+  ansible.builtin.command: /usr/bin/true
+  become: true
+  changed_when: false
+
 - name: Install Homebrew casks
   community.general.homebrew_cask:
     name: "{{ item }}"
     state: present
+    sudo_password: "{{ bootstrap_sudo_password }}"
   loop: "{{ brew_casks }}"
   become: false
 

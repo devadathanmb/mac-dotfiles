@@ -34,39 +34,45 @@ macos_defaults:
     domain: com.apple.TextEdit
     key: RichText
     type: bool
-    state: absent
+    state: present
+    value: false
   - name: TextEdit | Use UTF-8 encoding
     domain: com.apple.TextEdit
     key: PlainTextEncoding
     type: int
-    state: absent
+    state: present
+    value: 4
   - name: TextEdit | Use UTF-8 encoding for write
     domain: com.apple.TextEdit
     key: PlainTextEncodingForWrite
     type: int
-    state: absent
+    state: present
+    value: 4
   - name: Activity Monitor | Show all processes
     domain: com.apple.ActivityMonitor
     key: ShowCategory
     type: int
-    state: absent
+    state: present
+    value: 100
   - name: Activity Monitor | Sort by CPU usage
     domain: com.apple.ActivityMonitor
     key: SortColumn
     type: string
-    state: absent
+    state: present
+    value: CPUUsage
   - name: Activity Monitor | Set sort direction
     domain: com.apple.ActivityMonitor
     key: SortDirection
     type: int
-    state: absent
+    state: present
+    value: 0
   - name: App Store | Disable automatic downloads
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticDownload
     type: bool
     state: present
     become: true
-    value: true
+    value: false
   - name: Dock | Auto-hide Dock
     domain: com.apple.dock
     key: autohide
@@ -83,7 +89,8 @@ macos_defaults:
     domain: com.apple.dock
     key: mineffect
     type: string
-    state: absent
+    state: present
+    value: scale
   - name: Dock | Minimize windows into their application icon
     domain: com.apple.dock
     key: minimize-to-application
@@ -94,12 +101,14 @@ macos_defaults:
     domain: com.apple.dock
     key: show-process-indicators
     type: bool
-    state: absent
+    state: present
+    value: true
   - name: Dock | Show pinned and open applications
     domain: com.apple.dock
     key: static-only
     type: bool
-    state: absent
+    state: present
+    value: false
   - name: Dock | Don't animate opening applications
     domain: com.apple.dock
     key: launchanim
@@ -116,7 +125,8 @@ macos_defaults:
     domain: com.apple.dock
     key: expose-animation-duration
     type: float
-    state: absent
+    state: present
+    value: 0.1
   - name: Dock | Don't automatically rearrange Spaces
     domain: com.apple.dock
     key: mru-spaces
@@ -223,7 +233,8 @@ macos_defaults:
     domain: com.apple.finder
     key: _FXShowPosixPathInTitle
     type: bool
-    state: absent
+    state: present
+    value: true
   - name: Finder | Hide all desktop icons
     domain: com.apple.finder
     key: CreateDesktop
@@ -258,12 +269,14 @@ macos_defaults:
     domain: com.apple.finder
     key: FXPreferredViewStyle
     type: string
-    state: absent
+    state: present
+    value: Nlsv
   - name: Finder | Disable warning before emptying Trash
     domain: com.apple.finder
     key: WarnOnEmptyTrash
     type: bool
-    state: absent
+    state: present
+    value: false
   - name: Finder | Open new windows to Home folder
     domain: com.apple.finder
     key: NewWindowTarget
@@ -360,15 +373,6 @@ macos_defaults:
     type: bool
     state: present
     value: false
-  - name: Keyboard | Read Caps Lock modifier key mapping
-    domain: NSGlobalDomain
-    key: com.apple.keyboard.modifiermapping.0-0-0
-    type: plist
-    state: present
-    host: currentHost
-    value:
-      "(\n        {\n        HIDKeyboardModifierMappingDst = 30064771113;\n        HIDKeyboardModifierMappingSrc = 30064771129;\n\
-      \    }\n)"
   - name: Keyboard | Enable automatic capitalization
     domain: NSGlobalDomain
     key: NSAutomaticCapitalizationEnabled
@@ -385,17 +389,20 @@ macos_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticQuoteSubstitutionEnabled
     type: bool
-    state: absent
+    state: present
+    value: false
   - name: Keyboard | Disable smart dashes
     domain: NSGlobalDomain
     key: NSAutomaticDashSubstitutionEnabled
     type: bool
-    state: absent
+    state: present
+    value: false
   - name: Keyboard | Enable full keyboard access for all controls
     domain: NSGlobalDomain
     key: AppleKeyboardUIMode
     type: int
-    state: absent
+    state: present
+    value: 2
   - name: Save Dialogs | Always expand save panel by default
     domain: NSGlobalDomain
     key: NSNavPanelExpandedStateForSaveMode
@@ -412,7 +419,8 @@ macos_defaults:
     domain: NSGlobalDomain
     key: NSDisableAutomaticTermination
     type: bool
-    state: absent
+    state: present
+    value: true
   - name: Spaces | Use separate spaces per display
     domain: com.apple.spaces
     key: spans-displays
@@ -470,12 +478,13 @@ macos_defaults:
     type: int
     state: present
     host: currentHost
-    value: 8
+    value: 2
   - name: System UI | Show Bluetooth in menu bar
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC Bluetooth
     type: bool
-    state: absent
+    state: present
+    value: true
   - name: System UI | Hide Display in menu bar
     domain: com.apple.controlcenter
     key: Display
@@ -570,12 +579,13 @@ macos_defaults:
     key: location
     type: string
     state: present
-    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
+    value: '{{ ansible_facts[''env''][''HOME''] }}/Pictures/Screenshots'
   - name: Screenshots | Save screenshots in PNG format
     domain: com.apple.screencapture
     key: type
     type: string
-    state: absent
+    state: present
+    value: png
   - name: Screenshots | Disable HDR screenshots
     domain: com.apple.screencapture
     key: captureHDR
@@ -586,19 +596,20 @@ macos_defaults:
     domain: com.apple.screencapture
     key: disable-shadow
     type: bool
-    state: absent
+    state: present
+    value: true
   - name: Trackpad | Set tracking speed
     domain: NSGlobalDomain
     key: com.apple.trackpad.scaling
     type: float
     state: present
-    value: 2.0
+    value: 1.5
   - name: Trackpad | Enable tap to click
     domain: com.apple.AppleMultitouchTrackpad
     key: Clicking
-    type: bool
+    type: int
     state: present
-    value: true
+    value: 1
   - name: Trackpad | Enable tap behavior globally
     domain: NSGlobalDomain
     key: com.apple.mouse.tapBehavior
