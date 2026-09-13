@@ -3,7 +3,6 @@ antigravity
 antigravity-cli
 arc
 balenaetcher
-boring-notch
 burp-suite
 calibre
 chatgpt
@@ -11,7 +10,6 @@ claude
 claude-code@latest
 codex
 codexbar
-copilot-cli
 discord
 fluidvoice
 font-fira-code

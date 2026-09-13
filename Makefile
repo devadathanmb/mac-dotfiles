@@ -4,7 +4,7 @@ PLAYBOOK    := ansible-playbook
 CAFFEINATE  := caffeinate -ims
 
 RAYCAST_CONFIG_DIR        := exports/raycast
-RAYCAST_BACKUP_DEST       := $(RAYCAST_CONFIG_DIR)/raycast-x-backup.rayconfig
+RAYCAST_BACKUP_DEST       := $(RAYCAST_CONFIG_DIR)/raycast-backup.rayconfig
 RAYCAST_BACKUP_SOURCE_DIR ?= $(HOME)
 RAYCAST_EXPORT_DEEPLINK   := raycast://extensions/raycast/raycast/export-settings-data?launchType=userInitiated
 
@@ -45,8 +45,8 @@ mise:        ## Install mise + latest Python/Node
 backup:      ## Back up installed packages/extensions/macOS defaults into the repo
 	$(call play,backup)
 
-raycast-backup: ## Open Raycast Beta's export prompt
-	@open -b com.raycast-x.macos "$(RAYCAST_EXPORT_DEEPLINK)"
+raycast-backup: ## Open Raycast's export prompt
+	@open -b com.raycast.macos "$(RAYCAST_EXPORT_DEEPLINK)"
 	@printf 'Export the .rayconfig file, then run `make raycast-backup-mv`.\n'
 
 raycast-backup-mv: ## Move latest Raycast export from RAYCAST_BACKUP_SOURCE_DIR into the repo
