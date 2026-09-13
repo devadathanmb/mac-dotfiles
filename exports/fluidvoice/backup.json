@@ -3,7 +3,7 @@
 
   ],
   "appVersion" : "1.6.9",
-  "exportedAt" : "2026-09-13T13:03:08Z",
+  "exportedAt" : "2026-09-13T13:41:04Z",
   "promptProfiles" : [
 
   ],
@@ -91,7 +91,7 @@
     "overlayPosition" : "bottom",
     "overlaySize" : "pill",
     "pasteLastTranscriptionShortcutEnabled" : false,
-    "pauseMediaDuringTranscription" : false,
+    "pauseMediaDuringTranscription" : true,
     "preferredInputDeviceUID" : "BuiltInMicrophoneDevice",
     "preferredOutputDeviceUID" : "BuiltInSpeakerDevice",
     "pressAndHoldMode" : false,
@@ -122,7 +122,7 @@
         "aliases" : [
           "comma"
         ],
-        "id" : "5E129694-6103-49F3-81B4-9AC2930C9DEB",
+        "id" : "55920F05-C079-4AE6-8293-E1099B1C87BA",
         "symbol" : ","
       },
       {
@@ -130,14 +130,14 @@
           "period",
           "full stop"
         ],
-        "id" : "89D98308-6B96-406E-AA92-76EE4926854E",
+        "id" : "3D03564E-3313-4095-8729-156C41D38997",
         "symbol" : "."
       },
       {
         "aliases" : [
           "dot"
         ],
-        "id" : "22A296BE-BED5-4325-9413-0E755B013AEC",
+        "id" : "9AADA7CD-E95E-4A11-BF62-4336DDCAB219",
         "symbol" : "."
       },
       {
@@ -145,7 +145,7 @@
           "question mark",
           "questionmark"
         ],
-        "id" : "2975E476-C7D0-4A3C-89D1-EFDB4FC36DB9",
+        "id" : "AF89405D-E181-4E9F-89B0-CDA6E3C5E95F",
         "symbol" : "?"
       },
       {
@@ -154,14 +154,14 @@
           "exclamation point",
           "bang"
         ],
-        "id" : "37A418F0-537A-4CB2-A570-11C2A67D0571",
+        "id" : "BDC709F8-3B5F-4001-9039-0B0836C21A78",
         "symbol" : "!"
       },
       {
         "aliases" : [
           "colon"
         ],
-        "id" : "730A9075-98CE-4B34-A2F7-36635951A776",
+        "id" : "55652ABB-2E6F-4EAE-8FC8-99C99A35DA66",
         "symbol" : ":"
       },
       {
@@ -169,7 +169,7 @@
           "semicolon",
           "semi colon"
         ],
-        "id" : "4DA535A2-BCE7-40CC-937C-D77C676D4530",
+        "id" : "D73E6543-948B-4336-9BE1-D0E9F9AA5712",
         "symbol" : ";"
       },
       {
@@ -178,7 +178,7 @@
           "dot dot dot",
           "three dots"
         ],
-        "id" : "24C73F84-4665-4C15-8342-2DFA05FBAC89",
+        "id" : "AB1E7E32-A604-4FAE-852E-1EC1DF5D8DA9",
         "symbol" : "..."
       },
       {
@@ -187,7 +187,7 @@
           "forward slash",
           "forwardslash"
         ],
-        "id" : "C7065F09-8150-4415-B51D-A1FB4BB0E930",
+        "id" : "96DAE4DB-F298-4FA8-B71D-FE496D58C90F",
         "symbol" : "\/"
       },
       {
@@ -195,14 +195,14 @@
           "backslash",
           "back slash"
         ],
-        "id" : "53B70D05-80E9-42F5-8EFA-A9C28E4A2ED4",
+        "id" : "3B20BB4B-9BE4-4B58-A08E-0DF36B980C7F",
         "symbol" : "\\"
       },
       {
         "aliases" : [
           "hyphen"
         ],
-        "id" : "195F0F44-DBAF-4BDF-9D0F-F151A5FC86D3",
+        "id" : "ACF7B7D1-0515-49E8-844B-68602B117AFF",
         "symbol" : "-"
       },
       {
@@ -210,7 +210,7 @@
           "dash",
           "minus sign"
         ],
-        "id" : "EF465D58-749E-4881-98AF-2BB118768639",
+        "id" : "5639327B-949B-43FB-B3F8-50F48856C44E",
         "symbol" : "-"
       },
       {
@@ -218,14 +218,14 @@
           "em dash",
           "long dash"
         ],
-        "id" : "257274EC-FC56-4BFC-84B8-DC94E0F10910",
+        "id" : "DB75B74A-BEE2-4905-B857-3741C0BB09D5",
         "symbol" : "—"
       },
       {
         "aliases" : [
           "en dash"
         ],
-        "id" : "0BC61A4F-13FD-47F7-B81B-7D1D84224BF8",
+        "id" : "5FF9536F-F916-4A35-8DE6-C0F56B92E4E1",
         "symbol" : "–"
       },
       {
@@ -237,7 +237,7 @@
           "open paren",
           "left paren"
         ],
-        "id" : "95F96DA4-AB03-4DA6-B031-81D1CD2EA10B",
+        "id" : "3AB564B2-9135-4E77-9902-012B42B96866",
         "symbol" : "("
       },
       {
@@ -249,7 +249,7 @@
           "close paren",
           "right paren"
         ],
-        "id" : "3E0B9EE5-48EC-4410-A76C-6BD262AB11F6",
+        "id" : "B126A54D-06F3-4FEB-B775-5ACC6688E2DD",
         "symbol" : ")"
       },
       {
@@ -259,7 +259,7 @@
           "open square bracket",
           "left square bracket"
         ],
-        "id" : "E4DFF99E-36F6-492E-ABDD-D6B987DCDA14",
+        "id" : "39D36122-F38C-4313-897D-5402CC3E2171",
         "symbol" : "["
       },
       {
@@ -269,7 +269,7 @@
           "close square bracket",
           "right square bracket"
         ],
-        "id" : "CF159133-2C16-4103-BEA7-8C86FAC576FD",
+        "id" : "82DFFB19-698E-41C1-A762-C1C5B09877C8",
         "symbol" : "]"
       },
       {
@@ -281,7 +281,7 @@
           "open curly bracket",
           "left curly bracket"
         ],
-        "id" : "F05D40D5-8B60-4B7B-9C70-D95FAF6BF62E",
+        "id" : "79AC8BB8-FB91-484C-9630-AE852BFBF868",
         "symbol" : "{"
       },
       {
@@ -293,7 +293,7 @@
           "close curly bracket",
           "right curly bracket"
         ],
-        "id" : "E4FF0DD0-6D7F-43BA-9629-F364B1366559",
+        "id" : "72B77B5E-40DD-48FF-BBD3-A1B44FA427F1",
         "symbol" : "}"
       },
       {
@@ -302,7 +302,7 @@
           "left angle bracket",
           "less than sign"
         ],
-        "id" : "3C572EAA-C34D-4996-9F69-64B5FD889F77",
+        "id" : "810B70FA-FBFC-4696-99BF-A8EA685D3FB3",
         "symbol" : "<"
       },
       {
@@ -311,7 +311,7 @@
           "right angle bracket",
           "greater than sign"
         ],
-        "id" : "03BA8FED-6057-48EE-BBA1-1F6371CDB5AA",
+        "id" : "8859D70E-2D71-4570-95F6-A3ED90EE53F9",
         "symbol" : ">"
       },
       {
@@ -321,7 +321,7 @@
           "quotation mark",
           "double quote"
         ],
-        "id" : "E15A8159-EB74-4D8A-ACB0-479C469FD10A",
+        "id" : "2287FF1D-ABE9-49D2-8911-596D3690D074",
         "symbol" : "\""
       },
       {
@@ -331,7 +331,7 @@
           "open double quote",
           "opening double quote"
         ],
-        "id" : "6408834F-EEDF-4A57-90FD-E281E763E5AE",
+        "id" : "8ED7B15C-AF64-410F-9FE2-65AD45CB6B3A",
         "symbol" : "\""
       },
       {
@@ -341,21 +341,21 @@
           "close double quote",
           "closing double quote"
         ],
-        "id" : "D3C0044E-8B45-4C7C-92D4-5BDFC5A3346C",
+        "id" : "E94334DC-06E7-4B50-8B26-C33A77F51CFB",
         "symbol" : "\""
       },
       {
         "aliases" : [
           "single quote"
         ],
-        "id" : "D2B70756-C32C-4D7E-A589-C0DCFC2A7BD3",
+        "id" : "64FDEFC6-F1DD-4B21-901A-4E70ECC645D1",
         "symbol" : "'"
       },
       {
         "aliases" : [
           "apostrophe"
         ],
-        "id" : "E5881224-F3C4-475E-8EA4-1C53C116161C",
+        "id" : "4EE98656-AA3D-4ECB-A949-5D9882EB14B4",
         "symbol" : "'"
       },
       {
@@ -364,7 +364,7 @@
           "at sign",
           "commercial at"
         ],
-        "id" : "F5EE1752-6954-4BC4-9D54-640D1790E7B7",
+        "id" : "D6319729-99C9-401A-A9C1-55E5DCC70A41",
         "symbol" : "@"
       },
       {
@@ -372,7 +372,7 @@
           "ampersand",
           "and sign"
         ],
-        "id" : "7729E034-D690-47CE-AF85-5E6E43FA6925",
+        "id" : "BF951534-343E-4BA7-9687-F167C6AEA2B9",
         "symbol" : "&"
       },
       {
@@ -380,7 +380,7 @@
           "plus sign",
           "plus"
         ],
-        "id" : "9F4DF817-CF65-447B-9EE5-575B74CCAE8C",
+        "id" : "592A3324-0C34-4640-87FA-554A5C54ED70",
         "symbol" : "+"
       },
       {
@@ -390,7 +390,7 @@
           "equal",
           "equals"
         ],
-        "id" : "A1EC34C5-79CB-4D2F-9AE9-56FEEDA5DD72",
+        "id" : "4824B416-36F1-415B-B653-C290EE05F4FD",
         "symbol" : "="
       },
       {
@@ -399,7 +399,7 @@
           "percentage sign",
           "percent"
         ],
-        "id" : "DF44436E-8A8E-48FB-BBFD-E7218CA8B169",
+        "id" : "7260226B-FFF4-41ED-848B-E95C9D27228A",
         "symbol" : "%"
       },
       {
@@ -407,7 +407,7 @@
           "dollar sign",
           "dollar"
         ],
-        "id" : "3058A167-34C2-4E9A-BC12-0DDC97FC8315",
+        "id" : "555AE75A-2E22-41EA-85CF-B4B322CC5500",
         "symbol" : "$"
       },
       {
@@ -418,7 +418,7 @@
           "pound sign",
           "number sign"
         ],
-        "id" : "F3A6B122-5A29-4239-8878-B2860344B0AA",
+        "id" : "258CB8AF-6B5A-43DA-A677-97285017B10A",
         "symbol" : "#"
       },
       {
@@ -426,14 +426,14 @@
           "asterisk",
           "star symbol"
         ],
-        "id" : "16A9EA6C-83A5-41CD-BE70-754017372A1F",
+        "id" : "2126B753-BE1C-4751-A554-5DF51CB10727",
         "symbol" : "*"
       },
       {
         "aliases" : [
           "underscore"
         ],
-        "id" : "2AB95994-FFDC-43A2-930A-9F2EB53E1775",
+        "id" : "DF64E2F6-26DE-43E5-A9E2-33C6ECB6EC42",
         "symbol" : "_"
       },
       {
@@ -441,21 +441,21 @@
           "pipe",
           "vertical bar"
         ],
-        "id" : "413287BA-41C3-4282-BD54-4BCC8B88FCBD",
+        "id" : "4A3B606B-4DD4-4805-B62A-CCA75829071A",
         "symbol" : "|"
       },
       {
         "aliases" : [
           "tilde"
         ],
-        "id" : "C5427C59-197C-4D67-8494-0DEBCBE593A8",
+        "id" : "FA7DC0A1-0973-4DB8-A84B-6DA42FD4434D",
         "symbol" : "~"
       },
       {
         "aliases" : [
           "caret"
         ],
-        "id" : "1B731C7B-241F-434F-B02A-922276236F7E",
+        "id" : "2220C6A2-FF9B-41E8-8C84-7361465AB0E3",
         "symbol" : "^"
       },
       {
@@ -463,7 +463,7 @@
           "backtick",
           "back tick"
         ],
-        "id" : "ADE267AC-B390-45F8-A762-BA9B0D727F18",
+        "id" : "777A2802-2CF0-43D3-B403-385905174925",
         "symbol" : "`"
       }
     ],
@@ -497,7 +497,7 @@
     "showMainWindowAtLoginLaunch" : true,
     "showMicrophoneChangeAlerts" : true,
     "showThinkingTokens" : true,
-    "skipSilentRecordingsEnabled" : false,
+    "skipSilentRecordingsEnabled" : true,
     "spokenFormattingActionRules" : [
       {
         "action" : "newLine",
@@ -535,7 +535,7 @@
     ],
     "textInsertionMode" : "standard",
     "transcriptionPreviewCharLimit" : 150,
-    "transcriptionSoundIndependentVolume" : false,
+    "transcriptionSoundIndependentVolume" : true,
     "transcriptionSoundVolume" : 1,
     "transcriptionStartSound" : "fluid_sfx_0",
     "userTypingWPM" : 40,
@@ -544,6 +544,17 @@
     "weekendsDontBreakStreak" : true
   },
   "transcriptionHistory" : [
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 80,
+      "id" : "F1330F9C-7DD6-46A7-AE20-FBBA6766DAA4",
+      "processedText" : "Understood. Please provide the raw transcribed text you would like me to clean. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Thank you.",
+      "timestamp" : "2026-09-13T13:19:34Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
     {
       "appName" : "Ghostty",
       "characterCount" : 137,
