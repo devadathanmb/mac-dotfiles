@@ -96,7 +96,6 @@
     "@slkiser/opencode-quota"
   ],
   "provider": {
-    "copilot": {},
     "openai": {}
   }
 }
