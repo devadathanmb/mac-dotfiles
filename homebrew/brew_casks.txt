@@ -21,7 +21,6 @@ ghostty
 gimp
 google-chrome
 iterm2
-jordanbaird-ice
 localsend
 mitmproxy
 obsidian
@@ -38,5 +37,6 @@ snapzy
 stats
 tailscale-app
 telegram-desktop
+thaw
 visual-studio-code
 zed

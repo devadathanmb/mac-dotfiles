@@ -16,17 +16,28 @@ fi
 echo "🚀 Ansible Dotfiles Bootstrap"
 echo "=============================="
 
-# Check for Homebrew
-if ! command -v brew &> /dev/null; then
-    echo "📦 Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # Initialize Homebrew environment for this shell session
+setup_homebrew_shellenv() {
     if [ -x /opt/homebrew/bin/brew ]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
     elif [ -x /usr/local/bin/brew ]; then
         eval "$(/usr/local/bin/brew shellenv)"
     fi
+}
+
+# A previous bootstrap attempt may have installed Homebrew without updating the
+# terminal that launched this script. Find its standard installation before
+# deciding whether a new installation is needed.
+if ! command -v brew &> /dev/null; then
+    setup_homebrew_shellenv
+fi
+
+# Check for Homebrew
+if ! command -v brew &> /dev/null; then
+    echo "📦 Installing Homebrew..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Initialize Homebrew environment for this shell session
+    setup_homebrew_shellenv
 fi
 
 # Check for Ansible
@@ -42,6 +53,6 @@ ansible-galaxy collection install -r requirements.yml
 
 # Run the main playbook
 echo "🚀 Running Ansible playbook..."
-ansible-playbook playbooks/main.yml --ask-become-pass "$@"
+ansible-playbook playbooks/main.yml "$@"
 
 echo "✅ Bootstrap complete!"

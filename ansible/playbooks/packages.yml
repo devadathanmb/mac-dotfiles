@@ -5,5 +5,13 @@
   gather_facts: true
   become: false
 
+  vars_prompt:
+    - name: bootstrap_sudo_password
+      prompt: BECOME password
+      private: true
+
+  vars:
+    ansible_become_password: "{{ bootstrap_sudo_password }}"
+
   roles:
     - role: homebrew
