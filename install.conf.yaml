@@ -33,14 +33,11 @@
     ~/.config/zed: configs/zed
     ~/.config/opencode/AGENTS.md: configs/opencode/AGENTS.md
     ~/.config/opencode/cli.json: configs/opencode/cli.json
-    ~/.config/opencode/opencode-minimax-easy-vision.jsonc: configs/opencode/opencode-minimax-easy-vision.jsonc
     ~/.config/opencode/opencode-quota/quota-toast.jsonc: configs/opencode/opencode-quota/quota-toast.jsonc
     ~/.config/opencode/opencode.jsonc: configs/opencode/opencode.jsonc
     ~/.config/opencode/themes/github-dark-default.json: configs/opencode/themes/github-dark-default.json
     ~/.config/opencode/tui.jsonc: configs/opencode/tui.jsonc
     ~/.codex/config.toml: configs/codex/config.toml
-    ~/.codex/AGENTS.md: configs/agents/AGENTS.md
-    ~/.claude/CLAUDE.md: configs/agents/AGENTS.md
     ~/.claude/:
       glob: true
       path: configs/claude/*
