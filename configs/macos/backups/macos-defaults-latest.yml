@@ -570,7 +570,7 @@ macos_defaults:
     key: location
     type: string
     state: present
-    value: /Users/devadathanmb/Pictures/Screenshots
+    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
   - name: Screenshots | Save screenshots in PNG format
     domain: com.apple.screencapture
     key: type

@@ -67,9 +67,9 @@
     # VSCode Extensions Backup
     - name: Check if VSCode is installed
       ansible.builtin.command:
-        cmd: which code
+        argv: [code, --version]
       register: code_check
-      ignore_errors: true
+      failed_when: false
       changed_when: false
       tags: vscode
 
@@ -156,7 +156,7 @@
       tags: apps
 
     # macOS Defaults Backup
-    - name: Back up managed macOS defaults to timestamped file
+    - name: Refresh latest managed macOS defaults backup
       ansible.builtin.command:
         argv:
           - "{{ ansible_playbook_python }}"

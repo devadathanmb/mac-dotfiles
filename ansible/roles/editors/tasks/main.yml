@@ -1,9 +1,9 @@
 ---
 - name: Check if VSCode is installed
   ansible.builtin.command:
-    cmd: which code
+    argv: [code, --version]
   register: code_check
-  ignore_errors: true
+  failed_when: false
   changed_when: false
 
 - name: Read VSCode extensions from file
@@ -13,10 +13,10 @@
 
 - name: Install VSCode extensions
   ansible.builtin.command:
-    cmd: "code --install-extension {{ item }}"
+    argv: [code, --install-extension, "{{ item }}"]
   loop: "{{ vscode_extensions | default([]) }}"
   when: code_check.rc == 0
-  ignore_errors: true
+  failed_when: false
   changed_when: false
 
 - name: Read Zed extensions from file
