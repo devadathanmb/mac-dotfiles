@@ -2,75 +2,53 @@
 
 > Hello, welcome $HOME
 
-Personal macOS dotfiles and workstation provisioning.
+Personal macOS setup using Ansible and Dotbot.
 
-This repository uses Ansible for setup and Dotbot for symlinks. It is built for my own machines first, but kept readable so others can inspect, borrow, or adapt what is useful.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Install](#install)
-- [Commands](#commands)
-- [Layout](#layout)
-- [License](#license)
-
-## Overview
-
-At a high level, this repo manages:
-
-- Homebrew packages and applications
-- macOS defaults
-- shell, terminal, editor, and Git configuration
-- symlinks from this repo into `$HOME`
-
-The `Makefile` is the main entry point. Ansible playbooks live in `ansible/`, and Dotbot links are defined in `install.conf.yaml`.
-
-## Install
+## Fresh Install
 
 > [!WARNING]
-> This is a personal macOS setup. Review the repository before running it on your system. Setup commands change the live macOS environment, and Dotbot may replace existing files with symlinks.
+> This setup changes macOS settings and links files from this repository into `$HOME`. Review it before running on another Mac.
 
-```bash
-git clone --recursive https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
-cd ~/.mac-dots
-make bootstrap
-```
+1. Install Apple's Command Line Tools:
 
-If the repo was cloned without submodules:
+   ```bash
+   xcode-select --install
+   ```
 
-```bash
-git submodule update --init --recursive
-```
+   Wait for the installation to finish.
+
+2. Clone and bootstrap:
+
+   ```bash
+   git clone --recursive https://github.com/devadathanmb/mac-dotfiles.git ~/.mac-dots
+   cd ~/.mac-dots
+   make bootstrap
+   ```
+
+The bootstrap requests the administrator password and installs the managed applications, packages, runtimes, dotfiles, and macOS settings.
+
+Application exports in [`exports/`](./exports/) require manual import after setup.
 
 ## Commands
 
 ```bash
-make             # list available targets
-make bootstrap   # first-time setup
-make all         # run the full setup
-make packages    # install packages and applications
-make macos       # apply macOS defaults
-make dotfiles    # link dotfiles
+make bootstrap   # provision a fresh Mac
+make all         # reapply the complete setup
+make packages    # install managed packages and applications
+make macos       # apply macOS settings
+make dotfiles    # link managed configuration into $HOME
+make backup      # refresh tracked package lists and backups
+make hooks-run   # validate the repository
 ```
 
-Pass Ansible flags through `ARGS` when needed:
+Preview Ansible changes without applying them:
 
 ```bash
 make macos ARGS="--check --diff"
 ```
 
-## Layout
-
-```text
-Makefile             command entry point
-ansible/             playbooks, roles, inventory, and validation scripts
-configs/             application configuration linked into $HOME
-exports/             application exports and preference snapshots; not applied automatically
-homebrew/            tracked Homebrew package lists
-scripts/             helper scripts linked into ~/.local/bin
-install.conf.yaml    Dotbot symlink map
-dotbot/              Dotbot submodule
-```
+> [!CAUTION]
+> `make backup` rewrites tracked package lists and backups from the current machine. Always review `git diff` afterward.
 
 ## License
 
