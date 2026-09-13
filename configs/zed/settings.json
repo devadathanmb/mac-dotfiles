@@ -8,6 +8,7 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
     // ─── Font ────────────────────────────────────────────────────────────────────
+    "icon_theme": "Material Icon Theme",
     "cli_default_open_behavior": "existing_window",
     "diff_view_style": "split",
     "edit_predictions": {
@@ -16,11 +17,11 @@
     "auto_update": true,
     "agent_ui_font_size": 17,
     "agent_buffer_font_size": 15,
-    "buffer_font_family": "JetBrains Mono",
-    "buffer_font_size": 15.5,
+    "buffer_font_family": "Maple Mono NF",
+    "buffer_font_size": 15.0,
     "buffer_font_weight": 600,
     // "ui_font_weight": 800.0,
-    "ui_font_family": "JetBrains Mono",
+    "ui_font_family": "Maple Mono NF",
     "ui_font_size": 17,
     "file_scan_exclusions": ["**/.env"],
     "project_panel": {
@@ -59,6 +60,10 @@
             "type": "registry",
         },
         "opencode": {
+            "default_config_options": {
+                "effort": "high",
+                "model": "opencode/x-preview-f-free"
+            },
             "type": "registry",
         },
         "auggie": {
@@ -115,7 +120,7 @@
     "theme": {
         "mode": "system",
         "light": "One Light",
-        "dark": "GitHub Dark Default",
+        "dark": "GitHub Dark",
     },
     "theme_overrides": {
         "Github Dark": {

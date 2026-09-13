@@ -10,6 +10,8 @@ set -gx EDITOR nvim
 set -gx PNPM_HOME "$HOME/Library/pnpm"
 
 # PATH entries are kept global so sourcing this file does not persist universal variables.
+# Keep Homebrew tools ahead of macOS system tools, including Bash.
+fish_add_path --global --path --prepend --move /opt/homebrew/bin
 fish_add_path --global --path --prepend \
     /opt/homebrew/opt/postgresql@17/bin \
     $PNPM_HOME \

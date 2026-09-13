@@ -1,13 +1,24 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "openai/gpt-5.6-luna",
-  "small_model": "opencode/deepseek-v4-flash-free",
+  "small_model": "opencode/big-pickle",
   "autoupdate": "notify",
   "share": "disabled",
   "lsp": false,
+  "disabled_providers": [],
   "tool_output": {
     "max_lines": 500,
     "max_bytes": 20000
+  },
+  "agent": {
+    "explore": {
+      "model": "openai/gpt-5.6-luna",
+      "variant": "high"
+    },
+    "general": {
+      "model": "openai/gpt-5.6-terra",
+      "variant": "high"
+    }
   },
   "experimental": {
     "openTelemetry": false,
@@ -19,39 +30,30 @@
     "reserved": 10000
   },
   "formatter": false,
-  "plugin": [],
-  "agent": {
-    "explore": {
-      "model": "openai/gpt-5.6-luna",
-      "variant": "low"
-    },
-    "general": {
-      "model": "openai/gpt-5.6-terra",
-      "variant": "medium"
-    }
-  },
   "mcp": {
-    "exa": {
-      "type": "remote",
-      "url": "https://mcp.exa.ai/mcp?tools=web_search_exa,get_code_context_exa,crawling_exa",
-      "enabled": true,
-      "headers": {
-        "x-api-key": "{file:~/.secrets/exa-api-key}"
-      }
-    },
     "context7": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
         "CONTEXT7_API_KEY": "{file:~/.secrets/context7-api-key}"
       }
     },
-    "gh_grep": {
+    "exa": {
+      "enabled": true,
       "type": "remote",
-      "url": "https://mcp.grep.app",
-      "enabled": false
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "x-api-key": "{file:~/.secrets/exa-api-key}"
+      }
+    },
+    "gh_grep": {
+      "enabled": false,
+      "type": "remote",
+      "url": "https://mcp.grep.app"
     },
     "deepwiki": {
+      "enabled": false,
       "type": "remote",
       "url": "https://mcp.deepwiki.com/mcp"
     },
@@ -87,5 +89,14 @@
       "aws*": "ask",
       "wangler*": "ask"
     }
+  },
+  // OpenCode Quota: tuiCommandDisplay chooses whether native TUI command output appears in the session transcript or a local popup dialog.
+  // OpenCode Quota: loads the server plugin for slash commands and quota checks.
+  "plugin": [
+    "@slkiser/opencode-quota"
+  ],
+  "provider": {
+    "copilot": {},
+    "openai": {}
   }
 }

@@ -1,8 +1,8 @@
 {
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-luna",
-  "defaultThinkingLevel": "low",
-  "lastChangelogVersion": "0.84.1",
+  "defaultModel": "gpt-5.6-terra",
+  "defaultThinkingLevel": "off",
+  "lastChangelogVersion": "0.85.1",
   "theme": "custom-github-dark",
   "packages": [
     "npm:pi-mcp-adapter",
