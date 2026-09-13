@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Create a timestamped backup of the macOS defaults managed by this repo."""
+"""Refresh the latest backup of macOS defaults managed by this repo."""
 
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import platform
 import subprocess
 from pathlib import Path
@@ -138,6 +137,16 @@ def parse_array_item(value: str) -> Any:
         return value
 
 
+def portable_value(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+
+    home = str(Path.home())
+    if value == home or value.startswith(f"{home}/"):
+        return "{{ ansible_facts['env']['HOME'] }}" + value[len(home) :]
+    return value
+
+
 def backup_defaults(source_dir: Path) -> list[dict[str, Any]]:
     backed_up: list[dict[str, Any]] = []
 
@@ -149,7 +158,7 @@ def backup_defaults(source_dir: Path) -> list[dict[str, Any]]:
             actual_type = "plist" if entry.get("type") == "plist" else read_type(entry)
             backed_up_entry["type"] = actual_type
             backed_up_entry["state"] = "present"
-            backed_up_entry["value"] = parse_value(raw_value, actual_type)
+            backed_up_entry["value"] = portable_value(parse_value(raw_value, actual_type))
         else:
             backed_up_entry["state"] = "absent"
             backed_up_entry.pop("value", None)
@@ -161,8 +170,7 @@ def backup_defaults(source_dir: Path) -> list[dict[str, Any]]:
 
 def write_backup(output_dir: Path, defaults: list[dict[str, Any]]) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-    output_file = output_dir / f"macos-defaults-{timestamp}.yml"
+    output_file = output_dir / "macos-defaults-latest.yml"
     content = yaml.dump(
         {"macos_defaults": defaults},
         Dumper=IndentedSafeDumper,
