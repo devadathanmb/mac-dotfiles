@@ -1,6 +1,7 @@
 astro
 dockerfile
-github-dark-default
+github-theme
 html
 make
+material-icon-theme
 mdx
