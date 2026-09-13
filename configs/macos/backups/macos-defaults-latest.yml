@@ -136,9 +136,9 @@ macos_defaults:
   - name: Dock | Set icon size
     domain: com.apple.dock
     key: tilesize
-    type: float
+    type: int
     state: present
-    value: 62.0
+    value: 63
   - name: Dock | Disable magnification
     domain: com.apple.dock
     key: magnification
@@ -579,7 +579,7 @@ macos_defaults:
     key: location
     type: string
     state: present
-    value: '{{ ansible_facts[''env''][''HOME''] }}/Pictures/Screenshots'
+    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
   - name: Screenshots | Save screenshots in PNG format
     domain: com.apple.screencapture
     key: type
