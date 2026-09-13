@@ -1,7 +1,5 @@
 ---
-# ==============================================================================
 # TEXTEDIT SETTINGS
-# ==============================================================================
 
 - name: TextEdit | Use plain text mode for new documents
   tags: [macos]
@@ -27,9 +25,7 @@
     type: int
     value: 4
 
-# ==============================================================================
 # ACTIVITY MONITOR SETTINGS
-# ==============================================================================
 
 - name: Activity Monitor | Show all processes
   tags: [macos]
@@ -55,9 +51,7 @@
     type: int
     value: 0
 
-# ==============================================================================
 # APP STORE SETTINGS
-# ==============================================================================
 
 - name: App Store | Disable automatic downloads
   tags: [macos]
@@ -67,3 +61,21 @@
     type: bool
     value: false
   become: true
+
+# ITERM2 SETTINGS
+
+- name: iTerm2 | Specify custom preferences folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.googlecode.iterm2
+    key: PrefsCustomFolder
+    type: string
+    value: "{{ dotfiles_repo }}/exports/iterm2"
+
+- name: iTerm2 | Load preferences from custom folder
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: com.googlecode.iterm2
+    key: LoadPrefsFromCustomFolder
+    type: bool
+    value: true
