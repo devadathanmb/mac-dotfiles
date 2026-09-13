@@ -13,6 +13,7 @@ set -gx PNPM_HOME "$HOME/Library/pnpm"
 # Keep Homebrew tools ahead of macOS system tools, including Bash.
 fish_add_path --global --path --prepend --move /opt/homebrew/bin
 fish_add_path --global --path --prepend \
+    /opt/homebrew/sbin \
     /opt/homebrew/opt/postgresql@17/bin \
     $PNPM_HOME \
     ~/.local/bin \

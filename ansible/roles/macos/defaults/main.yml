@@ -1,2 +1,28 @@
 ---
 dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
+
+macos_dock_applications:
+  - name: Arc
+    path: /Applications/Arc.app
+  - name: Ghostty
+    path: /Applications/Ghostty.app
+  - name: Visual Studio Code
+    path: /Applications/Visual Studio Code.app
+  - name: Zed
+    path: /Applications/Zed.app
+  - name: ChatGPT
+    path: /Applications/ChatGPT.app
+
+macos_login_items:
+  - name: FluidVoice
+    path: /Applications/FluidVoice.app
+  - name: Ice
+    path: /Applications/Ice.app
+  - name: LocalSend
+    path: /Applications/LocalSend.app
+  - name: Raycast
+    path: /Applications/Raycast.app
+  - name: Snapzy
+    path: /Applications/Snapzy.app
+  - name: Stats
+    path: /Applications/Stats.app

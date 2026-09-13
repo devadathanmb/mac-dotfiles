@@ -3,6 +3,39 @@
 # DOCK SETTINGS
 # ==============================================================================
 
+- name: Dock | Read pinned applications
+  tags: [macos]
+  ansible.builtin.command:
+    argv: [dockutil, --list]
+  register: dock_items
+  changed_when: false
+  check_mode: false
+
+- name: Dock | Record pinned application names
+  tags: [macos]
+  ansible.builtin.set_fact:
+    current_dock_apps: "{{ dock_items.stdout_lines | map('regex_replace', '\t.*$', '') | list }}"
+    expected_dock_apps: "{{ macos_dock_applications | map(attribute='name') | list }}"
+
+- name: Dock | Remove unexpected pinned applications
+  tags: [macos]
+  ansible.builtin.command:
+    argv: [dockutil, --remove, all, --no-restart]
+  when: current_dock_apps != expected_dock_apps
+  changed_when: true
+  notify: Restart Dock
+
+- name: Dock | Add pinned applications in order
+  tags: [macos]
+  ansible.builtin.command:
+    argv: [dockutil, --add, "{{ item.path }}", --no-restart]
+  loop: "{{ macos_dock_applications }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: current_dock_apps != expected_dock_apps
+  changed_when: true
+  notify: Restart Dock
+
 - name: Dock | Auto-hide Dock
   tags: [macos]
   community.general.osx_defaults:

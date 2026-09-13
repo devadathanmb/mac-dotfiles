@@ -14,28 +14,8 @@
 - name: Install VSCode extensions
   ansible.builtin.command:
     cmd: "code --install-extension {{ item }}"
-  loop: "{{ vscode_extensions }}"
+  loop: "{{ vscode_extensions | default([]) }}"
   when: code_check.rc == 0
-  ignore_errors: true
-  changed_when: false
-
-- name: Check if Cursor is installed
-  ansible.builtin.command:
-    cmd: which cursor
-  register: cursor_check
-  ignore_errors: true
-  changed_when: false
-
-- name: Read Cursor extensions from file
-  ansible.builtin.set_fact:
-    cursor_extensions: "{{ lookup('file', dotfiles_repo + '/configs/cursor/extensions.txt').splitlines() | reject('==', '') | list }}"
-  when: cursor_check.rc == 0
-
-- name: Install Cursor extensions
-  ansible.builtin.command:
-    cmd: "cursor --install-extension {{ item }}"
-  loop: "{{ cursor_extensions }}"
-  when: cursor_check.rc == 0
   ignore_errors: true
   changed_when: false
 
@@ -54,4 +34,4 @@
 
 - name: Display extension installation summary
   ansible.builtin.debug:
-    msg: "VSCode and/or Cursor extensions installed; Zed extensions configured for auto-install on startup. Some may have failed (deprecated extensions)."
+    msg: "VSCode extensions installed; Zed extensions configured for auto-install on startup. Some may have failed (deprecated extensions)."

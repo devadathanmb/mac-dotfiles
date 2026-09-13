@@ -2,3 +2,7 @@
 # Mise role defaults
 mise_python_version: latest
 mise_node_version: latest
+mise_bun_version: latest
+mise_deno_version: latest
+mise_go_version: latest
+mise_rust_version: stable

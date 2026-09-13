@@ -51,20 +51,15 @@ if [[ $- != *i* ]]; then
 fi
 
 eval "$(atuin init zsh --disable-up-arrow)"
-source "/Users/devadathanmb/.deno/env"
-export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+[[ -f "$HOME/.deno/env" ]] && source "$HOME/.deno/env"
 
-export PATH=$PATH:/Users/devadathanmb/.spicetify
+export PATH="$PATH:$HOME/.spicetify"
 
 # Added by Antigravity
-export PATH="/Users/devadathanmb/.antigravity/antigravity/bin:$PATH"
-
-
-# Pi
-export PATH="/Users/devadathanmb/.local/share/mise/installs/node/26.4.0/bin:$PATH"
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
 # pnpm
-export PNPM_HOME="/Users/devadathanmb/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;

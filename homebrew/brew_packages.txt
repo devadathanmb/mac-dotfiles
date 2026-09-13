@@ -1,6 +1,7 @@
 agavra/tap/tuicr
 anomalyco/tap/opencode
 ansible
+ansible-lint
 ast-grep
 atuin
 bash
@@ -10,11 +11,9 @@ broot
 btop
 chafa
 cmake
-cmatrix
 coreutils
 csvkit
-docker
-docker-compose
+dockutil
 duti
 eza
 fastfetch
@@ -52,9 +51,11 @@ neovim
 nmap
 pandoc
 parallel
+pnpm
 poppler
 postgresql@17
 pre-commit
+prettier
 procs
 qpdf
 qrencode
@@ -67,11 +68,8 @@ shuffledns
 swiftformat
 swiftlint
 tabiew
-tailscale
 tgpt
 tmux
-trufflehog
-tty-clock
 typst
 uv
 vhs

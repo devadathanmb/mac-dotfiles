@@ -1,7 +1,7 @@
 ---
 - name: Check if Zap ZSH is installed
   ansible.builtin.stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/zap"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/zap/zap.zsh"
   register: zap_installed
 
 - name: Ensure .local/share/zap directory exists
