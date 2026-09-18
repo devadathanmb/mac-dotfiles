@@ -1,101 +1,102 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "openai/gpt-5.6-luna",
-  "small_model": "opencode/big-pickle",
-  "autoupdate": "notify",
+  "update": "notify",
   "share": "disabled",
-  "lsp": false,
   "disabled_providers": [],
   "tool_output": {
     "max_lines": 500,
     "max_bytes": 20000
   },
-  "agent": {
+  "agents": {
+    "title": {
+      "model": "opencode/big-pickle"
+    },
     "explore": {
-      "model": "openai/gpt-5.6-luna",
-      "variant": "high"
+      "model": "openai/gpt-5.6-luna#high"
     },
     "general": {
-      "model": "openai/gpt-5.6-terra",
-      "variant": "high"
+      "model": "openai/gpt-5.6-terra#high"
     }
   },
   "experimental": {
-    "openTelemetry": false,
     "disable_paste_summary": true
   },
   "compaction": {
     "auto": true,
-    "prune": true,
-    "reserved": 10000
+    "buffer": 10000
   },
   "formatter": false,
+  "lsp": {
+    "pyright": {
+      "disabled": true
+    }
+  },
   "mcp": {
-    "context7": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{file:~/.secrets/context7-api-key}"
+    "servers": {
+      "context7": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp"
+      },
+      "deepwiki": {
+        "type": "remote",
+        "url": "https://mcp.deepwiki.com/mcp",
+        "disabled": true
+      },
+      "exa": {
+        "type": "remote",
+        "url": "https://mcp.exa.ai/mcp",
+        "headers": {
+          "x-api-key": "{file:~/.secrets/exa-api-key}"
+        }
+      },
+      "grep_app": {
+        "type": "remote",
+        "url": "https://mcp.grep.app",
+        "disabled": true
       }
-    },
-    "exa": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://mcp.exa.ai/mcp",
-      "headers": {
-        "x-api-key": "{file:~/.secrets/exa-api-key}"
-      }
-    },
-    "gh_grep": {
-      "enabled": false,
-      "type": "remote",
-      "url": "https://mcp.grep.app"
-    },
-    "deepwiki": {
-      "enabled": false,
-      "type": "remote",
-      "url": "https://mcp.deepwiki.com/mcp"
-    },
-    "playwright": {
-      "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp"],
-      "enabled": false
     }
   },
-  "permission": {
-    "bash": {
-      "gh * create*": "ask",
-      "gh * edit*": "ask",
-      "git push *--force": "ask",
-      "git push *--force *": "ask",
-      "git push -f": "ask",
-      "git push -f *": "ask",
-      "git push * -f": "ask",
-      "git push * -f *": "ask",
-      "git push +*": "ask",
-      "git push * +*": "ask",
-      "git branch -D": "ask",
-      "git branch -D *": "ask",
-      "git push --delete *": "ask",
-      "git push * --delete *": "ask",
-      "git reset --hard": "ask",
-      "git reset --hard *": "ask",
-      "git clean -f *": "ask",
-      "git clean -fd *": "ask",
-      "git clean -fdx *": "ask",
-      "rm *": "ask",
-      "sudo *": "ask",
-      "aws*": "ask",
-      "wangler*": "ask"
+  "permissions": [
+    {
+      "action": "skill",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "$HOME/.mac-dots/configs/agents/*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/agent-gh/**",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "aws*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "*rm *",
+      "effect": "ask"
     }
-  },
+  ],
   // OpenCode Quota: tuiCommandDisplay chooses whether native TUI command output appears in the session transcript or a local popup dialog.
   // OpenCode Quota: loads the server plugin for slash commands and quota checks.
-  "plugin": [
-    "@slkiser/opencode-quota"
+  "plugins": [
+    // "@slkiser/opencode-quota@latest",
+    // "@mohak34/opencode-notifier@0.2.8"
   ],
-  "provider": {
+  "providers": {
+    // Detected openai authentication; opencode-quota added this global provider declaration.
     "openai": {}
   }
 }
