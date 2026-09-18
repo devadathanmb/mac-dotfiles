@@ -39,7 +39,6 @@ mole
 mpv
 neovim
 nmap
-opencode
 pandoc
 parallel
 pnpm
