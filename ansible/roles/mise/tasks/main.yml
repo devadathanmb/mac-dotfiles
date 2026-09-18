@@ -18,19 +18,27 @@
       deno@{{ mise_deno_version }}
       go@{{ mise_go_version }}
       rust@{{ mise_rust_version }}
-  register: mise_use_result
-  changed_when: "'installed' in (mise_use_result.stdout + mise_use_result.stderr)"
+  register: mise_runtime_use_result
+  changed_when: "'installed 0 tools' not in (mise_runtime_use_result.stdout + mise_runtime_use_result.stderr)"
 
-- name: Install Pi coding agent globally
+- name: Install AI coding CLIs globally with npm
   community.general.npm:
-    name: "@earendil-works/pi-coding-agent"
+    name: "{{ item }}"
     global: true
-    state: present
-    executable: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/shims/npm"
+    state: latest
+    executable: "{{ lookup('ansible.builtin.env', 'HOME') }}/.local/share/mise/shims/npm"
+  loop: "{{ npm_ai_coding_packages }}"
+  environment:
+    npm_config_allow_scripts: "{{ npm_ai_coding_allow_scripts | join(',') }}"
+
+- name: Refresh mise shims for global npm CLIs
+  ansible.builtin.command:
+    cmd: mise reshim
+  changed_when: false
 
 - name: Display installed versions
   ansible.builtin.debug:
     msg: |
       Mise setup complete!
-      {{ mise_use_result.stdout | default('') }}
-      {{ mise_use_result.stderr | default('') }}
+      {{ mise_runtime_use_result.stdout | default('') }}
+      {{ mise_runtime_use_result.stderr | default('') }}

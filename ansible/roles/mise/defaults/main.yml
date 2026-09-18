@@ -6,3 +6,17 @@ mise_bun_version: latest
 mise_deno_version: latest
 mise_go_version: latest
 mise_rust_version: stable
+
+# Mise manages Node; npm manages AI coding CLIs. Several official packages use
+# trusted postinstall scripts to select a platform-native binary.
+npm_ai_coding_packages:
+  - "@opencode/cli"
+  - "@anthropic-ai/claude-code"
+  - "@cometix/codex"
+  - "@earendil-works/pi-coding-agent"
+npm_ai_coding_allow_scripts:
+  - "@anthropic-ai/claude-code"
+  - "@opencode/cli"
+  - "@google/genai"
+  - esbuild
+  - protobufjs
