@@ -28,7 +28,7 @@ ollama-app
 onlyoffice
 opencode-desktop
 paper
-postman
+bruno
 protonvpn
 raspberry-pi-imager
 raycast
