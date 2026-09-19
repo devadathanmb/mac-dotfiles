@@ -7,8 +7,6 @@ burp-suite
 calibre
 chatgpt
 claude
-claude-code@latest
-codex
 codexbar
 discord
 docker-desktop
@@ -23,7 +21,6 @@ google-chrome
 iterm2
 localsend
 mitmproxy
-obsidian
 ollama-app
 onlyoffice
 opencode-desktop
