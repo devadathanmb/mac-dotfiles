@@ -1,0 +1,9 @@
+---
+- name: Tmux Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+
+  roles:
+    - role: tmux
