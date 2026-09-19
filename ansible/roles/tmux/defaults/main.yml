@@ -1,0 +1,3 @@
+---
+tmux_config_path: "{{ dotfiles_repo }}/.tmux.conf"
+tmux_plugin_directory: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins"

@@ -1,0 +1,4 @@
+---
+# Path to the dotfiles repository. Keep this inventory-wide because multiple
+# independent roles and playbooks consume tracked files from the repository.
+dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"

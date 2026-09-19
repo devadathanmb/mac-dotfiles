@@ -1,0 +1,28 @@
+---
+- name: Read plugins declared in tmux configuration
+  ansible.builtin.set_fact:
+    tmux_plugin_repositories: >-
+      {{ lookup('ansible.builtin.file', tmux_config_path)
+         | regex_findall("@plugin ['\"]([^'\"]+)['\"]") }}
+
+- name: Verify tmux plugins are declared
+  ansible.builtin.assert:
+    that: tmux_plugin_repositories | length > 0
+    fail_msg: "No @plugin declarations found in {{ tmux_config_path }}"
+
+- name: Ensure tmux plugin directory exists
+  ansible.builtin.file:
+    path: "{{ tmux_plugin_directory }}"
+    state: directory
+    mode: "0755"
+
+- name: Install TPM and declared tmux plugins
+  ansible.builtin.git:
+    repo: "https://github.com/{{ item }}.git"
+    dest: "{{ tmux_plugin_directory }}/{{ item | basename }}"
+    depth: 1
+    version: master
+    update: true
+  loop: "{{ tmux_plugin_repositories }}"
+  loop_control:
+    label: "{{ item }}"

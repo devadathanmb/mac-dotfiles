@@ -20,6 +20,8 @@
       tags: [dotbot, symlinks]
     - role: homebrew
       tags: [homebrew, packages]
+    - role: tmux
+      tags: [tmux, plugins]
     - role: mise
       tags: [mise, python, node]
     - role: macos

@@ -6,7 +6,6 @@
   become: false
 
   vars:
-    dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
     zed_extensions_installed_dir: "{{ lookup('env', 'HOME') }}/Library/Application Support/Zed/extensions/installed"
 
   tasks:

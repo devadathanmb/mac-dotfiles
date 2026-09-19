@@ -1,6 +1,4 @@
 ---
-dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
-
 macos_dock_applications:
   - name: Visual Studio Code
     path: /Applications/Visual Studio Code.app

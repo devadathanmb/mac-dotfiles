@@ -12,7 +12,7 @@ RAYCAST_EXPORT_DEEPLINK   := raycast://extensions/raycast/raycast/export-setting
 play = cd $(ANSIBLE_DIR) && $(CAFFEINATE) $(PLAYBOOK) playbooks/$(1).yml $(ARGS)
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap all packages macos dotfiles zsh editors mise backup raycast-backup raycast-backup-mv hooks hooks-run
+.PHONY: help bootstrap all packages macos dotfiles tmux zsh editors mise backup raycast-backup raycast-backup-mv hooks hooks-run
 
 help:        ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -32,6 +32,9 @@ macos:       ## Apply macOS defaults
 
 dotfiles:    ## Symlink dotfiles (dotbot)
 	$(call play,dotbot)
+
+tmux:        ## Install TPM and plugins declared in .tmux.conf
+	$(call play,tmux)
 
 zsh:         ## Set up zsh
 	$(call play,zsh)
