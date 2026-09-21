@@ -4,6 +4,7 @@
 # which stays untracked because this repository is public.
 
 [tools]
+agy = "latest"
 bun = "latest"
 deno = "latest"
 go = "latest"
