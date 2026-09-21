@@ -30,6 +30,7 @@
     ~/.config/htop: configs/htop
     ~/.config/btop: configs/btop
     ~/.config/mpv: configs/mpv
+    ~/.config/mise/config.toml: configs/mise/config.toml
     ~/.config/zed: configs/zed
     ~/.config/opencode/AGENTS.md: configs/opencode/AGENTS.md
     ~/.config/opencode/cli.json: configs/opencode/cli.json

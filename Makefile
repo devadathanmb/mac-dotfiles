@@ -42,7 +42,7 @@ zsh:         ## Set up zsh
 editors:     ## Install editor extensions (VSCode/Cursor/Zed)
 	$(call play,editors)
 
-mise:        ## Install mise + latest Python/Node
+mise:        ## Install mise + tools declared in the tracked global config
 	$(call play,mise)
 
 backup:      ## Back up installed packages/extensions/macOS defaults into the repo

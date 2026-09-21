@@ -6,4 +6,8 @@
   become: false
 
   roles:
+    # Dotbot links configs/mise/config.toml to ~/.config/mise/config.toml before
+    # the mise role installs the tools declared there.
+    - role: dotbot
+      tags: [dotbot, symlinks]
     - role: mise

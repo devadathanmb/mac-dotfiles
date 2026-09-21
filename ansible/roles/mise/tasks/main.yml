@@ -1,6 +1,8 @@
 ---
 # Mise Version Manager Role
-# Installs mise and the configured development runtimes.
+# Installs mise and applies the global tools declared in the tracked
+# configs/mise/config.toml. Dotbot links that file to ~/.config/mise/config.toml.
+# Change global tools by editing the tracked config, not with `mise use --global`.
 
 - name: Install mise via Homebrew
   community.general.homebrew:
@@ -8,37 +10,28 @@
     state: present
   become: false
 
-- name: Install and set development runtimes globally
-  ansible.builtin.command:
-    cmd: >-
-      mise use --global --yes
-      python@{{ mise_python_version }}
-      node@{{ mise_node_version }}
-      bun@{{ mise_bun_version }}
-      deno@{{ mise_deno_version }}
-      go@{{ mise_go_version }}
-      rust@{{ mise_rust_version }}
-  register: mise_runtime_use_result
-  changed_when: "'installed 0 tools' not in (mise_runtime_use_result.stdout + mise_runtime_use_result.stderr)"
+- name: Check the tracked mise config is linked
+  ansible.builtin.stat:
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.config/mise/config.toml"
+  register: mise_global_config
 
-- name: Install AI coding CLIs globally with npm
-  community.general.npm:
-    name: "{{ item }}"
-    global: true
-    state: latest
-    executable: "{{ lookup('ansible.builtin.env', 'HOME') }}/.local/share/mise/shims/npm"
-  loop: "{{ npm_ai_coding_packages }}"
-  environment:
-    npm_config_allow_scripts: "{{ npm_ai_coding_allow_scripts | join(',') }}"
+- name: Fail when the tracked mise config is missing
+  ansible.builtin.assert:
+    that: mise_global_config.stat.exists
+    fail_msg: >-
+      ~/.config/mise/config.toml is missing. Run `make dotfiles` (or `make mise`,
+      which links dotfiles first) before provisioning mise tools.
 
-- name: Refresh mise shims for global npm CLIs
+- name: Install globally configured mise tools
   ansible.builtin.command:
-    cmd: mise reshim
-  changed_when: false
+    cmd: mise install
+    chdir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
+  register: mise_install_result
+  changed_when: "'installed 0 tools' not in (mise_install_result.stdout + mise_install_result.stderr)"
 
 - name: Display installed versions
   ansible.builtin.debug:
     msg: |
       Mise setup complete!
-      {{ mise_runtime_use_result.stdout | default('') }}
-      {{ mise_runtime_use_result.stderr | default('') }}
+      {{ mise_install_result.stdout | default('') }}
+      {{ mise_install_result.stderr | default('') }}
