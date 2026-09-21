@@ -1,6 +1,5 @@
 alt-tab
 antigravity
-antigravity-cli
 arc
 balenaetcher
 burp-suite
