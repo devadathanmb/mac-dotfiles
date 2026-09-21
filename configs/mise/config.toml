@@ -1,0 +1,24 @@
+# Global mise tools for this Mac. Dotbot links this file to
+# ~/.config/mise/config.toml, so `mise use --global` writes land here.
+# Machine-local overrides and secrets belong in ~/.config/mise/config.local.toml,
+# which stays untracked because this repository is public.
+
+[tools]
+bun = "latest"
+deno = "latest"
+go = "latest"
+node = "26.9.0"
+
+# AI coding CLIs. The npm backend installs each package into its own tool
+# directory, so the commands resolve regardless of which Node version a project
+# pins. Claude Code and OpenCode run a postinstall to select the platform
+# binary; OpenCode's package name is also new enough to trip aube's reputation
+# gate. Codex tracks the Cometix fork, which only publishes -cometix
+# prereleases, so the version is pinned instead of "latest".
+"npm:@anthropic-ai/claude-code" = { version = "latest", allow_builds = ["@anthropic-ai/claude-code"] }
+"npm:@cometix/codex" = "0.154.0-cometix"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@opencode/cli" = { version = "latest", allow_low_downloads = true, allow_builds = ["@opencode/cli"] }
+
+python = "latest"
+rust = "stable"
