@@ -3,6 +3,17 @@
 # Machine-local overrides and secrets belong in ~/.config/mise/config.local.toml,
 # which stays untracked because this repository is public.
 
+[settings]
+# Agent CLIs should receive newly published releases immediately. Keep the
+# global release-age policy in effect for all other tools.
+minimum_release_age_excludes = [
+  "agy",
+  "npm:@anthropic-ai/claude-code",
+  "npm:@cometix/codex",
+  "npm:@earendil-works/pi-coding-agent",
+  "npm:@opencode/cli",
+]
+
 [tools]
 agy = "latest"
 bun = "latest"
