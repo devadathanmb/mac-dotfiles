@@ -73,6 +73,18 @@ macos_defaults:
     state: present
     become: true
     value: false
+  - name: iTerm2 | Specify custom preferences folder
+    domain: com.googlecode.iterm2
+    key: PrefsCustomFolder
+    type: string
+    state: present
+    value: "{{ ansible_facts['env']['HOME'] }}/.mac-dots/exports/iterm2"
+  - name: iTerm2 | Load preferences from custom folder
+    domain: com.googlecode.iterm2
+    key: LoadPrefsFromCustomFolder
+    type: bool
+    state: present
+    value: true
   - name: Dock | Auto-hide Dock
     domain: com.apple.dock
     key: autohide
@@ -136,9 +148,9 @@ macos_defaults:
   - name: Dock | Set icon size
     domain: com.apple.dock
     key: tilesize
-    type: int
+    type: float
     state: present
-    value: 63
+    value: 61.0
   - name: Dock | Disable magnification
     domain: com.apple.dock
     key: magnification
@@ -478,13 +490,12 @@ macos_defaults:
     type: int
     state: present
     host: currentHost
-    value: 2
+    value: 8
   - name: System UI | Show Bluetooth in menu bar
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC Bluetooth
     type: bool
-    state: present
-    value: true
+    state: absent
   - name: System UI | Hide Display in menu bar
     domain: com.apple.controlcenter
     key: Display
@@ -603,7 +614,7 @@ macos_defaults:
     key: com.apple.trackpad.scaling
     type: float
     state: present
-    value: 1.5
+    value: 2.0
   - name: Trackpad | Enable tap to click
     domain: com.apple.AppleMultitouchTrackpad
     key: Clicking

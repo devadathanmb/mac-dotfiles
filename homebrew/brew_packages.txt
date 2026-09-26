@@ -1,3 +1,4 @@
+aiven-client
 ansible
 ansible-lint
 ast-grep
@@ -15,7 +16,6 @@ duti
 eza
 fastfetch
 fd
-fish
 fzf
 gawk
 gh
@@ -29,6 +29,7 @@ hyperfine
 imagemagick
 iperf3
 jq
+k6
 k9s
 kustomize
 lazydocker
@@ -68,3 +69,4 @@ yamllint
 yazi
 yq
 zoxide
+zstud/reef/reef
