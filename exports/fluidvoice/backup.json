@@ -3,7 +3,7 @@
 
   ],
   "appVersion" : "1.6.9",
-  "exportedAt" : "2026-09-19T08:28:45Z",
+  "exportedAt" : "2026-09-22T18:52:01Z",
   "promptProfiles" : [
 
   ],
@@ -123,7 +123,7 @@
         "aliases" : [
           "comma"
         ],
-        "id" : "3E27FFB9-6964-4AA1-9989-90373227CEB9",
+        "id" : "00C64DD7-262C-42DD-848E-861574DE312A",
         "symbol" : ","
       },
       {
@@ -131,14 +131,14 @@
           "period",
           "full stop"
         ],
-        "id" : "F2049506-43BA-40C2-86E4-49B3422398E7",
+        "id" : "D0E2F858-C59A-4DA8-99BC-487CAEABB65E",
         "symbol" : "."
       },
       {
         "aliases" : [
           "dot"
         ],
-        "id" : "4C10CEA9-FDCE-4BB8-9D68-FE036A299411",
+        "id" : "263D8CC1-8528-49D4-A0FE-DC2BD89C635F",
         "symbol" : "."
       },
       {
@@ -146,7 +146,7 @@
           "question mark",
           "questionmark"
         ],
-        "id" : "C85478E5-24C6-47CC-90E6-3769C440FB85",
+        "id" : "A89EF66A-5BC1-4AAD-B6DB-DBEFF9F5D3E7",
         "symbol" : "?"
       },
       {
@@ -155,14 +155,14 @@
           "exclamation point",
           "bang"
         ],
-        "id" : "D73AC7BE-6949-4A69-9587-D29EAB9026BD",
+        "id" : "8438D4C6-922E-4510-B26F-C31F781CDBEC",
         "symbol" : "!"
       },
       {
         "aliases" : [
           "colon"
         ],
-        "id" : "4BCD8A02-5349-4968-9ED5-45E94977588C",
+        "id" : "29771545-E5FB-4621-87CB-BD2F6588C0E0",
         "symbol" : ":"
       },
       {
@@ -170,7 +170,7 @@
           "semicolon",
           "semi colon"
         ],
-        "id" : "16E56B21-D8A0-4060-A60B-68370622D64D",
+        "id" : "74A6CC0B-AA48-4002-9487-73E722AEE0F8",
         "symbol" : ";"
       },
       {
@@ -179,7 +179,7 @@
           "dot dot dot",
           "three dots"
         ],
-        "id" : "51D4E702-B04D-42FE-8941-3EA8DE55BF3C",
+        "id" : "4A693153-A7CF-4B21-B895-63592E34471F",
         "symbol" : "..."
       },
       {
@@ -188,7 +188,7 @@
           "forward slash",
           "forwardslash"
         ],
-        "id" : "236CACEA-ACF0-4D99-AD3D-C8AEBFBDA4B6",
+        "id" : "996602B6-54BF-42D6-AA1D-5443DB38F087",
         "symbol" : "\/"
       },
       {
@@ -196,14 +196,14 @@
           "backslash",
           "back slash"
         ],
-        "id" : "7C36EE63-BAE0-49D3-9310-700D83C1DA47",
+        "id" : "30B1660F-5EE9-4BB1-8A1F-FBCBC8AFEC61",
         "symbol" : "\\"
       },
       {
         "aliases" : [
           "hyphen"
         ],
-        "id" : "56597DAD-0769-439E-B2A0-E03829AEAF0A",
+        "id" : "0D0AA408-04F7-4369-AB8F-1A3B877D3C41",
         "symbol" : "-"
       },
       {
@@ -211,7 +211,7 @@
           "dash",
           "minus sign"
         ],
-        "id" : "472F0F92-C65E-41CB-86EC-2E7AD1B6F98B",
+        "id" : "0F6E79E8-2ED4-44CD-9F99-0A7F751292C5",
         "symbol" : "-"
       },
       {
@@ -219,14 +219,14 @@
           "em dash",
           "long dash"
         ],
-        "id" : "C68EA0D9-8AD2-40DB-8A9F-B695F01E9F81",
+        "id" : "28726650-2EB0-44CC-877A-D575E5A5A5AB",
         "symbol" : "—"
       },
       {
         "aliases" : [
           "en dash"
         ],
-        "id" : "42D6B8CF-344C-4E68-9DE0-C5FD83932E5D",
+        "id" : "C5350EEF-6DAF-4E9E-8B61-022BB1BE4539",
         "symbol" : "–"
       },
       {
@@ -238,7 +238,7 @@
           "open paren",
           "left paren"
         ],
-        "id" : "44B95B91-571A-4D05-8708-F98AC29F2A53",
+        "id" : "3C61CD0B-5A03-40BD-90C7-DF1E6CE72867",
         "symbol" : "("
       },
       {
@@ -250,7 +250,7 @@
           "close paren",
           "right paren"
         ],
-        "id" : "D82002A3-E59B-4F18-A5E0-BDD675AAE296",
+        "id" : "7748043A-4747-4AA1-9599-018E2837D854",
         "symbol" : ")"
       },
       {
@@ -260,7 +260,7 @@
           "open square bracket",
           "left square bracket"
         ],
-        "id" : "A08A5C71-89D0-42C8-BA3C-EAC2AF506113",
+        "id" : "D4BB5848-7734-4ED4-9200-30C9C0DB6D40",
         "symbol" : "["
       },
       {
@@ -270,7 +270,7 @@
           "close square bracket",
           "right square bracket"
         ],
-        "id" : "9F18A41D-B758-43ED-AD3F-ED5F3B2AEFB7",
+        "id" : "6C4F553D-C4BA-44F5-B766-91EC19876A01",
         "symbol" : "]"
       },
       {
@@ -282,7 +282,7 @@
           "open curly bracket",
           "left curly bracket"
         ],
-        "id" : "AE5C36AF-4943-4CDE-BB47-D06F84793D0B",
+        "id" : "BA2908BC-E3CF-4883-9732-8330826551D2",
         "symbol" : "{"
       },
       {
@@ -294,7 +294,7 @@
           "close curly bracket",
           "right curly bracket"
         ],
-        "id" : "7BA5D7E7-9BAB-4485-8752-674B80E17927",
+        "id" : "FCB281A1-C2AD-43B2-B0C0-F65EE5DE3597",
         "symbol" : "}"
       },
       {
@@ -303,7 +303,7 @@
           "left angle bracket",
           "less than sign"
         ],
-        "id" : "4F79D70C-56D9-49D1-9012-BEE06E43026D",
+        "id" : "42AFE0DA-971F-4DF2-A9EA-8A6FF4475AD6",
         "symbol" : "<"
       },
       {
@@ -312,7 +312,7 @@
           "right angle bracket",
           "greater than sign"
         ],
-        "id" : "3FE64A54-4E20-4FFD-988E-4F2D2128EF92",
+        "id" : "BDC11C08-16AC-4852-B869-0D51DBAD3ABD",
         "symbol" : ">"
       },
       {
@@ -322,7 +322,7 @@
           "quotation mark",
           "double quote"
         ],
-        "id" : "7E9B1CDF-5DD2-4D5F-85F9-42B6E0CFD716",
+        "id" : "896DF63C-6547-4F43-A4D3-1B94C17A95F1",
         "symbol" : "\""
       },
       {
@@ -332,7 +332,7 @@
           "open double quote",
           "opening double quote"
         ],
-        "id" : "1FC709F7-9679-4842-8BC2-C526026D1879",
+        "id" : "256068DE-D64F-4588-AD3B-01FBC52CA79B",
         "symbol" : "\""
       },
       {
@@ -342,21 +342,21 @@
           "close double quote",
           "closing double quote"
         ],
-        "id" : "BBA7CCFB-DB2E-4014-8AD0-0C9DAD724323",
+        "id" : "35A560ED-B5E2-45D0-B2FC-9350F9D98FBE",
         "symbol" : "\""
       },
       {
         "aliases" : [
           "single quote"
         ],
-        "id" : "F28CBD1D-30BC-4184-BF2F-7AE76BCA6AF5",
+        "id" : "2D8C81D3-1203-465E-9BC9-6411664278B8",
         "symbol" : "'"
       },
       {
         "aliases" : [
           "apostrophe"
         ],
-        "id" : "F9A38C1E-A116-471F-8D9C-CBCF961C848E",
+        "id" : "E5D95ACD-A61A-43E5-8EDD-F17F851872E4",
         "symbol" : "'"
       },
       {
@@ -365,7 +365,7 @@
           "at sign",
           "commercial at"
         ],
-        "id" : "5ACFE20C-8141-4D73-B905-5F676466F3D1",
+        "id" : "C6068C23-93FB-4B33-97DE-7D39E202B31D",
         "symbol" : "@"
       },
       {
@@ -373,7 +373,7 @@
           "ampersand",
           "and sign"
         ],
-        "id" : "D23DAA59-A1A2-4C03-B4FD-4583BB91DBB6",
+        "id" : "23AC3486-34BD-4F68-9219-435A92655FD2",
         "symbol" : "&"
       },
       {
@@ -381,7 +381,7 @@
           "plus sign",
           "plus"
         ],
-        "id" : "9A3AF196-7819-4D63-A284-229FBE36665B",
+        "id" : "F5C8C531-549C-40FF-AD6B-2D0BCB4F952E",
         "symbol" : "+"
       },
       {
@@ -391,7 +391,7 @@
           "equal",
           "equals"
         ],
-        "id" : "A0668707-9AC3-42A3-AAFE-501A9D3CD394",
+        "id" : "4842AD20-793C-4A33-A03F-90E35ACC80E7",
         "symbol" : "="
       },
       {
@@ -400,7 +400,7 @@
           "percentage sign",
           "percent"
         ],
-        "id" : "EF19697F-6AE8-4048-8B90-746488B48DA0",
+        "id" : "7C7BD35D-482E-495C-8BE4-C95C3B276044",
         "symbol" : "%"
       },
       {
@@ -408,7 +408,7 @@
           "dollar sign",
           "dollar"
         ],
-        "id" : "62867C92-9DBB-4EBA-A2DA-3E6D434E0C86",
+        "id" : "1B4E6D5A-E2B6-46E4-8854-6582A21116DF",
         "symbol" : "$"
       },
       {
@@ -419,7 +419,7 @@
           "pound sign",
           "number sign"
         ],
-        "id" : "7693A165-77F2-48A4-A878-7A0EE3C0C1BE",
+        "id" : "39270D6B-61AF-4926-861C-5F275D51AFE0",
         "symbol" : "#"
       },
       {
@@ -427,14 +427,14 @@
           "asterisk",
           "star symbol"
         ],
-        "id" : "3253F1EC-3743-45D7-8C6F-E61BD29AD2AB",
+        "id" : "0F8FED5F-FE07-4133-B087-55EDCEFC9CA6",
         "symbol" : "*"
       },
       {
         "aliases" : [
           "underscore"
         ],
-        "id" : "9BF4D437-38C4-48AA-A460-3ABA25D256CA",
+        "id" : "39AA4728-CE43-4FE3-886A-7987EF2FBF67",
         "symbol" : "_"
       },
       {
@@ -442,21 +442,21 @@
           "pipe",
           "vertical bar"
         ],
-        "id" : "1241133C-D4AA-48B0-B103-D2665D01A361",
+        "id" : "15EC2F4A-FD52-4C76-9D45-4E926F168A76",
         "symbol" : "|"
       },
       {
         "aliases" : [
           "tilde"
         ],
-        "id" : "0DBAE191-49CB-4F32-8BE5-944977EC2662",
+        "id" : "1E3610DA-FEAF-4F89-8EA8-D2227857060C",
         "symbol" : "~"
       },
       {
         "aliases" : [
           "caret"
         ],
-        "id" : "C418226D-7A48-47FE-A845-29E1D7A6FAE0",
+        "id" : "FAB68438-9212-4463-B011-34F3DB4672B1",
         "symbol" : "^"
       },
       {
@@ -464,7 +464,7 @@
           "backtick",
           "back tick"
         ],
-        "id" : "82F0F8AE-91A3-4DAD-8BA6-E9F371330104",
+        "id" : "3D72F331-2AB5-4397-B185-C8ED0736707B",
         "symbol" : "`"
       }
     ],
@@ -492,9 +492,9 @@
     },
     "selectedNemotronLanguage" : "en",
     "selectedProviderID" : "google",
-    "selectedSpeechModel" : "whisper-large",
+    "selectedSpeechModel" : "parakeet-tdt-v2",
     "shareAnonymousAnalytics" : false,
-    "showMainWindowAtLoginLaunch" : true,
+    "showMainWindowAtLoginLaunch" : false,
     "showMicrophoneChangeAlerts" : true,
     "showThinkingTokens" : true,
     "skipSilentRecordingsEnabled" : true,
