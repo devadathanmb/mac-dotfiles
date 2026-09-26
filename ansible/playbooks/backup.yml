@@ -10,14 +10,17 @@
 
   tasks:
     # Homebrew Formulae Backup
-    - name: Get top-level Homebrew formulae
+    # Use the "installed on request" list rather than `brew leaves`: leaves hides
+    # formulae that are also dependencies of another installed formula (e.g. fish
+    # pulled in by zstud/reef/reef), silently dropping them from the manifest.
+    - name: Get directly-installed (on request) Homebrew formulae
       ansible.builtin.command:
-        cmd: brew leaves
+        cmd: brew list --formula --installed-on-request
       register: installed_formulae
       changed_when: false
       tags: formulae
 
-    - name: Write top-level formulae to file
+    - name: Write directly-installed formulae to file
       ansible.builtin.copy:
         content: "{{ installed_formulae.stdout_lines | sort | join('\n') }}{{ '\n' if installed_formulae.stdout_lines | length > 0 else '' }}"
         dest: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
@@ -26,7 +29,7 @@
 
     - name: Display formulae backup result
       ansible.builtin.debug:
-        msg: "Backed up {{ installed_formulae.stdout_lines | length }} top-level Homebrew formulae to brew_packages.txt"
+        msg: "Backed up {{ installed_formulae.stdout_lines | length }} directly-installed Homebrew formulae to brew_packages.txt"
       tags: formulae
 
     # Homebrew Casks Backup
@@ -180,7 +183,7 @@
           ========================================
           Backup Complete!
           ========================================
-          Homebrew formulae (leaves): {{ installed_formulae.stdout_lines | default([]) | length }}
+          Homebrew formulae (on request): {{ installed_formulae.stdout_lines | default([]) | length }}
           Homebrew casks: {{ installed_casks | default([]) | length }}
           VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
           Zed extensions: {{ zed_extensions.stdout_lines | default([]) | length }}
