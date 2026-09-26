@@ -16,6 +16,7 @@ duti
 eza
 fastfetch
 fd
+fish
 fzf
 gawk
 gh
@@ -51,6 +52,7 @@ procs
 qpdf
 qrencode
 redis
+reef
 ripgrep-all
 rsync
 shellcheck
@@ -69,4 +71,3 @@ yamllint
 yazi
 yq
 zoxide
-zstud/reef/reef
