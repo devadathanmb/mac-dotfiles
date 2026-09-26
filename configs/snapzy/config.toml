@@ -1,5 +1,5 @@
 schema_version = 1
-snapzy_min_version = "1.31.0"
+snapzy_min_version = "1.32.3"
 
 [general]
 language = "en"
@@ -8,7 +8,7 @@ play_sounds = true
 url_scheme_enabled = true
 show_menu_bar_icon = true
 start_at_login = true
-export_location = "~/Pictures/Snapzy"
+export_location = "~/Desktop/Snapzy"
 
 [updates]
 check_automatically = true
@@ -17,7 +17,7 @@ channel = "stable"
 
 [diagnostics]
 enabled = false
-retention_days = 1
+retention_days = 3
 
 [menu_bar]
 icon_style = "default"
@@ -34,7 +34,7 @@ recording_template = "Snapzy_Recording_{datetime}"
 
 [capture.screenshot]
 format = "png"
-include_snapzy = true
+include_snapzy = false
 show_cursor = false
 freeze_area = false
 show_selection_area_overlay = true
@@ -74,7 +74,7 @@ capture_system_audio = true
 capture_microphone = false
 microphone_device_id = "system-default"
 remember_last_area = true
-include_snapzy = true
+include_snapzy = false
 show_cursor = true
 dim_non_selected_area = true
 highlight_clicks = false
@@ -99,9 +99,10 @@ hold_duration = 0.3
 
 [quick_access]
 enabled = true
+play_sounds = true
 position = "bottomRight"
 auto_dismiss = false
-auto_dismiss_delay = 3.0
+auto_dismiss_delay = 10.0
 pause_countdown_on_hover = true
 overlay_scale = 1.0
 drag_drop = true
@@ -109,7 +110,7 @@ two_finger_swipe_to_dismiss = true
 swipe_sensitivity = 1.0
 trackpad_swipe_mode = "inverted"
 swipe_left_action = "dismiss"
-swipe_right_action = "delete"
+swipe_right_action = "dismiss"
 hide_card_when_window_open = true
 animation_style = "slide"
 actions_order = ["copy", "saveOrOpen", "dismiss", "delete", "edit", "uploadToCloud", "pinToScreen"]
@@ -121,11 +122,11 @@ center_bottom = "saveOrOpen"
 top_trailing = "dismiss"
 top_leading = "delete"
 bottom_leading = "edit"
-bottom_trailing = "pinToScreen"
+bottom_trailing = "uploadToCloud"
 
 [history]
 enabled = true
-retention_days = 7
+retention_days = 30
 max_count = 500
 background_style = "hud"
 open_on_launch = false
@@ -163,12 +164,12 @@ enabled = true
 
 [shortcuts.global.fullscreen]
 enabled = true
-key = "F"
+key = "3"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.area]
 enabled = true
-key = "["
+key = "4"
 modifiers = ["command", "shift"]
 
 [shortcuts.global.repeat_area]
@@ -253,7 +254,7 @@ modifiers = ["command", "shift"]
 
 [shortcuts.global.history]
 enabled = true
-key = "O"
+key = "H"
 modifiers = ["command", "shift"]
 
 [shortcuts.overlay.area_application_capture]
@@ -346,8 +347,8 @@ modifiers = ["command", "control"]
 
 [shortcuts.annotate_actions.cloud_upload]
 enabled = true
-key = ""
-modifiers = []
+key = "U"
+modifiers = ["command"]
 
 [shortcuts.annotate_actions.auto_redact_sensitive_data]
 enabled = true
