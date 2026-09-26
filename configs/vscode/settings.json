@@ -1538,5 +1538,6 @@
     "editor.defaultFormatter": "vscode.css-language-features"
   },
   "contextLink.pathType": "relative",
-  "diffEditor.maxComputationTime": 0
+  "diffEditor.maxComputationTime": 0,
+  "js/ts.experimental.useTsgo": true
 }

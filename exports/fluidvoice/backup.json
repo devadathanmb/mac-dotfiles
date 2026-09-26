@@ -3,7 +3,7 @@
 
   ],
   "appVersion" : "1.6.9",
-  "exportedAt" : "2026-09-19T08:28:45Z",
+  "exportedAt" : "2026-09-22T18:52:01Z",
   "promptProfiles" : [
 
   ],
@@ -123,7 +123,7 @@
         "aliases" : [
           "comma"
         ],
-        "id" : "3E27FFB9-6964-4AA1-9989-90373227CEB9",
+        "id" : "00C64DD7-262C-42DD-848E-861574DE312A",
         "symbol" : ","
       },
       {
@@ -131,14 +131,14 @@
           "period",
           "full stop"
         ],
-        "id" : "F2049506-43BA-40C2-86E4-49B3422398E7",
+        "id" : "D0E2F858-C59A-4DA8-99BC-487CAEABB65E",
         "symbol" : "."
       },
       {
         "aliases" : [
           "dot"
         ],
-        "id" : "4C10CEA9-FDCE-4BB8-9D68-FE036A299411",
+        "id" : "263D8CC1-8528-49D4-A0FE-DC2BD89C635F",
         "symbol" : "."
       },
       {
@@ -146,7 +146,7 @@
           "question mark",
           "questionmark"
         ],
-        "id" : "C85478E5-24C6-47CC-90E6-3769C440FB85",
+        "id" : "A89EF66A-5BC1-4AAD-B6DB-DBEFF9F5D3E7",
         "symbol" : "?"
       },
       {
@@ -155,14 +155,14 @@
           "exclamation point",
           "bang"
         ],
-        "id" : "D73AC7BE-6949-4A69-9587-D29EAB9026BD",
+        "id" : "8438D4C6-922E-4510-B26F-C31F781CDBEC",
         "symbol" : "!"
       },
       {
         "aliases" : [
           "colon"
         ],
-        "id" : "4BCD8A02-5349-4968-9ED5-45E94977588C",
+        "id" : "29771545-E5FB-4621-87CB-BD2F6588C0E0",
         "symbol" : ":"
       },
       {
@@ -170,7 +170,7 @@
           "semicolon",
           "semi colon"
         ],
-        "id" : "16E56B21-D8A0-4060-A60B-68370622D64D",
+        "id" : "74A6CC0B-AA48-4002-9487-73E722AEE0F8",
         "symbol" : ";"
       },
       {
@@ -179,7 +179,7 @@
           "dot dot dot",
           "three dots"
         ],
-        "id" : "51D4E702-B04D-42FE-8941-3EA8DE55BF3C",
+        "id" : "4A693153-A7CF-4B21-B895-63592E34471F",
         "symbol" : "..."
       },
       {
@@ -188,7 +188,7 @@
           "forward slash",
           "forwardslash"
         ],
-        "id" : "236CACEA-ACF0-4D99-AD3D-C8AEBFBDA4B6",
+        "id" : "996602B6-54BF-42D6-AA1D-5443DB38F087",
         "symbol" : "\/"
       },
       {
@@ -196,14 +196,14 @@
           "backslash",
           "back slash"
         ],
-        "id" : "7C36EE63-BAE0-49D3-9310-700D83C1DA47",
+        "id" : "30B1660F-5EE9-4BB1-8A1F-FBCBC8AFEC61",
         "symbol" : "\\"
       },
       {
         "aliases" : [
           "hyphen"
         ],
-        "id" : "56597DAD-0769-439E-B2A0-E03829AEAF0A",
+        "id" : "0D0AA408-04F7-4369-AB8F-1A3B877D3C41",
         "symbol" : "-"
       },
       {
@@ -211,7 +211,7 @@
           "dash",
           "minus sign"
         ],
-        "id" : "472F0F92-C65E-41CB-86EC-2E7AD1B6F98B",
+        "id" : "0F6E79E8-2ED4-44CD-9F99-0A7F751292C5",
         "symbol" : "-"
       },
       {
@@ -219,14 +219,14 @@
           "em dash",
           "long dash"
         ],
-        "id" : "C68EA0D9-8AD2-40DB-8A9F-B695F01E9F81",
+        "id" : "28726650-2EB0-44CC-877A-D575E5A5A5AB",
         "symbol" : "—"
       },
       {
         "aliases" : [
           "en dash"
         ],
-        "id" : "42D6B8CF-344C-4E68-9DE0-C5FD83932E5D",
+        "id" : "C5350EEF-6DAF-4E9E-8B61-022BB1BE4539",
         "symbol" : "–"
       },
       {
@@ -238,7 +238,7 @@
           "open paren",
           "left paren"
         ],
-        "id" : "44B95B91-571A-4D05-8708-F98AC29F2A53",
+        "id" : "3C61CD0B-5A03-40BD-90C7-DF1E6CE72867",
         "symbol" : "("
       },
       {
@@ -250,7 +250,7 @@
           "close paren",
           "right paren"
         ],
-        "id" : "D82002A3-E59B-4F18-A5E0-BDD675AAE296",
+        "id" : "7748043A-4747-4AA1-9599-018E2837D854",
         "symbol" : ")"
       },
       {
@@ -260,7 +260,7 @@
           "open square bracket",
           "left square bracket"
         ],
-        "id" : "A08A5C71-89D0-42C8-BA3C-EAC2AF506113",
+        "id" : "D4BB5848-7734-4ED4-9200-30C9C0DB6D40",
         "symbol" : "["
       },
       {
@@ -270,7 +270,7 @@
           "close square bracket",
           "right square bracket"
         ],
-        "id" : "9F18A41D-B758-43ED-AD3F-ED5F3B2AEFB7",
+        "id" : "6C4F553D-C4BA-44F5-B766-91EC19876A01",
         "symbol" : "]"
       },
       {
@@ -282,7 +282,7 @@
           "open curly bracket",
           "left curly bracket"
         ],
-        "id" : "AE5C36AF-4943-4CDE-BB47-D06F84793D0B",
+        "id" : "BA2908BC-E3CF-4883-9732-8330826551D2",
         "symbol" : "{"
       },
       {
@@ -294,7 +294,7 @@
           "close curly bracket",
           "right curly bracket"
         ],
-        "id" : "7BA5D7E7-9BAB-4485-8752-674B80E17927",
+        "id" : "FCB281A1-C2AD-43B2-B0C0-F65EE5DE3597",
         "symbol" : "}"
       },
       {
@@ -303,7 +303,7 @@
           "left angle bracket",
           "less than sign"
         ],
-        "id" : "4F79D70C-56D9-49D1-9012-BEE06E43026D",
+        "id" : "42AFE0DA-971F-4DF2-A9EA-8A6FF4475AD6",
         "symbol" : "<"
       },
       {
@@ -312,7 +312,7 @@
           "right angle bracket",
           "greater than sign"
         ],
-        "id" : "3FE64A54-4E20-4FFD-988E-4F2D2128EF92",
+        "id" : "BDC11C08-16AC-4852-B869-0D51DBAD3ABD",
         "symbol" : ">"
       },
       {
@@ -322,7 +322,7 @@
           "quotation mark",
           "double quote"
         ],
-        "id" : "7E9B1CDF-5DD2-4D5F-85F9-42B6E0CFD716",
+        "id" : "896DF63C-6547-4F43-A4D3-1B94C17A95F1",
         "symbol" : "\""
       },
       {
@@ -332,7 +332,7 @@
           "open double quote",
           "opening double quote"
         ],
-        "id" : "1FC709F7-9679-4842-8BC2-C526026D1879",
+        "id" : "256068DE-D64F-4588-AD3B-01FBC52CA79B",
         "symbol" : "\""
       },
       {
@@ -342,21 +342,21 @@
           "close double quote",
           "closing double quote"
         ],
-        "id" : "BBA7CCFB-DB2E-4014-8AD0-0C9DAD724323",
+        "id" : "35A560ED-B5E2-45D0-B2FC-9350F9D98FBE",
         "symbol" : "\""
       },
       {
         "aliases" : [
           "single quote"
         ],
-        "id" : "F28CBD1D-30BC-4184-BF2F-7AE76BCA6AF5",
+        "id" : "2D8C81D3-1203-465E-9BC9-6411664278B8",
         "symbol" : "'"
       },
       {
         "aliases" : [
           "apostrophe"
         ],
-        "id" : "F9A38C1E-A116-471F-8D9C-CBCF961C848E",
+        "id" : "E5D95ACD-A61A-43E5-8EDD-F17F851872E4",
         "symbol" : "'"
       },
       {
@@ -365,7 +365,7 @@
           "at sign",
           "commercial at"
         ],
-        "id" : "5ACFE20C-8141-4D73-B905-5F676466F3D1",
+        "id" : "C6068C23-93FB-4B33-97DE-7D39E202B31D",
         "symbol" : "@"
       },
       {
@@ -373,7 +373,7 @@
           "ampersand",
           "and sign"
         ],
-        "id" : "D23DAA59-A1A2-4C03-B4FD-4583BB91DBB6",
+        "id" : "23AC3486-34BD-4F68-9219-435A92655FD2",
         "symbol" : "&"
       },
       {
@@ -381,7 +381,7 @@
           "plus sign",
           "plus"
         ],
-        "id" : "9A3AF196-7819-4D63-A284-229FBE36665B",
+        "id" : "F5C8C531-549C-40FF-AD6B-2D0BCB4F952E",
         "symbol" : "+"
       },
       {
@@ -391,7 +391,7 @@
           "equal",
           "equals"
         ],
-        "id" : "A0668707-9AC3-42A3-AAFE-501A9D3CD394",
+        "id" : "4842AD20-793C-4A33-A03F-90E35ACC80E7",
         "symbol" : "="
       },
       {
@@ -400,7 +400,7 @@
           "percentage sign",
           "percent"
         ],
-        "id" : "EF19697F-6AE8-4048-8B90-746488B48DA0",
+        "id" : "7C7BD35D-482E-495C-8BE4-C95C3B276044",
         "symbol" : "%"
       },
       {
@@ -408,7 +408,7 @@
           "dollar sign",
           "dollar"
         ],
-        "id" : "62867C92-9DBB-4EBA-A2DA-3E6D434E0C86",
+        "id" : "1B4E6D5A-E2B6-46E4-8854-6582A21116DF",
         "symbol" : "$"
       },
       {
@@ -419,7 +419,7 @@
           "pound sign",
           "number sign"
         ],
-        "id" : "7693A165-77F2-48A4-A878-7A0EE3C0C1BE",
+        "id" : "39270D6B-61AF-4926-861C-5F275D51AFE0",
         "symbol" : "#"
       },
       {
@@ -427,14 +427,14 @@
           "asterisk",
           "star symbol"
         ],
-        "id" : "3253F1EC-3743-45D7-8C6F-E61BD29AD2AB",
+        "id" : "0F8FED5F-FE07-4133-B087-55EDCEFC9CA6",
         "symbol" : "*"
       },
       {
         "aliases" : [
           "underscore"
         ],
-        "id" : "9BF4D437-38C4-48AA-A460-3ABA25D256CA",
+        "id" : "39AA4728-CE43-4FE3-886A-7987EF2FBF67",
         "symbol" : "_"
       },
       {
@@ -442,21 +442,21 @@
           "pipe",
           "vertical bar"
         ],
-        "id" : "1241133C-D4AA-48B0-B103-D2665D01A361",
+        "id" : "15EC2F4A-FD52-4C76-9D45-4E926F168A76",
         "symbol" : "|"
       },
       {
         "aliases" : [
           "tilde"
         ],
-        "id" : "0DBAE191-49CB-4F32-8BE5-944977EC2662",
+        "id" : "1E3610DA-FEAF-4F89-8EA8-D2227857060C",
         "symbol" : "~"
       },
       {
         "aliases" : [
           "caret"
         ],
-        "id" : "C418226D-7A48-47FE-A845-29E1D7A6FAE0",
+        "id" : "FAB68438-9212-4463-B011-34F3DB4672B1",
         "symbol" : "^"
       },
       {
@@ -464,7 +464,7 @@
           "backtick",
           "back tick"
         ],
-        "id" : "82F0F8AE-91A3-4DAD-8BA6-E9F371330104",
+        "id" : "3D72F331-2AB5-4397-B185-C8ED0736707B",
         "symbol" : "`"
       }
     ],
@@ -492,9 +492,9 @@
     },
     "selectedNemotronLanguage" : "en",
     "selectedProviderID" : "google",
-    "selectedSpeechModel" : "whisper-large",
+    "selectedSpeechModel" : "parakeet-tdt-v2",
     "shareAnonymousAnalytics" : false,
-    "showMainWindowAtLoginLaunch" : true,
+    "showMainWindowAtLoginLaunch" : false,
     "showMicrophoneChangeAlerts" : true,
     "showThinkingTokens" : true,
     "skipSilentRecordingsEnabled" : true,
@@ -544,6 +544,1172 @@
     "weekendsDontBreakStreak" : true
   },
   "transcriptionHistory" : [
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1399,
+      "id" : "55DB5A4E-B516-4513-92A5-3A327306FB9A",
+      "processedText" : "In one of the recent commits, there was a fix done by another agent to fix the hotkey binding. So apparently, when I used to press Control plus Option plus Space, and when Fluid Voice window was open, it did not used to trigger Fluid Voice. So there was a fix that we did to fix it, but it's not working. I'm still seeing that in the latest build that I run. Also, there is another problem. When the post-AI transcription fails after a few attempts, the pill is still stuck. So the pill that actually shows the status is stuck forever, and I have to force exit Fluid Voice and come back. If it fails after a couple of attempts, it should ideally just pick up the transcription at least and copy-paste that to my clipboard instead of being stuck for the entirety. These are the 2 issues that I found. I don't know what exactly is causing them. We need to find and fix the actual root cause because apparently it was fixed, but it's not fixed, because I still see this happening: this hotkey not working issue. This happens when Fluid Voice window is open, or I open Fluid Voice to change something, then I quit it, Command-W it. Then, this problem happens. If I open Fluid Voice again, then Command-Q it, then open Fluid Voice again, then Command-W it, then it will not happen. This happens because of some, I think this happens when the application's window opens and comes to the doc or something. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "In one of the recent commits, there was a fix done by another agent to fix off the hotkey binding. So apparently like when I used to press control plus option plus space, it and when fluid voice window was open, it did not used to trigger fluid voice, right? So there was a fix that we did to fix it off, but it's not working. I'm still seeing that in the latest build that I run, also, there is another problem. So, when the post-AI transcription fails after like a few attempts, the pill is still stuck. So the pill that actually shows the status is stuck forever, and I have to like kill and close force exit flow advoice and come back. If it like fails after like a couple of attempts, it should ideally just like pick up the transcription at least and copy-paste that to my clipboard instead of like being this stuck for entire entirety. These are the two issues that I found. I don't know, like, what exactly is causing them. We need to find and fix the actual root cause because apparently it was fixed, but it's not fixed. Because I still see this happening: this hotkey not working issue. This happens when fluid voice window is open, or like I, you know, open fluid voice to change something, then I quit it, command w it. Then, this problem happens. If I open fluid voice again, then command Q it, then open fluid voice again then command w it then it will not happen this happens because of some i think this happens when the applications window opens and comes to the doc or something",
+      "timestamp" : "2026-09-22T18:48:28Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 133,
+      "id" : "D8DEA49B-F55F-433C-8A22-EFF3FFF42521",
+      "processedText" : "For the CLI tools, the agent CLI tools, I don't want this to be true, this minimum age, I should get the latest update all the time. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "For the CLI tools, the agent CLI tools, I don't want this to be true, this minimum age, it sh I should get the latest update all the time, fix it off",
+      "timestamp" : "2026-09-22T18:45:54Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 380,
+      "id" : "3DFAA730-40AB-47A3-862D-23D2FAD5DEBC",
+      "processedText" : "Yeah, and about the KTU API, what was the problem? I saw that you tried to resolve to the root CA or something, right? The DNS, it was some domain from Kerala government or something like that. Then we quickly changed into this discussion. But I was reading your thinking and it was showing stuff like that. Can you explain what did you find there? Is the service itself is down? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "yeah, and about the KTU API, like what was the problem? I saw that you tried to resolve to the root CA or something, right? The DNS, it was some domain from Kerala government or something like that. then we quickly changed into this discussion. But I was reading your thinking and it was showing stuff like that. Can you explain what did you find there? Like is the D I mean, the the service itself is down",
+      "timestamp" : "2026-09-22T18:42:30Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 231,
+      "id" : "91692FBC-F3B8-4B2C-9D5C-C93C603821FE",
+      "processedText" : "Did you save the token locally anywhere inside the Mac or did you do anything like that? If so, we should remove it off. And I saw that you were trying to connect to the db using the old password and it was succeeding, is that so? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Did you save the token locally anywhere inside the Mac or did you do anything like that? If so, we should remove it off. And I saw that you were trying to connect to the db using the old password and it was succeeding, is that so?",
+      "timestamp" : "2026-09-22T18:39:05Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 446,
+      "id" : "8FEAC4FA-863D-4ABA-914D-D53A0EB13121",
+      "processedText" : "This ENV file actually contains the production secrets, right? This is inside the Raspberry Pi. If there is a way to programmatically replace it properly, then go ahead and do it. I think the entire secrets are leaked. I don't know what all stuff you leaked. I saw DB, I saw better uptime token, I saw the bot token as well. I can replace the bot token, but for the DB, is there any way to do it using the event CLI? You leaked the entire stuff. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "This ENV file actually contains the production secrets, right? This is inside the Raspberry Pi. If there is a way to programmatically replace it properly, then go ahead and do it. I think the entire secrets are leaked. I don't know what all stuff you leaked. I saw DB, I saw better uptime token, I saw the bot token as well. I will, I can replace the bot token but for the D B you you is there any way to do it using the Avent C L I I mean you leak the entire stuff.",
+      "timestamp" : "2026-09-22T18:28:33Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 340,
+      "id" : "CB4DE2B4-22C9-44A7-B63E-B4325B14758B",
+      "processedText" : "You printed the entire DB, secrets and everything, in this chat, right? I saw that you were printing that stuff—very bad. Now I need to rotate it. Is there any way to rotate it using Aiven CLI? I don't want to log into the page and stuff. We have to make sure that you don't print the stuff in this chat again. There is an ENV file inside. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "You printed the entire DB cigarettes and everything in this chat, right? I saw that you were printing that stuff very bad. Now I need to rotate it. Is there any way to rotate it using AVEN CLI? I don't want to log into the page and stuff. We should have to make sure that you don't print the stuff in this chat again. There is an ENV file inside.",
+      "timestamp" : "2026-09-22T18:27:40Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 384,
+      "id" : "45461DFA-D808-47DC-8759-0AC50627225E",
+      "processedText" : "I don't understand why Tailscale is causing this issue. Why is Tailscale causing this issue? I mean, Tailscale is there, but why does it cause this issue? So, 192.168.1.7 is actually the IP address of the Pi itself. We have AdGuard DNS running there. I don't know if AdGuard DNS is causing the issue, or whatever. Why would Tailscale cause this issue? I did not understand that part. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I don't understand what is tail scale causing this issue. Why is tail scale causing this issue? I mean, tail scale is there, but why does it cause cause this issue? So, 192.168.1.7 is actually the IP address of the PI itself. We have ad guard DNS running there. I don't know if ad guard DNS is causing the issue or like whatever. Why would tail scale cause this issue? I did not understand that part.",
+      "timestamp" : "2026-09-22T18:19:26Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Arc",
+      "characterCount" : 541,
+      "id" : "92AF9B72-1EFA-467C-9D38-69FC1EBE1D9C",
+      "processedText" : "Is there a markdown review tool like Mo Mo? I use this tool called MO, which is a web-based markdown review tool. Not a review tool, it's Markdown Reader tool. So you can open random markdown files using that tools and it opens on your web browser and you can do stuff. I need a markdown reader tool that I can add annotation comments on. So, I often read plan files, spec files from agents, and I need to add comments on it. I need a better tool for that. Is there any tool that is available for this kind of workflow? Can you check online ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Is there a markdown review tool like Mo Mo? I use this tool called MO, which is a web-based markdown review tool. Not a review tool, it's Markdown Reader tool. So you can open random markdown files using that tools and it opens on your web browser and you can do stuff. I need a markdown reader tool that I can add annotation comments on. So, I often read plan files, spec files from agents, and I need to add comments on it. I need a better tool for that. Is there any tool that is available for this kind of workflow? Can you check online",
+      "timestamp" : "2026-09-21T17:32:55Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 730,
+      "id" : "43AF7DB9-BFB4-449C-B13B-57953F8CD79E",
+      "processedText" : "Also one more thing, when you are taking—I don't know what you did, you took the build or like whatever—when you took the build, Fluid voice suddenly opened on this laptop. I have the stable version installed on this machine. I don't want this particular fork version to be installed. I don't know if that's actually happening or not, but when you took the build, I actually saw that happening. We don't need that, right? That should be also made clear in the agents.md file and stuff. If that's happening—I don't know what is happening, but I'm just telling you because I saw the window becoming open when you took the build—is my fluid voice actually getting replaced by the fork? I don't want that happening, just to be clear. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Also one more thing when you are taking I don't know what you did you took the build or like whatever when you took the build Fluid voice suddenly opened on my this laptop I have the stable version installed on this machine. I don't want this particular fork version to be installed. I don't know if that's actually happening or not, but when you took the build, I actually saw that happening. We don't need that, right? If that should be also made clear in the agents.md file and stuff. If that's happening, I don't know what is happening, but I'm just like telling you because I saw the window becoming open when you took the build. Is my fluid voice actually getting replaced by the fork I don't want that happening just to be clear",
+      "timestamp" : "2026-09-21T17:21:09Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 909,
+      "id" : "6568C390-AC5E-4C51-84DD-CEE994469E20",
+      "processedText" : "There was apparently one fix that we did yesterday or in the last couple of days where the fix was basically even if I had Fluid Voice opened somewhere and I press the hotkey Ctrl+Option+Space, it was not triggering the voice dictation pill, right? It was fixed as per the previous agent that worked on it, but when I have the build that we took last which basically had the stuff which before we did the cleanup by rebasing to version branch, that still had that bug. So when I used to, sometimes when I used to press Ctrl+Option+Spacebar, even when Fluid Voice was open, it was not showing the pill, it was not showing the dictation. I don't know if that bug is still there or not, or is it like some stuff that got introduced by master? That's the problem. I don't have any idea, and it was so unstable, that's why I asked you to switch to release branch. But if that bug is still there, we should fix it. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "There was apparently like one fix that we did yesterday or day like in the last couple of days where you know the fix was basically even if I had if I had fluid voice opened somewhere and I press the hotkey control plus option plus space. It was not triggering the voice dictation spill, right? It was fixed as per the previous agent that worked on it, but when I I have the build that we took last which basically had the you know the the stuff which before we did the cleanup by rebasing to version branch that still had that bug. So when I used to, you know, sometimes when I used to press Ctrl option spacebar, even when Fluid Voice was open, it was not showing the pill, it was not showing the dictation. I don't know if that bug is still there or not, like, or is it like some stuff that got introduced by master? That's the problem. I don't have any idea, and it was like so unstable, that's why I asked you to switch to release branch. But if that bug is still there, we should fix it off.",
+      "timestamp" : "2026-09-21T17:18:46Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1134,
+      "id" : "3E7D2BD0-0B24-4CE5-8CD4-621D2B6FD549",
+      "processedText" : "Okay, so right now I think we don't log a lot of information from user chats, which is actually bad for analytics and understanding user flows and stuff. I'm talking purely with respect to user flows, right? I'm not talking with respect to other stuff, but I want to see more details on what the user is actually doing inside the application so that we can have more insights on what kind of features to add and bugs and stuff. So I need to review the current user logging information right now and also the log rotation scheme. I think the log rotation is very low. It would be better if we can actually retain more volume of logs so that it will be actually helpful to see what traffic our application is getting and stuff like that. So I need to do 2 things. Research, also check online if required, check the documentation and stuff if required, and tell me what are all the practical things that we should be logging, and then also we need to update the Docker config to update the log retention scheme to something higher so that we have more volume of logs stored. So, first of all, just do the research, don't make any edits. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, so right now I think we don't log a lot of information from user chats, which is actually bad for analytics and understanding user flows and stuff. I'm talking purely with respect to user flows, right? I'm not talking with respect to other stuff, but I want to like see more details on what the user is actually doing inside the application so that we can have more insights on like what kind of features to add and like bugs and stuff. So I needed to review the current user logging information right now and also the log rotation scheme. I think the log rotation is like very low. I like it would be better if we can actually retain more volume of logs so that it will be actually helpful to see what is the you know traffic our application is getting and stuff like that. So I needed to do two things. Research also check online if required, check the documentation and stuff if required, and tell me what are all the practical stuff that we should be logging and then also we need to update the docker config to update the log right, the log retention scheme to something higher so that we have more volume of logs stored. So, first of all, just do the research, don't make any edits.",
+      "timestamp" : "2026-09-21T17:17:03Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 908,
+      "id" : "6B33B32C-53F2-4F7E-B34F-1BA1B7F677F2",
+      "processedText" : "This is a fork of Fluid Voice that we maintain. We have some commits that are extra on top of the existing master branch. The problem is that we recently rebased and merged master and it has a lot of unstable and buggy code, which is actually making my life a lot difficult. So instead of trying to rebase and master and taking the build every single time, let's actually try to go to the previous release, right? Let's take release builds. So instead of trying to merge master into the freedom branch, let's first of all save the commits, our commits, the commits that we did and reset this branch, freedom branch, reset the freedom branch all together from where it diverged then fast forward or basically reset the freedom branch so we should reset the freedom branch basically to the last latest release branch they have and then play our commits on top of this so that at least we get a stable version. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "This is a fork of Fluid Voice that we maintain. We have some commits that are extra on top of the existing master branch. The problem is that we recently rebased and merged master and it has a lot of unstable and buggy code, which is actually making my life a lot difficult. So instead of trying to rebase and master and taking the build every single time, let's actually try to go to the previous release, right? Let's take release builds. So instead of trying to merge master into the freedom branch, let's first of all save the commits, our commits, the commits that we did and reset this branch, freedom branch, reset the freedom branch all together from where it diverged then fast forward or basically reset the freedom branch so we should reset the freedom branch basically to the last latest release branch they have and then play our commits on top of this so that at least we get a stable version",
+      "timestamp" : "2026-09-21T17:10:12Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 500,
+      "id" : "75786C34-7E4B-4FB5-BEFA-85E835EA221E",
+      "processedText" : "I can see that inside the logs there is actually an error, Grammy error, where we tried to edit the same message twice or something. I don't know if it is a race condition or like some kind of deduplication or like something happened. I need to check and tell me if it's a bug or not. We did a lot of refactor and extensive changes in the last 2 days, so it could very well be a bug from there. Do not edit any files. Just tell me if it is some kind of a race condition or what exactly is the cause. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I can see that inside the logs there is actually an error, Grammy error, where we tried to edit the same message twice or something. I don't know if it is a raise condition or like some kind of deduplication or like something happened. I need to check and tell me if it's a bug or not. We did a lot of refactor and extensive changes in the last two days, so it could very well be a bug from there. Do not edit any files. Just tell me if it is some kind of a race condition or what exactly is the cause.",
+      "timestamp" : "2026-09-21T10:54:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 225,
+      "id" : "40734B3E-427B-449E-B8C3-0D2999574DCC",
+      "processedText" : "Also, one more thing, can we do some guard rails in linting or type check to prevent anti-patterns from getting in? I think we already have some good configuration values. Maybe also consider adding it to the agents.md file. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Also one more thing, can we do some guard rails in linting or like type check to prevent anti-patterns from getting in? I I think already some we have some good configuration values. Maybe also consider adding it to agents.md file.",
+      "timestamp" : "2026-09-21T08:12:59Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 608,
+      "id" : "7A04B5C7-A727-4324-91BA-6FDE31979649",
+      "processedText" : "Also, one more thing: before, I used to notice that when the post-AI transcription fails, for example, if I use Google Gemini and the transcription cleanup fails, the pill used to still be stuck in the same loading state. That also should not happen. I don't know if that actually came from the patch that we did before. If it is from that, that should not be happening, so failure should actually kill the thing basically, and I at least should get the transcription without the post-processing into the clipboard or like whatever it should be. At least the stuck state case should not happen, is my point. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Also, one more thing before I used to notice that when the post-AI transcription fails, for example, if I use Google Gemini and the transcription cleanup fails, the pill used to still be stuck in the same loading state. That also should not happen. I don't know if that actually came from the patch that we did before. If it is from that, that should not be happening so failure should actually kill the thing basically and i at least i should get the transcription without the post processing into the clipboard or like whatever it should be at least the state stuck case should not happen is my point",
+      "timestamp" : "2026-09-21T06:54:36Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 313,
+      "id" : "A4FA7B1B-57A0-43E9-92BB-6AE4E9216AB6",
+      "processedText" : "Okay, so for the repository construction, you can actually work on it. For the LLM fallback semantics, I don't know how to fix it, but we should have a fallback. Basically, sending the notification is better than failing it, that's my point. But if there is a better way to fix it, then tell me, I am open to it. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, so for the repository construction you can actually work on it. For the LLM fallback semantics C I don't know how to fix it but we should have a fallback basically I mean sending the notification is basically better than you know failing it, that's my point. But if there is a better way to fix it, then tell me, I'm open to it.",
+      "timestamp" : "2026-09-20T19:11:16Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 91,
+      "id" : "9F19135A-2AF0-4C57-8BC7-CF1D7AC9B280",
+      "processedText" : "Okay, are we done with all the changes that we planned? Is there anything else to be done? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, are we done with all the changes that we planned? Is there anything else to be done?",
+      "timestamp" : "2026-09-20T19:09:32Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 618,
+      "id" : "A45A678A-F38D-4A8E-B160-FF3679692D0E",
+      "processedText" : "Okay, when you try to prompt sub-agents to do work that can potentially overlap and create confusion, ask them to create a Git work tree, right? And then you should basically merge the changes back together after reviewing. This is only when it can potentially cause overlapping. Prompt clearly in all the sub-agent prompts—click prompt clearly that if there is an issue that is already existing in the repo that can be from another agent's output, don't try to fix it. I saw, I was reading the transcript and I saw one of the agent was basically confused about some linting error that was coming from the live edits. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, when you try to prompt sub-agents to do work that can potentially overlap and create confusion, ask them to create a git work tree, right? And then you should basically merge the changes back together after reviewing. This is only when it can potentially cause overlapping. Prompt clearly in all the sub-agent prompts click prompt clearly that if there is an issue that is already existing in the repo that can be from another agent's output, don't try to fix it. I saw, I was reading the transcript and I saw one of the agent was basically confused about some linting error that was coming from the live edits.",
+      "timestamp" : "2026-09-20T18:29:16Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 100,
+      "id" : "30602FAF-D31A-4D54-9B97-47F4E0C72193",
+      "processedText" : "Reviews should be done by you, don't delegate review, only implementation work should be delegated. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Reviews should be done by you, don't delegate review, only implementation work should be delegated.",
+      "timestamp" : "2026-09-20T18:19:55Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 604,
+      "id" : "10D4D903-33BF-4C59-B7F3-0BFC74E3559C",
+      "processedText" : "One interesting thing that I can find from here is that he has not mentioned open source contribution as separate, right? He mentions it as a part of the same projects or work experience. Okay, work experience, he was doing more of a formal open source contribution where he was probably also getting paid for it. Not really sure, but also he has mentioned projects as well. Okay, the projects part is definitely not getting paid. But yeah, the work experiences he was basically an open source contributor. So I was also wondering should we actually keep our open source contribution as separate or not? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "One interesting thing that I can find from here is that he has not mentioned open source contribution as separate, right? He mentions it as a part of the same projects or like work experience. Okay, work experience, he was doing more of a formal open source contribution where he was probably also getting paid for it. Not really sure, but but also he has mentioned projects as well. Okay, the projects part is definitely not getting paid. But yeah, the work experiences he was like basically an open source contributor. So I was also wondering should we actually keep our open source contribution as separate or not?",
+      "timestamp" : "2026-09-20T17:31:46Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 564,
+      "id" : "44D662E7-83EC-4933-9E16-32148A923BF6",
+      "processedText" : "Okay, this is the resume of someone whom I know in the sense that I am part of their community and active in their Discord community and stuff. This is someone, this resume, whom I know. This guy is obviously a goat, right? He is one of the top 5% engineers out there. He has done things at that scale. So let's just analyze it in a way. I am not claiming that it is a great resume. It might not be with respect to ATS and stuff, it might not be because at this scale he is basically getting referrals after referrals for sure, but still it is worth looking into. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, this is the resume of someone whom I know in the sense that you know I'm like part of their community and active in their Discord community and stuff. This is someone this resume whom I know. This guy has like obviously, he's a goat, right? He's one of the top five percent engineers out there. He has done things at that scale. So, you know, let's just like analyze it in a way. I mean, I'm not claiming that it's a great resume. It might not be with respect to ATS and stuff, it might not be because you know at this scale like he's basically going referrals after referrals for sure, but still it's like worth looking into.",
+      "timestamp" : "2026-09-20T17:30:38Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 93,
+      "id" : "A4711E6C-3ED8-41D7-BDA7-09B1CB68C3B4",
+      "processedText" : "Okay, this has been quite some time. SSH into the machine again and check what is the stats. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, this has been quite some time. SSH into the machine again and check what is the stats.",
+      "timestamp" : "2026-09-20T17:13:52Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1191,
+      "id" : "DFA6B4EB-956D-4979-A9E4-57B1A4F201B8",
+      "processedText" : "Okay, so if you look at the working, right, you can see this is actually doing something more than just X token. So X token can be already manufactured from the previous exploit that we have mentioned inside the README, but this website was actually doing more than XToken. They were doing some kind of cryptographic stuff in the front-end client code base to make sure that it's coming from the front-end line. The hard part was actually reverse engineering that because when they started using reCAPTCHA this thing, we were able to actually use the existing exploit and get the token and bypass it completely. This was something that was already done. And at some point, they changed it to this mechanism, which started rejecting those generated reCAPTCHA tokens because obviously it was not matching. They had this client-side code that was adding more stuff on top of it. The hard part was actually reverse engineering that. It should be mentioned inside this working.md and flow this content naturally you are writing all this stuff but it should be like I don't think this is actually correctly placed as such because there is no connection between each section that you have written. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, so if you look at the working, right, you can see this is actually doing something more than just X token. So X token can be already manufactured from the previous exploit that we have mentioned inside the README, but this website was actually doing more than XToken. They were doing some kind of cryptographic stuff in the front-end client code base to make sure that it's coming from the front-end line. The hard part was actually reverse engineering that because when they started using recapture this thing, we were able to actually use the existing exploit and get the token and bypass it com completely. This was something that was already done. And at some point, they changed it to this mechanism, which started rejecting those generated recapture tokens because obviously it was not matching. They had this client-side code that was adding more stuff on top of it. The hard part was actually reverse engineering that. It should be mentioned inside this working.md and flow this content naturally you are writing all this stuff but it should be like I don't think this is actually correctly placed as such because there is no connection between each section that you have written.",
+      "timestamp" : "2026-09-20T17:13:31Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 210,
+      "id" : "FD8A62A9-A0E5-47E7-A3D6-0D60FA08CC0C",
+      "processedText" : "Actually, we should be explaining this. So this working.md file should be a simple human-readable explanation of how it used to work and how it was reverse engineered. More like a story or something like that. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Actually we should be explaining this. So this working.md file should be actually a simple human readable explanation of how it used to work and how it was reverse engineered. More like a maybe a a story or anything, something like that",
+      "timestamp" : "2026-09-20T17:11:23Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 278,
+      "id" : "2AAF4825-F254-4EF0-BC54-CF85A8BA2D5E",
+      "processedText" : "For example, I just read the README myself and I realized that it talks about things like database, Redis, it just has a lot of unwanted stuff that does not need to be there. Working is already explained. I did read it completely and remove all the unwanted nonsense from this. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "For example, I just read the README myself and I realized that it talks about things like database, Redis, it just like has a lot of unwanted stuff that does not need to be there. Working is already explained. I did not read the working I did read it completely and remove all the unwanted nonsense from this.",
+      "timestamp" : "2026-09-20T16:41:07Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 394,
+      "id" : "8E631ACD-2F3E-4672-95BC-0AF96ACFB4E5",
+      "processedText" : "Actually, we have not touched this Grok config since a very long time. It was written with this model in mind and these things keep changing very frequently, especially inference endpoints and stuff. So, I don't know if we need to rework some of the things. Can you check their latest documentation? Like, for example, this max tokens, is it even required? We can drop it off, if not required. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Actually we have not touched this Grok config since a very long time. It was written with this model in mind and these things keep changing very frequently, especially inference and points and stuff. So, I don't know if we need to rework some of the things. Can you check their latest documentation? Like, for example, this max tokens, is it even required? We can drop it off, if not required",
+      "timestamp" : "2026-09-20T15:54:45Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 165,
+      "id" : "70E7854D-852C-4199-8767-F941A11F4C76",
+      "processedText" : "Actually, I think only the README should mention the historical part, you don't have to mention the other stuff in walking and all. README, only README is required. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Actually I think only the README should mention about the historical part, you don't have to mention about the other stuff in walking and all. README, only README is required",
+      "timestamp" : "2026-09-20T15:50:03Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 415,
+      "id" : "7BA0A659-705B-4FB0-A691-C948269C109E",
+      "processedText" : "I remember seeing a notification that I got from Grok a few weeks back that this particular model that we were using—I think we were using this model Llama, right?—that was actually getting deprecated and they were shutting down operations, so we need to find a better model for this that is actually cheap and is for free in Grok and then use that and update the config and stuff. The API key will be available in ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I remember seeing a notification that I got from Grok few weeks back that this particular model that we were using, I think it we were using this model Llama right that was actually getting deprecated and they were shutting down operation so we need to find a better model for this that is actually cheap and is for free in Grok and then use that and update the config and stuff. The key API key will be available in",
+      "timestamp" : "2026-09-20T15:44:55Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 638,
+      "id" : "44E36EBB-76F7-4F94-996C-AE26674A2625",
+      "processedText" : "I am preparing this repository to be open source and I need your help in anti-sloping the documentation and stuff. Also the git history, the git history has like command code and stuff hooked in. We should remove all that. Rewrite the git history and force push. This repo will be made open source and made also archived because they have shifted the recapture mechanism to turn style, cloud fire turnstile. So we should document that as well. basically saying that this is how it used to do, it used to be done. KTU bot used to use this basically. I don't know if that information is mentioned in the README right now or not. So use the ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I'm preparing this repository to be open source and I need your help in anti-sloping the documentation and stuff. Also the git history, the git history has like command code and stuff hooked in. We should remove all that. Rewrite the git history and force push. This repo will be made open source and made also archived because they have shifted the recapture mechanism to turn style, cloud fire turnstile. So we should document that as well. basically saying that this is how it used to do, it used to be done. KTU bot used to use this basically. I don't know if that information is mentioned in the README right now or not. So use the",
+      "timestamp" : "2026-09-20T15:42:46Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 84,
+      "id" : "475E6FB0-C600-40FE-986C-27464A648593",
+      "processedText" : "And yes, you have to rewrite that commit message that you flagged about walled key. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And yes, you have to rewrite that commit message that you flagged about walled key.",
+      "timestamp" : "2026-09-20T14:42:48Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 418,
+      "id" : "F0EF2C2D-B57B-473B-8BA1-19EE6900F3D6",
+      "processedText" : "Actually, do one thing. See, Swarm is not required. We are not using Docker Swarm anymore. Drop it. Remove the Docker Swarm stuff from private repository and also remove it from public. It's okay. I don't think it's too big of a deal. If someone feels like it's just a Docker Hub thing or something like that, they'll feel like that. Remove that Docker Swarm file. We don't need that. We don't do that deploy anymore. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Actually, do one thing. See, Swam is not required. We are not using Docker Swam anymore. Drop it. Remove the Docker Swam stuff from private repository and also remove it from public. It's okay. I mean, I don't think it's like too big of a deal. It it someone like feels like it's just a Docker hub thing or something like that. They'll they'll feel like that. Remove that Docker swamp file. We don't need that. We don't do that deploy anymore.",
+      "timestamp" : "2026-09-20T14:42:38Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 201,
+      "id" : "9D188CFB-695F-4369-8E96-BF9B51F9AD75",
+      "processedText" : "Yeah, change the commit wording and, actually, remove the image name and stuff. Rewrite the history as well. We have to rewrite the history and force push this. The private name should not be exposed. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Yeah, change the commit wording and yes, actually remove remove the image name and stuff. rewrite the history as well. We have to rewrite the history and force push this. The private name should not be exposed.",
+      "timestamp" : "2026-09-20T14:41:05Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 243,
+      "id" : "164EEFEA-7F87-47AD-BD9B-215507C0887C",
+      "processedText" : "Well, the script is running for too much time, we don't have so much time. You don't need to check the entire history. In the entire history there might be leaks, but I have revoked those tokens and stuff, so we don't have to care about that. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Well the script is running for like too much time, we don't have so much time. You don't need to like check the entire history. In the entire history there might be leaks, but I have revoked those tokens and stuff, so we don't have to care about that",
+      "timestamp" : "2026-09-20T14:37:49Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 496,
+      "id" : "D8FDE5A1-9C0B-4158-9E8C-FBDF0EF5E575",
+      "processedText" : "So now we are about to push our changes to the public repository. Before you do that, I need you to do a few things. Do a grep repository-wide for sensitive stuff like secrets, or any kind of wording related to the X token and stuff, basically, inside git history and everything. So, in the commits we played and in the files that we changed, there is a chance that there is a slight chance that something got leaked. I need you to do a review first and flag if there is anything that you found. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "So now we are about to push our changes to the public repository. Before you do that, I need you to do few things. Do a grep repository-wide for sensitive stuff like secrets, or you know, any kind of wording related to like the X token and stuff, basically, like inside git history and everything. So, in the commits we played and in the files that we changed, there is a chance that there is a slight chance that something got leaked. I need you to do a review first and flag if there is anything that you found.",
+      "timestamp" : "2026-09-20T14:31:51Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 137,
+      "id" : "8B7B1AC0-2842-4DE8-AACE-D5D8291AE082",
+      "processedText" : "Do not print the tokens and stuff. If you're trying to do something by execing and all, don't read the tokens, it has sensitive secrets. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Do not print the tokens and stuff. If you're trying to do something by execing and all, don't read the tokens, it has sensitive secrets",
+      "timestamp" : "2026-09-20T14:25:49Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 226,
+      "id" : "73C55FF8-915A-4E86-9538-B6DF374E8D60",
+      "processedText" : "So you can see that this command is basically returning status is down, where actually it's not down. I thought it was due to a stale API token or something, but it doesn't seem to be fixed, right? We force created the stack. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "So you can see that this command is basically returning status is down, where I actually it's not down. I thought it was due to a stale API token or something, but I mean it doesn't seem to be fixed, right? We restarted the stack not restarted we force created the stack",
+      "timestamp" : "2026-09-20T14:25:29Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 532,
+      "id" : "99EC9FAA-D426-411C-BAB7-493B55174931",
+      "processedText" : "No, I think the 2 final organization story and all is not really required. I mean it was a blocker, but that was for your context. I don't think that is something you keep making this mistake. Maybe it's worth adding to the scale that when I speak out, I speak out a lot of context, which is necessary for you to understand to actually produce the final point, but that does not mean we should be adding context-specific points into the resume, right? For example, this one, final to organization, what—why do they care about this? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I think the two final organization story and all is not really required. I mean it was a blocker but that was for your context. I don't think that is something you keep making this mistake. Maybe it's worth adding to the scale that when I speak out, I speak out a lot of context, which is necessary for you to understand to actually produce the final point, but that does not mean we should be adding contact specific points into the resume, right? For example, this one, final to organization, what what I mean why do they care about this?",
+      "timestamp" : "2026-09-20T12:40:46Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 242,
+      "id" : "6BADEA5D-45BC-4AF4-A3AF-8F5BC7888059",
+      "processedText" : "And yes, to answer your question, both of them were migrated high value, high paying customers. Around 11,000 lines of code was removed, somewhere around that, from production and it was shipped like a few weeks back, zero issues whatsoever. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And yes, to answer your question, both of them were migrated high value, high paying customers. Around 11,000 lines of code was remote, somewhere around that, from production and it was shipped like few weeks back zero issues whatsoever",
+      "timestamp" : "2026-09-20T11:56:36Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 739,
+      "id" : "C40E4BCF-BBD7-4BB2-B832-FF8A8055F050",
+      "processedText" : "No, I mean you are the one who said mentorship, right? So there is no official mentorship I have done because mentorship actually requires the system assigning you a mentee. That is incorrect to say that a mentorship can be done otherwise. No, it's not. It's simply not. It's basically okay to set in your profile itself to mentor someone. So saying that mentorship is inherent and you can do it without anyone assigning is simply wrong. I'm sorry, I cannot agree to that. That is not how it works. And this is not just about this single organization; it's not how it works in the entire space, right? And for influence, I do agree, all these things can be part of influence, but you said mentorship yourself. I did not invent that thing. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I mean you are the one who said mentorship, right? So there is no official mentorship I have done because mentorship actually requires the system assigning you a MNT. that is incorrect to say that you know a mentorship can be done otherwise. No, it's not. It's simply not. If like that's what, right, you you are it's basically okay are in your profile itself to mentor someone. So saying that mentorship is inherent and you can do it without anyone assigning is simply wrong. I'm sorry. I cannot agree to that. That is not how it works. And this is not just about this single organization, it's not how it works in the entire space, right? And for influence, I do agree, all these things can be part of influence, but you said mentorship yourself. I did not invent that thing.",
+      "timestamp" : "2026-09-20T11:54:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 2035,
+      "id" : "9B8C1234-1280-4C97-A7F1-D49EDDB036B0",
+      "processedText" : "We were actually suggesting some workarounds for them, but it was very clear that they are not going to agree to the workarounds. It was very clear from their messy way of replying to the messages and emails, which CS also flagged. The problem was that for that particular tenant or organization, you had to create multiple expense policies to get the same setup working, and it is in the scale of 70 to 80 policies, something like that. And what my team lead told me is that it is not possible because the way the infrastructure is designed, blocking IEO code, it will time out, the API will time out, and it will not work for them. This was a blocker, so which means it is an absolute blocker, right? You cannot work around it, so you still have to keep the code. This was what I was told, this was what everyone was told, this is what everyone believed except me. I went ahead and load tested the thing, I found that the claim is not true because the claim was true 4 years back. The infrastructure has changed quite a lot after that. I saw that a single batch rerun on 200 expenses, a policy wider run which I have already mentioned here, was taking around 5 minutes, right? This is the worst of worst case. I brought it down to under 10 seconds, 20 seconds, something like that. I think it is 10 seconds or something. It just results in seconds basically now. I did some optimizations and I pushed the code and I brought down the API response time. It was taking 2 seconds, 2.5 seconds end-to-end time at max. I brought it down to around 400, 300 milliseconds on the customer's account. In the worst, customer's account is basically the worst of worst case scenario. I tested even the worst case, basically, adding a 10% extra load than what the customer has. So, I have done things like this. I have not mentioned it inside the resume. I don't know if it is worth mentioning as well. I don't even know where should I even mention this if I want to mention this? But I just wanted to say things like I have done things like this. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "We were actually suggesting some workarounds for them, but it was like very clear that they are not going to agree to the workarounds. it was very clear from their like mess way of replying to the message and emails, which CS also flagged. The problem was that for that particular tenant or organization, you had to create multiple expense policies to get the same setup working, and it's like in the scale of 70 to 80 policies, something like that. And what my team lead told me is that it's not possible because you know, the way the infrastructure is designed, blocking IEO code, it will time out, the API will time out and it will not work for them. This was a blocker, so which means it's an absolute blocker, right? You cannot work around it, so you still have to keep the code. This was what I was told, this was what everyone was told, this is what everyone believed except me. I went ahead and load tested the thing, I found that the claim is not true because the claim was true four years back. The infrastructure has changed quite a lot after that. I saw that a single batch rerun on 200 expenses, a policy wider run which I have already mentioned here, was taking around 5 minutes, right? This is the worst of worst case. I brought it down to like under what, 10 seconds, 20 seconds, something like that. I I think it's 10 seconds or something. It just like results in seconds basically now. I did some optimizations and I pushed the code and I brought down the API response time. It was taking 2 seconds, 2.5 seconds end-to-end time at max. I brought it down to around 400, 300 milliseconds on the customer's account. In the worst, customer's account is basically the worst of worst case scenario. I tested even the worst case, basically, like you know, adding like a 10% extra load than what the customer has. So, I've done things like this. I have not mentioned it inside the resume. I don't know if it's worth mentioning as well. I don't even know, like, where should I even mention this if I want to mention this? But I just wanted to say things like I have done things like this.",
+      "timestamp" : "2026-09-20T11:49:21Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1935,
+      "id" : "46C3FCBA-1C05-4539-A645-8DBC982E7BAE",
+      "processedText" : "Also, to give you one example, just for this case, I don't know if it is worth mentioning in the resume or not. This happened in the last month, right? So I deprecated a feature, a very old feature, like an 8-year-old feature or something like that, which was related to JSON policies. So you can check the help articles if you want to JSON policies. I don't know if they still exist, they might have in remote. So there used to be this feature called JSON policies, which were basically a legacy way of configuring expense policies from the back end. And it was replaced by form policies, but they could never migrate off the existing old data to the newer version so that they can completely deprecate the code, right? This is around like 10,000 lines of code, including tests and configuration files and everything. They could never do that. This also had like security flaws because when you do stuff like JSON you have to start invoking eval and you know you can wrap it with AST eval and like secure way of evaling but eval itself is such a bad thing to do. So this was the task. I was not involved on this initially, but later on I got assigned because it was assigned to a senior engineer, but then it later on got assigned to me, because I own this area and I have to execute, right? I have to help him execute the stuff. There were a lot of missing pieces on the migration process that he came up with, but I took care of all that in the execution phase. And I migrated. And we ended up migrating almost all of the stuff, and just 2 organizations, 2 tenants were the only ones left. Out of which one was like the highest paying customer, it was like very highest-paying customer, so you cannot do anything about it, you cannot communicate them and like make them sad, they will churn and it will cause issues, right? So, no, you know, CS team, customer support team, customer success team, or product team would go about it. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Also to give you one example, just for this case, I don't know if it is worth mentioning in the resume or not. This happened in the last month, right? So I deprecated a feature, a very old feature, like an 8-year-old feature or something like that, which was related to JSON policies. So you can check the help articles if you want to JSON policies. I don't know if they still exist, they might have in remote. So there used to be this feature called JSON policies, which were basically a legacy way of configuring expense policies from the back end. And it was replaced by form policies, but they could never migrate off the existing old data to the newer version so that they can completely deprecate the code, right? This is around like 10,000 lines of code, including tests and configuration files and everything. They could never do that. This also had like security flaws because when you do stuff like JSON you have to start invoking eval and you know you can wrap it with ASD eval and like secure way of evaling but eval itself is such a bad thing to do. So this was the task. I was not involved on this initially, but later on I got assigned because it was assigned to a senior engineer, but then it later on got assigned to me, because I own this area and I have to execute, right? I have to help him execute the stuff. There were a lot of missing pieces on the migration process that he came up with, but I like took care of of all that in the execution phase. And I migrated. And we ended up migrating almost all of the stuff, and just two organizations, two tenants were the only ones left. Out of which one was like the highest paying customer, it was like very highest-paying customer, so you cannot do anything about it, you cannot communicate them and like make them sad, they will churn and it will cause issues, right? So, no, you know, CS team, customer support team, customer success team, or product team would go about it.",
+      "timestamp" : "2026-09-20T11:46:17Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1423,
+      "id" : "FE9F57AB-642E-4B9B-86FF-C77CFA3D30CB",
+      "processedText" : "Yeah, and for the leadership part, you are right. I have not done any kind of mentoring as such because who would assign a mentee to someone like me who is just 2 years in, and for design review, I have done peer review, authoritative review, I have not done. That's because of how the system behaves. I mean, it's not that I'm not capable of design reviews. I have done design reviews, I have caught things which could have actually gone to production and caused bugs. I have done PR reviews at scale, I have done PR reviews of critical infrastructure, critical initiatives, critical product-facing, customer-facing initiatives, and found issues. Basically, I'm talking about reviews that I've done on senior engineers, PRs and stuff. So, PR review with respect to peer review, I have done, but like I said, authoritative review is not something that the system assigns you at this level. That is a problem with the system. I mean, I'm not complaining, but it's how the system works. I cannot do anything about it. And for cross-team technical influence, I don't know what that means. Stakeholder negotiation, I also don't know what that means. Raising engineering standard of others, I have done it, right? Like, but I mean, how do you mention all these things? I don't know how do you raise the engineering standard for others and stuff. I strive to do all these things, I have done these things. That's why I got like. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Yeah, and for the leadership part, you are right. I have not done any kind of mentoring as such because who would assign a mentee to someone like me who is just like two years in, and for design review, I have done peer review, you know, authoritative review, I have not done. That's because of how the system behaves. I mean, it's not that I'm not capable of design reviews. I have done design reviews, I have caught things which could have actually gone to production and caused bugs. I have done PR reviews at scale, I have done you know PR reviews of critical infrastructure, critical initiatives, critical product-facing, customer-facing initiatives, and found issues. Basically, like I'm talking about reviews that I've done on like senior engineers, PRs and stuff. So, PR, PR review with respect to peer review, I have done, but like I said, authoritative review is not something that the system assigns you at this level. That is a problem with the system. I mean, I'm not complaining, but it's how the system works. I cannot do anything about it. And for cross-team technical influence, I don't know what that means. Stakeholder negotiation, I also don't know what that means. Raising en thegineering standard of others, I have done it, right? Like, but I mean, how do you mention all these things? I don't know how do you raise the engineering standard for others and stuff. I strive to do all these things, I have done these things. That's why I got like.",
+      "timestamp" : "2026-09-20T11:42:59Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 487,
+      "id" : "8000A808-985E-4B10-BCC1-C94C2DC242C0",
+      "processedText" : "And another thing is that this is one particular API, right? So 100,000 requests per day is for one particular API. I have to check it again if that holds true anymore. But that is not the actual load that the application and platform gets. That 100,000 requests per day is on that single resource, right? It is about that particular resource which we migrated, but if you take a look at the whole platform, it is going to be millions basically, millions of requests a day, essentially. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And another thing is that this is one particular API, right? So 100k requests per day is for one particular API. I mean I have to check it again if that holds true anymore. But that is not the actual load that the application and platform gets. That I mean 100k requests per day is on that single resource, right? We it's about that particular resource which we migrated, but if you take a look at the whole platform, it's going to be millions basically, millions of requests a day, essentially.",
+      "timestamp" : "2026-09-20T11:41:01Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1473,
+      "id" : "8ACF56C3-B212-40D3-9D29-68A840A8E1C0",
+      "processedText" : "Thanks, I think that was a really helpful session. If you think we can actually incorporate some of the learnings to the skill.md, I think we have a skill, right? This is a custom skill that we rolled so that we don't lose this context and this high-quality editing skill every single time. That's why the skill.md exists. So the idea is to, so in this chat, we have some good-quality tokens in here, but that should be transferred within new sessions as well. When I start a new session on a new chat, we should not be starting from zero. So if you think there are any learnings and stuff that can be incorporated into the skills.md file, I would like to see that first what it is, then we can add it. Again, let's only add practical things, don't add unwanted noise and stuff. So, yeah, that is one thing. And the second thing is that I want to ask you honestly: you saw my resume, we edited things. How do you write my resume? How do you write myself my resume? Like, like based on whatever you saw, is this the average developer resume that you see at 2 years, or is it not? I mean, I want a really frank up opinion. I'm not trying, I'm not asking you to praise me or anything like that. I just want to see where exactly I stand. Obviously, I am aware that there are people who have done much more capable things than me, much more things than me, but I want to see a realistic version how good this resume is and how good the career is, right? Career has been, I mean ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Thanks, I think that was a really helpful session. If you think we can actually incorporate some of the learnings to the skill.md, I think we have a skill, right? This is a custom skill that we rolled so that we don't lose this context and this high quality editing skill every single time. That's why the skill.md exists. So the idea is to, so in this chat, we have some good quality tokens in here, but that should be transferred within new sessions as well. When I start a new session on a new chat, we should not be starting from zero. So if you think there are any learnings and stuff that can be incorporated into the skills.md file. I would like to see that first what it is, then we can add it. Again, let's only add practical things, don't add unwanted noise and stuff. So, yeah, that is one thing. And the second thing is that I want to ask you honestly: you saw my resume, we edited things. How do you write my resume? How do you write myself my resume? Like, like based on whatever you saw, is this the average developer resume that you see at two years, or is it not? I mean, I want a really frank up opinion. I'm not trying, I'm not asking you to praise me or anything like that. I just want to see where exactly I stand. Obviously, I am aware that there are people who have done much more capable things than me, much more things than me, but I want to see a realistic version how good this resume is and how good the carrier is, right? Carrier has been, I mean",
+      "timestamp" : "2026-09-20T11:33:11Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 349,
+      "id" : "5B337D09-BFB0-47D0-A0D6-B8D19EA79449",
+      "processedText" : "Once you are done, let's harden these actions by using the SHA hash. We are using this guy's action, right? Like, this is a custom action from a user. It's better to harden it using a hash in both these cases. If the checkout and stuff, if there are new versions of these things available, let's first of all switch to that, then let's harden them. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Once you're done, let's actually harden these actions by the way by using the SHA hash. We are using this guy's action, right? Like this is not a you know, very popular action. I mean, it's a popular action, but it's a custom action from a user. It's better to harden it using a hash in both these cases. If the checkout and like stuff, if there are new versions of these things available, let's first of all switch to that then let's harden them",
+      "timestamp" : "2026-09-20T11:26:15Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 649,
+      "id" : "1C4E15BA-0E98-4710-B62C-8D3B403C2FD0",
+      "processedText" : "I have one question. So we have multiple scripts right now: build, format, preview, watch. Are all of them actually required? Can we combine maybe—I don't know—build and watch is basically doing the same thing, I guess. Not sure. And inside readme also, we are repeating stuff, right? Like, for example, I don't know if we need to repeat these things in the readme, or actually it's fine, I guess this is useful for both agents and humans, right? But I don't know, we have multiple scripts right now, it's making me a little bit worried. Like I said, I might be overthinking, it's my problem, I'm just asking you what is the right way to do things. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I have one question. So we have like multiple scripts right now build, format, preview, watch. Are all of them actually required? Can we like combine maybe I don't know, build and watch is basically doing the same thing, I guess. Not sure, and inside read me also, like we are repeating stuff, right? Like, for example, I don't know if we need to repeat these things in the readme or actually it's fine I guess this is useful for both agents and humans right but I don't know like we have multiple scripts right now it's making me a little bit worried yeah like I said it I might be overthinking it's my problem I'm just like asking you what is the right way to do things",
+      "timestamp" : "2026-09-20T11:23:32Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1126,
+      "id" : "5369D4B2-3CB2-4319-A71E-46CAADBE7500",
+      "processedText" : "So we are tracking our resume inside a Git repository, right? I mean, this is already very sophisticated and advanced from what people usually do. We are not editing the resume through some kind of online editor like Overleaf. Everything is completely local. We have a workflow that builds preview PNG. We have VS Code configuration and everything. So this is already pretty good, but is there anything that you think if you had access to as a tool, as an AI, if you had access to some kind of CLI tool, or if you had known something better, or if you had a helper script, or something like that, I saw that you were generating the PNG a lot of times. If that was actually part of the build script and we had a mechanism to easily do that, so you just execute one simple script without having to type out that verbose command all the time. Is there anything that we can add to the agents.md, readme.md, or a script, a throwaway script, or something like that that actually improves the workflow working with this repository? Same with the layout inspection and stuff. If there is anything, then we should focus on that first. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "So we are tracking our resume inside a git repository, right? I mean this is already very sophisticated and advanced from what people usually do. We are not editing the resume through some kind of online editor like overleaf. Everything is completely local. We have a workflow that builds preview PNG. We have VS Code configuration and everything. So this is already pretty good, but is there anything that you think if you had access to as a tool, as an AI, if you had access to some kind of CLI tool, or if you had known something better, or if you had a helper script, or like something like that, I saw that you were generating the PNG a lot of times. If that was actually part of the build script and we had like a mechanism to easily do that, so you just execute one simple script without having to type out that verbose command all the time. Is there anything that we can add to the agents.md, readme.md, or like a script, a throwaway script, or something like that that actually improves the workflow working with this repository. Same with the layout inspection and stuff. If there is anything, then we should focus on that first.",
+      "timestamp" : "2026-09-20T11:12:08Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1419,
+      "id" : "9B43CB75-A017-4D75-9E5B-45D7E95DDA71",
+      "processedText" : "Yeah, this looks actually pretty good. One thing that I would like is I would actually like a separate section after infrastructure and observability for tools, right? AI coding tools, or like whatever. That is actually pretty common in resumes these days. I want to make sure that maybe the project section already speaks for itself, like the open code stuff. But I don't know if we should add or not AI coding tools. I mean, it's not much, obviously, I mean, I use AI coding tools, it's just that the industry is going towards that way, right? You have to use AI coding tools. I don't know whether we should include a section or not. If we include a section, it will overflow for sure. The last point for KTU bot will overflow. Maybe this looks good. I think we can actually commit this version first. I would like you to do one thing. You already got the PNG, right? Do some little tweaking here and there to improve the layout, spacing, and stuff, just to improve the visual appearance, not the content, but the visual appearance. Once that is done, we can commit it, then we can think about doing the next stuff. So, just do some polishing with respect to visual appearance first, then we can continue. I think this has become a very good resume. Like everything is hyperlinked, projects are hyperlinked, stuff is highlighted really well. I think it's turning out to be pretty good, right? Or am I imagining that? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Yeah, this looks actually pretty good. One thing that I would like is I would actually like a separate section after you know infrastructure and observability for tools, right? AI coding tools, or like whatever. That is actually pretty common in presumes these days. I want to make sure that, like, maybe the project section already speaks for itself, like the open code stuff. But I don't know if we should add or not AI coding tools. I mean, it's not much, like, obviously, I mean, I use AI coding tools, like, it's just a very you know, it's just that the industry is going towards that way, right? You have to use AI coding tools. I don't know whether we should include a section or not. If we include a section, it will overflow for sure. The last point for KTU bot will overflow. Maybe this looks good. I think we can actually commit this version first. I would like you to do one thing. You already got the PNG, right? Do some little tweaking here and there to improve the layout, spacing and stuff, just to improve the visual appearance, not the content, but the visual appearance. Once that is done, we can commit it, then we can think about doing the next stuff. So, just do some polishing with respect to visual appearance first, then we can continue. I think this is a very this is this has become a very good resume. Like everything is hyperlinked, projects are hyperlinked, stuff is highlighted really well. I think it's turning out to be pretty good, right? Or am I imagining that?",
+      "timestamp" : "2026-09-20T11:09:47Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 917,
+      "id" : "8EE87C88-70FD-4689-A07E-5D4CAB92C3D6",
+      "processedText" : "See the problem is that when you talk about these kinds of skills sections, it becomes really difficult to define what should be mentioned and what should not be mentioned. For example, these technologies, these are the ones which I have directly worked on and which stand out as a separate entity on its own. But it's not just limited to just this, right? That is a distinction that I'm trying to make. I have personal projects which actually use TypeScript, for example. Maybe that's not worth mentioning because I think I'm more comfortable in Python now because I'm professionally using it, but even though I have done a lot of stuff in TypeScript and JavaScript, but yeah, maybe it's not worth mentioning. We already have the projects that are covering it, but net-net, to conclude, these are the tools that I have majorly worked on at work. But like I said, I don't want to keep it limited to just these tools. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "See the problem is that when you talk about these kind of skills section, it becomes really difficult to define what should be mentioned and what not should be mentioned. For example, these these technologies, these are the ones which I have directly worked on and which stand out as a separate entity on its own. But it's not just limited to just this, right? That is a distinction that I'm trying to make. I have worked on personal projects which actually use TypeScript, for example. Maybe that's not worth mentioning because I think I'm more comfortable in Python now because I'm professionally using it, but even though I have done a lot of stuff in TypeScript and JavaScript, but yeah, maybe it's not worth mentioning. We already have the projects that are covering it, but to net net to conclude, these are the tools that I have majorly worked on at work. But but like I said, I don't want to keep it limited to just these tools. I mean that is my",
+      "timestamp" : "2026-09-20T10:53:45Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 982,
+      "id" : "54DC58D9-A870-40B0-A01B-5A275A3D8B81",
+      "processedText" : "Now if you were to mention the skills next to the role itself, we don't really have enough space for it, right? Because the first line, which basically says the role and the company, is already too long. Even if we try to cut it short, maybe like change member of technical staff into MTS or something, I don't know if it's going to help. It might actually feel like squished together. So I think we need a dedicated skills section. Do you agree on that? If we need a dedicated skills section, where do we actually place it? That's also a question. So I don't really see a way to add skills without making this 2 pages. That's my point. If we want to really do that, then I think we'll have to get rid of some of these sections, right? Because I think work experience is actually more important than having a skill section. I'm not sure, but this is what I feel. There is no way we can have a skill section without leaking it to a second page or actually cutting short information. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Now if you were to mention the skills next to the role itself we don't in we don't really have enough space for it, right? Because the first Line which basically says the role and the company is already too long. Even if we try to cut short it, maybe like change MTS, like member of technical staff into MTS or something. I don't know if it's going to help. It might actually feel like squished together. So I think we need a dedicated skills section. Do you agree on that? If we need a spec dedicated skills section, where do we actually place it? That's also a question. So I don't really see a way to add skills without making these two pages. That's my point. If we want to really do that, then I think we'll have to get rid of some of these sections, right? Because I think work experience is actually more important than having a skill section I'm not sure but this is what I feel there is no way we can have a skill section without leaking it to second page or like actually cut shorting information.",
+      "timestamp" : "2026-09-20T10:48:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 615,
+      "id" : "76727F9C-E0E7-4824-8F2A-6F105C3C34F8",
+      "processedText" : "Okay, at this point, there are 2 options. So, since we updated the PDF to have that split page, there is a natural split that's already happening, right? So, if I ever needed, I can actually skip the second page altogether because there is no way that I can include these open source contributions or the project into the first page right there is no way I can do that. The second thing is a professional skills section. So we have 2 options. The problem of splitting into one page is already solved. Now, the option to evaluate is whether we need a special skills section or not. I did not quite understand. Okay. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, at this point there are two options. So, since we updated the PDF to have that split page, there is a natural split that's already happening, right? So, if I ever needed, I can actually skip the second page altogether because there is no way that I can include these open source contributions or the project into the first page right there is no way I can do that. The second thing is a professional skills section. So we have two options. The problem of splitting into one page is already solved. Now, the option to evaluate is whether we need a special skills section or, not. I did not quite understand. Okay.",
+      "timestamp" : "2026-09-20T10:46:40Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 417,
+      "id" : "CE56D1DE-152D-4F4D-994C-7676D88ACB18",
+      "processedText" : "Okay, you can continue on. One thing is that since we are adding more and more tests, do you think it's worth constructing a folder structure inside test directory instead of trying to squish everything into a top-level directory for better segregation or maybe move test into core directories? I'm not sure how it is done in TypeScript and what is the pattern in production code bases, but let's do the right thing. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, you can continue on. one thing is that since we are adding more and more tests, do you think it's worth constructing a folder structure inside test directory instead of trying to squish everything into a top-level directory for better segregation or maybe move test into core directories. I'm not sure how it is done in TypeScript and like what is the pattern in production code bases but let's do the right thing.",
+      "timestamp" : "2026-09-20T10:35:12Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 62,
+      "id" : "2A58D27B-E810-4615-88E4-059CCB6ECC51",
+      "processedText" : "This was a very excellent suggestion, I really appreciate it. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "This was a very excellent suggestion, I really appreciate it.",
+      "timestamp" : "2026-09-20T10:26:08Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 56,
+      "id" : "868DB699-A4DC-420A-B57C-5996AA13A1B5",
+      "processedText" : "Yeah, I think this is the right way. Go ahead. And also ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Yeah, I think this is the right way. Actually, correct, go ahead. And also",
+      "timestamp" : "2026-09-20T10:25:54Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 595,
+      "id" : "58DFAB79-69BB-469E-97E7-4436538A29CE",
+      "processedText" : "Let's create a `todo.md` of all the things that we want to keep track of, whether it be experimenting or whatever. Let's create a proper `todo.md` with proper priority. Don't keep priority as a separate section or anything, just keep it numbered according to priority. Create a `todo.md` on the stuff that we have to do. We will evaluate, for example, the experimenting part into a single page. We will evaluate that, but that's the last priority item that we should be doing. Create a `todo.md` and document everything there. Then tell me what is the first thing that we should get started on. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, let's instead of trying to get lost, let's actually create a to do.md of all the things that we want to keep track of, right. whether it be experimenting and like whatever, let's create a proper to do.md with proper priority, just like don't keep priority as a separate section or anything, just like keep it number point according to priority. Create a to-do.md on the stuff that we have to do. We will evaluate, for example, the experimenting part into single page. We will evaluate that, but that's the last priority item that we should be doing. Create a to-do.md and document everything there. Let's then tell me what is the first thing that we should get started on first.",
+      "timestamp" : "2026-09-20T10:16:12Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 900,
+      "id" : "91A1B5B8-E53F-481B-B448-A053F98C9322",
+      "processedText" : "Okay, so one thing that we were discussing before is that right now the resume is 2 pages, right? But we are not fully making use of the 2 pages. Whether 2 pages are required or not is a question. But if I try to keep it to 1 page, I will have to lose some information, which means my open source contributions will have to go—some of the points will have to be shortened to keep it intact, and 1 of the projects will also have to go. So, basically, KTU bot will be the only project left in the project section. This is 1 question. Now, in the last session when we did, you said that for your experience, a 2-page resume might not be required, but don't take it as my arrogance, but I am someone who does not believe in years of experience speaking about competence, I think that is gatekeeping. I'm not like being arrogant or trying to be rude, I'm just saying out that straight up I have seen that ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, so one thing that we were discussing before is that right now the resume is two pages, right? But we are not fully making use of the two pages. Whether two pages are required or not is a question. But if I try to keep it to one page, I will have to lose some information, which means my open source contributions will have to go the The I don't know, like some of the points will have to be shortened to keep it intact, and one of the projects will also have to book go. So, basically, KTU bot will be the only project left in the project section. This is one question. Now, before you say, I mean, in the last session when we did, you said that for your experience, two-page resume might not be required, but don't take it as my arrogance, but I am someone who does not believe in years of experience speaking about competence, I think that is gatekeeping. I'm not like being arrogant or trying to be rude, I'm just saying out that straight up I have seen that",
+      "timestamp" : "2026-09-20T10:01:58Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 492,
+      "id" : "CC192611-E3F9-49A3-8AA1-9A7A049F7716",
+      "processedText" : "And for the repository generics, we have attempted this in the past, but it actually leads to very bad typing and using any and basically working around TypeScript types. So I don't think it's really worth it. We can explore maybe mixins or some kind of generics in the future, but I don't. This is not something I would like to do right now. It can mess up a lot of stuff. So do the actual real duplication and stuff it found. Let's keep the 4th point, right? Let's keep it on hold for now. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And for the repository generics, we have attempted this in the past, but it actually leads to very bad typing and using any and like basically working around TypeScript types. So I don't think it's really worth it. We can explore maybe mixins or like some kind of generics in the future, but I don't. This is not something I would like to do right now. It can mess up a lot of stuff. So do the actual real duplication and stuff it fa found. Let's keep the fourth point right. Let's keep it On hold for now.",
+      "timestamp" : "2026-09-20T09:51:28Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 108,
+      "id" : "87EEFDA7-3BBB-4CC6-857E-4246A6EB3BE8",
+      "processedText" : "Can you give me a summary of all the changes that we did? So I did check the stuff, it seems to be working. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Can you give me a summary of all the changes that we did? So I did check the stuff, it seems to be working.",
+      "timestamp" : "2026-09-20T09:12:26Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 313,
+      "id" : "EF6F6115-FD9C-4EB7-810B-5B930AAC5A5E",
+      "processedText" : "No, I don't think we should be removing the results part from here. Results was one of the most selling features of this thing. It used to be why people used to use this thing. Like people used to get results by using this tool and not through the website and all, right? So, I don't think we should remove that. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I don't think we should be removing the results part from here. Results was one of the most selling features of this thing. It used to be why people used to use this thing. Like people used to get results by using this tool and not through the website and all, right? So, I don't think we should remove that.",
+      "timestamp" : "2026-09-20T08:27:02Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1367,
+      "id" : "BB01EB04-303A-47D7-9E67-D9A6440A3293",
+      "processedText" : "The data thing mentioned here is not something the reader can actually understand without more context. I think we should maybe rework this point altogether. So, background processing is something that they can understand, right? Notifications broadcast, maybe we can use etc. for that, but we should be using terms, terminology which is easy to understand. Data sync is more like an internal term related to the internal working. So, there are two things that BullMQ is basically solving here. So, we did kept it responsive under load by, it's not kept responsive under load. Maybe it is something else. Why do we have BullMQ? It is to basically, yeah, it is for responsive, like to reduce the response times to the user by delegating tasks to async. The second thing is to also work around Telegram write limiting. So we have a very smart broadcast system that we build. I don't know if it should be in this point or in the above point. Maybe it should be in the above point. I'm not really sure. But BullMQ is coming here, so I don't know where we should actually, or we should, I don't really know. Let's try to read the section together and then try to edit this together. I think that makes the difference, right? Let's take this full section together, the K2 bot section, then try to see how we can improve it instead of trying to go point by point like this. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "The data thing mentioned here is not something the reader can actually understand without more context. I think we should maybe rework this point altogether. So, background processing is something that they can understand, right? Notifications broadcast, maybe we can use etc. for that, but we should be using terms, terminology which is easy to understand. Data sync is more like an internal term related to the internal working. So, there are two things that BoolMQ is basically solving here. So, we did kept it responsive under load by, you know, it's not kept responsive under load. Maybe it is something else. Why do we have Woodland queue? It is to basically, yeah, it is for responsive, like to reduce the response times to the user by delegating tasks to async. The second thing is to also work around telegram write limiting. So we have a very smart broadcast system that we build. I don't know if it should be in this point or in the above point. Maybe it should be in the above point. I'm not really sure. But Bullamq is coming here, so I don't know where we should actually, or we should, I don't really know. Let's like try to read the section together and then try to edit this together. I think that makes the difference, right? Let's take this full section together, the K2 bot section, then try to see how we can improve it instead of trying to go point by point like this.",
+      "timestamp" : "2026-09-20T08:25:27Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 190,
+      "id" : "516C36B9-952E-4644-8AB6-A644284963F7",
+      "processedText" : "See, I am not saying to add marketing language or remote marketing language. This is what it is. We are not marketing anything. If it sounds marketing, that is fine, but this is what it is. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "See, I'm not saying to add marketing language or remote marketing language. This is what it is. We we are not marketing anything. If if it sounds marketing that's fine, but this is what it is.",
+      "timestamp" : "2026-09-20T08:09:36Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 401,
+      "id" : "3F656DE4-E468-4563-B97C-886B7B4BB3EA",
+      "processedText" : "No, it's still not good enough. So, the starting point is fine. What happened? Then we should explain the feature, right? Students basically subscribe to courses. I mean, the course subscription part is not really well explained. That's my complaint. It's not clear what exactly this feature is. The current version, even though it has em dashes and stuff, is actually very clear what this is, right? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, it's still not good enough. So, the starting point is fine. what happened? Then we should explain the feature, right? Students basically subscribe to courses. I mean, it's not the course subscription part is not really well explained. That's my complaint. It's not clear what exactly this feature is. The current version is actually, even though it has EM dashes and stuff, is actually very clear what this is, right?",
+      "timestamp" : "2026-09-20T08:09:22Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 724,
+      "id" : "43254B4C-79D0-4986-BE6D-B60131E711B9",
+      "processedText" : "No, I think this is still not good enough. So let's try to arrive at this point from first principles. What are the key information that we should retain in the point, right? Real-time notification that is important. 1,000 subscribers, nearly 1,000 subscribers, that is important. And what is the feature so people can actually subscribe to their course and the system would deliver only relevant announcements by filtering out noise. Flooding uses and all, I don't think it's the right terminology. This is not good enough, is my point. Please think really hard. This is not coming well. Think from first principles, come up with a point, right? I am trusting you as a mentor here, but it's not living up to the standards. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I think this is still not good enough. So let's try to arrive at this point from first principles. What are the key information that we should retain in the point, right? Real-time notification that is important. 1000 subscribers, nearly 1000 subscribers, that is important. and what is the feature so people can actually subscribe to their course and the system would deliver only relevant announcements by filtering out noise. Flooding uses and all, I don't think it's the right terminology. This is not good enough, is my point. Please think really hard. This is not coming well. Think from first principles, come up with a point, right? I am trusting you as a mentor here, but it's not living up to the standards.",
+      "timestamp" : "2026-09-20T08:08:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 440,
+      "id" : "C3AA169E-6CDA-49CE-811F-11EEBEE7C724",
+      "processedText" : "I think this is still unwantedly verbose. We should be relying on loaded terms and wording that actually makes things easy to read and understand. Now you are saying students subscribe by course and announcement type, unrelated updates, like it's unwantedly verbose, right? This is a very powerful feature. We should be able to communicate it in, I mean, when they read it, they should be able to understand the importance of this feature. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "no, I think I think this is still unwantedly verbose. we should be relying on loaded terms and wording that actually makes things easy to read and understand, rather and so. Now you are saying students subscribe by course and announcement type, unrelated updates, like it's unwantedly verbose, right? This is a very powerful feature. We should be able to communicate it in, I mean, when they read it, they should be able to understand the importance of this feature.",
+      "timestamp" : "2026-09-20T08:06:33Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 157,
+      "id" : "E48F662C-9A6B-4A48-8E5D-74907498097D",
+      "processedText" : "You can link the project, you can check my GitHub profile and link it right there. And the current point is coming well. I feel like we still can do better. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, you can link the pro project, you can check my GitHub profile and link it right there. And yeah, the current point is like coming well. I I feel like we s we still can do better.",
+      "timestamp" : "2026-09-20T07:34:35Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 273,
+      "id" : "CC0F7580-79A7-4120-A43B-C6007590728F",
+      "processedText" : "Okay, and one thing, the exact LaTeX that you produced about that is actually missing the point. So, build a real-time notification system that delivers fine, but now it actually hides the fact that people can actually subscribe and receive relevant notifications. I think ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, and one thing, the exact LaTeX that you produced about that is actually missing the point. So, build a real-time notification system that delivers fine, but now it actually hides the fact that people can actually subscribe and receive relevant notifications. I think",
+      "timestamp" : "2026-09-20T07:33:09Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 894,
+      "id" : "139FD0B6-1A2B-49BB-A821-23AF0FA065FB",
+      "processedText" : "I am not really sure. Maybe we should think about this point more because this is a big deal. I mean, this is also part of the reason why a lot of people still use this product. I mean, still, I mean, it's not a product, it's a problem, it's just an application that I host, right? It's free and open-source AGPL. This is one of the core features of the system that is a reason why people still use it. This real-time notification that does not flood their inbox, they can subscribe to a particular course, and even if a notification does not really match the course, but is still relevant, like let's say a holiday or something, they will still get it, so that's why we have this thing. I think we need to rework this a little more. This is one of the main features of the thing. You don't necessarily need to mention that, but I'm just telling you for context to come up with a better point. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I'm not really sure. Maybe we should think about this point more because this is a big deal. I mean this is also part of a reason why a lot of people still use this product. I mean, still, I mean, it's not a product, it's a problem, it's just an application that I host, right? It's free and open source AGPL. This is one of the core features of the system that are and a reason why people still use it. This like real-time notification that does not flood their inbox, they can, you know, like subscribe to a particular course, and even if a notification does not really match the course, but still relevant, like let's say a holiday or something, they'll still get it, so that's why we have this thing. I think we need to rework this a little more. This is one of the main features of the thing. You don't necessarily need to mention that, but I'm just telling you for context to come up with a better point",
+      "timestamp" : "2026-09-20T07:25:41Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 63,
+      "id" : "DA2A92FF-0B9C-4F2C-ABBB-CDAAA683B728",
+      "processedText" : "I'm asking, I mean, I don't really know what is the right way. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I'm asking, I mean I don't really know what is the right way.",
+      "timestamp" : "2026-09-20T07:07:00Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 190,
+      "id" : "3393E10F-6537-49C7-B114-017EB541EF25",
+      "processedText" : "It's not just one API, right, it's multiple APIs, multiple expense APIs. I think during phased rollouts would be more accurate because it was just not one rollout, multiple rollouts, right? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, I mean it's not just one API, right, it's multiple APIs, multiple expense APIs. I think during phased rollouts would be more accurate because it was just not one rollout, multiple rollouts, right",
+      "timestamp" : "2026-09-20T07:06:52Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 1007,
+      "id" : "3ED612EA-32A7-42A9-82D8-A6583D766F42",
+      "processedText" : "Okay, but if you're using bidirectional sync trigger, zero downtime is almost guaranteed, right? Is it not almost like inherently guaranteed? That is why you have to do it. I don't know if zero downtime... I'm not really sure if mentioning zero downtime is required here, because I think we are mentioning zero downtime for the RabbitMQ upgrade, which was exactly—which actually was zero downtime. So I don't really know, but this is basically the what you said expand and contract way of doing things, but just that you have two different schemas. It's similar to expand and contract, which is also zero downtime, but it's also clever because of these bidirectional sync triggers. Like I said, the zero downtime here is not anything, honestly. You just—your clients just start using the new API, and you deprecate the old API, and you drop the old schema. That is the part here. Maybe it is worth mentioning, I don't really know. Again, I'm giving you context so that we can actually write the best point. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, but if you're using bidirectional sync trigger zero downtime is almost guaranteed right? It it not almost like inherently guaranteed. That is why you had to do it. I don't know if zero downtime, I'm not really sure if mentioning zero downtime is required here because I think we are mentioning zero downtime for the rabbit MQ upgrade, which was exactly which actually was zero downtime. So I don't really know but this is basically the what you said expand and contract way of doing things but just that you have two different schemas it's it's similar to expand and contract which is also zero downtime but it's also clever because of this bi-directional sync triggers, like I said, the zero downtime here is not anything, honestly. You just like your clients just start using the new API and you deprecate the old API and you d drop the old schema. That is the part here. Maybe it is worth mentioning, I don't really know. Again, I'm giving you context so that we can actually write the best point.",
+      "timestamp" : "2026-09-20T07:04:46Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Code",
+      "characterCount" : 2040,
+      "id" : "C2805A81-4555-4F97-A375-09595FFC5297",
+      "processedText" : "There is one thing that I have not mentioned here. This migration was done in a very clever way. This is not specific to this particular migration, but all of the migrations. I migrated expense API, that is correct. But most of the migration was done in the same way along with this. Since we had no way to bring downtime and then migrate and stuff, every migration had to be zero downtime, and every migration had to be coexisting with each other. It is not like you are migrating everything and you bring up a new migrated version like that. You have to migrate data because the API is serving the same data. You also have to keep the existing components together because the resources are very tightly coupled inside the throttle. Because of this reason, a very clever mechanism was used in all of the migrations, including this one. Since every resource during the migration, the resource schema itself changed. This is again for your context. Not sure if it is worth including here or not. Since every resource had to be migrated, the way it was usually done is that you create sinks. You create the resource, you backfill the data, then you create Postgres triggers which map the data from one schema to another. So every write that was happening on the old API will be propagated to the new resource in the translated way, same backwards, which means both APIs work together at the same time until clients migrate off. The reason why this had to be done is because, like I said, since resources are very tightly coupled, there was no way you can migrate one thing and then bring that up and then destroy the other like that. It has to sort of coexist because there were a lot of APIs to be migrated. I only did this part, most API parts, but there were also other APIs that had to be migrated, which is why this mechanism was used. I do not know if it is worth mentioning or not, it is very unconventional, but it is also pretty clever and in a way we were using Postgres triggers to sync data to translate data and stuff like that. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "You know actually there is one thing that I have not mentioned here. So this migration was actually done in a very clever way. This is not specific to this particular migration, but all of the migration, right? Like I migrated expense API, that is correct. But most of the migration was basically done in the same way along with this. So since we had no way to you know bring downtime and then migrate and stuff, every migration had to be zero downtime, right? And every migration had to be coexisting with each other. So it's not like you know you are like migrating everything and you bring up a new migrated version and like that, you have to migrate everything, right? You have to migrate data because the API is serving the same data. You also have to keep the existing components together because the resources are very tightly coupled inside the throttle. Because of this reason, a very clever mechanism was actually used in all of the migrations, including this one. So, since every resource source during the migration, the resource schema itself changed. This is again for your context. Not sure if it's worth including here or not. Since every resource had to be migrated. The way it was usually done is that you create sinks, right? You create the resource, you backfill the data, then you create Postgres triggers which actually map the data from one schema to another. So every write that was happening on the old API will be propagated to the new resource in the translated way, same backwards, right? Which means both APIs work together at the same time until clients migrate off. The reason why this had to be done is because, like I said, since resources are very tightly coupled, there was no way you can like migrate one thing and then bring that up and then destroy the other, like that. It has to sort of coaxes because there were a lot of APIs to be migrated. I only did this part, most API parts, but there were also other APIs that had to be migrated, which is why this mechanism was used. I don't know if it's worth mentioning or not, it's very unconventional but it's also like pretty clever and in a way like we were using Postgres triggers to sync data to translate data and stuff like that",
+      "timestamp" : "2026-09-20T07:01:23Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1053,
+      "id" : "48FD0682-82BA-435C-8728-8A11AB08A3C2",
+      "processedText" : "No, the problem is if health check actually is taking into account about something about minting. So you said liveness, right? Fresh token in the queue or a successful win within 150 seconds. I understand all of that, but what does that mean? Let's say if the bot traffic itself is low, so you will keep restarting it or what that is the problem I have. So there can be like genuine cases where the bot traffic is low or actually not right because our worker keeps doing stuff, so maybe that is sort of a good design. I don't know. I did not understand what you meant by liveness, like is it basically checking when was the last successful mint or anything else? And for the rest of the stuff, fix all the issues. Let's just fix all the issues which are actually relevant. It could be very well the case that these AI agents invent problems that don't exist. Fix all the issues that are relevant. Also, do a code quality check after this. Once you are done, spin this agent again, check for code quality, and end everything. Make decisions practically. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, the problem is if health check actually is taking into account about something about minting. So you said liveness, right? Fresh token in the queue or a successful win within 150 seconds. I understand all of that, but what does that mean? Like, let's say if the board traffic itself is low, so you will keep restarting it or what that is the problem i have so there can be like genuine cases where the boat traffic is low or actually not right because our worker keeps doing stuff, so maybe that is sort of a good design. I don't know. I did not understand what did you mean by liveness, like is it basically checking when was the last successful mint or anything else? And for the rest of the stuff, like fix all the issues. I mean let's not let's not try to i mean just fix all the issues which are actually relevant it could be very well the case that these ai agents invent problems that doesn't exist fix all the issues that are relevant also like do a code quality check after this once you are done spin this agent again check for code quality and end everything make decisions practically",
+      "timestamp" : "2026-09-19T18:23:49Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 503,
+      "id" : "089E8EA2-A079-469F-9EE5-DF904943CC75",
+      "processedText" : "Okay, there is one thing. So we used to have a similar setup of browser pools before I implemented the server-side reCAPTCHA bypass. So it used to spawn Chromium instances from Puppeteer and then used to solve it. So the major problem that had was this thing right internally crashing because of some weird error, and the container was never restarted because it just internally crashes and never comes back up. This is a very big problem. I would like you to first review this code with another agent. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, there is one thing. so we used to have a similar setup of browser pools before I implemented the server side recapture bypass so it used to spawn chromium instances from puppeteer and then used to solve it so the major problem that had was this thing right internally crashing because of some weird error, and the container was never restarted because you know it just like internally crashes and never comes back up. This is a very big problem I would like you to first review this code with another agent",
+      "timestamp" : "2026-09-19T18:01:52Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 170,
+      "id" : "5C4D2807-D1EA-4F73-B050-827DACE0E852",
+      "processedText" : "It has been quite some time since we deployed the change. Can you check the board logs once if some user has interacted with the board? I did interact `\/home\/dev` is me. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, it's been quite some s time since we deployed the change. Can you check the board logs once if some user has interacted with the board? I did interact slash home slash D E V is me",
+      "timestamp" : "2026-09-19T17:59:30Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 212,
+      "id" : "E2A99840-AC2B-45E7-BC7E-0C27D696223E",
+      "processedText" : "Did you check the logs of the announcement, notify and stuff? Because I think that on start these guys actually sync the data, right? And the data sync worker also syncs the data. Can you check if that was fine? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, one thing. Did you check the logs of the announcement, notify and stuff? Because I think that on start these guys actually sync the data, right? And the data sync worker also syncs the data. Can you check if that was fine",
+      "timestamp" : "2026-09-19T17:41:55Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 162,
+      "id" : "5C1FA5D0-0432-4C31-8DBB-67757A0553CD",
+      "processedText" : "Not bad actually, not bad. I just tested it manually myself by checking the syllabus. It's not bad at all. It did not feel like we were actually doing more work. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Not bad actually, not bad. I just tested it manually myself by checking the syllabus. It's not bad at all. it did not feel like you know it we are we were actually doing more work.",
+      "timestamp" : "2026-09-19T17:40:47Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 147,
+      "id" : "4F5E5B63-BCC4-4133-AEA1-9B65C45B0C90",
+      "processedText" : "Is it done? Can you check the status? It is taking so much time. I think something seems to be wrong. I do not think it used to take so much time. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Is it done? Can you check the status? It's taking so much time. I think something seems to be wrong. I don't think it used to take so much time.",
+      "timestamp" : "2026-09-19T17:38:44Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 204,
+      "id" : "003E4A3F-3794-42EC-B2A2-9BC27E91D1A5",
+      "processedText" : "Then I don't think they would really go back to the recapture version. In that case, I plan to open source this and keep the other one private. So maybe a separate repo, a private repo, would make sense. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Then I don't think they would really go back to the recapture version. In that case, I plan to open sources and keep the other one private. So maybe a separate repo, a private repo, would make sense.",
+      "timestamp" : "2026-09-19T16:53:41Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 476,
+      "id" : "B64B2A37-1751-4B4F-85AF-A1C0C5E7ABD5",
+      "processedText" : "Okay, you can go ahead and implement the changes. For now, only implement the reverse engineer changes. Don't update the board code. And I was actually wondering should we keep this repo intact and check out to a new repo for this case? I mean most probably they are not going to revert back, so I plan to open source if that's the case because we did some actual work here, reverse engineering this entire flow if they completely shift to turnstile, which they already have. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, you can go ahead and implement the changes. For now, only implement the reverse engineer changes. Don't update the board code. And I was actually wondering should we keep this repo intact and check out to a new repo for this case? I mean in most probably they are not going to revert back so I plan to open sources if that's the case because, like, you know, we did some actual work here, reverse engineering this entire flow. If they completely shift to turnstile, which they already have.",
+      "timestamp" : "2026-09-19T16:53:13Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 458,
+      "id" : "4F5FAF5D-20A1-469B-9468-5C30B3785C4D",
+      "processedText" : "It is fine. We will have to rewrite the bot entirely and implement heavy caching and basically migrate all of the heavy work to our infrastructure. That is the only way to go about this. We should basically try to reduce the API calls as much as possible. But this has been already validated, right? As a temporary solution we can go ahead and implement this, check out to a new branch, follow the coding standards, implement the new version really cleanly. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Yeah, I mean it is fine. we will have to rewrite the bot entirely and implement heavy caching and basically migrate all of the heavy work to our infrastructure. That is the only way to go about this. We should, like, I don't know what to do, but like, we should basically try to reduce the API calls as much as possible. But this has been already validated right as a temporary solution we can go ahead and implement this check out to a new branch follow the coding standards implement the new version really cleanly",
+      "timestamp" : "2026-09-19T16:49:43Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 360,
+      "id" : "85DA66D4-2F06-40BC-8AD3-D873727B83AB",
+      "processedText" : "There is one thing that we might be missing. When you run this Docker container, it's doing a cold start, right? If there is a browser pool that's already available, then we can win the tokens easily, I believe. When you do this thing, the 4 to 5 seconds, I believe it's basically doing the cold start. Even 4 seconds for a cold start is not really a problem. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "There is one thing that we might be missing. When you run this Docker container, it's doing a cold start, right? If there is a browser pool that's already available, then we can win the tokens easily, I believe. When you do this thing, the 4-5 seconds, I believe it's basically doing the cold start. Even 4 seconds for a cold start is not really a problem, actually.",
+      "timestamp" : "2026-09-19T16:42:16Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 553,
+      "id" : "97642812-A697-47A5-92B6-DBBBD9B97F59",
+      "processedText" : "And for the AdGuard issue—I don't guard issue—it's basically a poor implementation of this thing on their end. So after the first challenge it makes to Cloudflare, it makes some more API calls which seems to be failing with 401, so we can rule that out. But the thing is that we should be able to sort of validate this first in the Raspberry Pi. Obviously, it's a very capable machine, 8 GB RAM, Raspberry Pi 5. I don't want to run the full browser instance and crash it, but we should validate if it's feasible or not before we even rewrite and stuff. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And for the ad guard issue, I don't guard issue, it's basically a poor implementation of this thing on their end. So after the first challenge it makes to Cloudflare, it makes some more API calls which seems to be failing with 401 so We can rule that out. But the thing is that we should be able to sort of validate this first in the Raspberry Pi. Obviously it's a very capable machine, 8 GB RAM, Raspberry Pi 5, I don't want to run the full browser instance and crash it, but we should validate if it's feasible or not. before we even rewrite and stuff.",
+      "timestamp" : "2026-09-19T16:27:23Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 365,
+      "id" : "5FCDCAE9-E464-4350-91DB-D7F370C081DE",
+      "processedText" : "This is the machine where the service was running the entire bot and the entire thing was running, but now since it requires a browser instance and we cannot reuse tokens, this becomes a problem because in a high-traffic situation—we are doing quite some heavy work here which uses the API—so if each API request requires a newly minted token, that is problematic. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "This is the machine where the service was running the entire bot and the entire thing was running but now since it requires a browser instance and we cannot reuse tokens. This becomes a problem because in a high-traffic situation, I mean, we are doing quite some heavy work here which uses the API. So if each API request requires a newly minted token that is problematic.",
+      "timestamp" : "2026-09-19T16:25:12Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 84,
+      "id" : "E36B0D20-EE82-4526-A47E-1FC8AD3DA284",
+      "processedText" : "Okay, there is a big problem for this, first of all. This runs on a Raspberry Pi 5. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, there is a big problem for this, first of all. this runs on a Raspberry Pi 5",
+      "timestamp" : "2026-09-19T16:24:23Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 260,
+      "id" : "D042A47A-7EA0-4816-A785-91A49B33FCD5",
+      "processedText" : "Now before you do anything, let me know what is the status. If this actually requires a browser instance and all, then we should not be doing this in master. We should check out to a new branch and do it there. We should rewrite this entire thing essentially. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Now before you do anything let me know what is the status. If this actually requires a browser instance and all then we should not be doing this in master. We should check out to a new branch and do it there. We should like rewrite this entire thing essentially.",
+      "timestamp" : "2026-09-19T16:21:04Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 368,
+      "id" : "DE96151C-75D7-4BE5-9449-7127E5BE317A",
+      "processedText" : "This is the network request I captured from this particular website while I was loading it on my browser. In their API request, they seem to send a particular header called XToken, which before used to be coming from a Google reCAPTCHA v3 script, but now they seem to have moved to Cloudflare. I needed to reverse engineer how exactly this token is getting generated. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "This is the network request I captured from this particular website while I was loading it on my browser. In their API request, they seem to send a particular header called XToken, which before used to be coming from a Google recapture v3 script, but now they seem to have more to Cloudflare. I needed to reverse engineer how exactly the stopping is getting generated",
+      "timestamp" : "2026-09-19T15:11:18Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "FluidVoice",
+      "characterCount" : 21,
+      "id" : "15AFF1EC-640A-4B28-96CE-277E21EC5E95",
+      "processedText" : "Hello, hello, hello. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Hello, hello, hello.",
+      "timestamp" : "2026-09-19T14:51:20Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : "FluidVoice"
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 213,
+      "id" : "3515DEF7-DE32-484D-B6DA-53D394CAA926",
+      "processedText" : "Maybe also maybe not mention somehow right now. ChessBase India is fine to mention, maybe just mention us the comedians and stuff. I don't really feel like mentioning his name, but just basically you can mention. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Maybe also maybe not mention somehow right now. Chessbase India is like fine to mention, maybe like just mention us the comedians and stuff. I don't know, like, yeah, I don't really feel like mentioning his name, but just basically you can mention",
+      "timestamp" : "2026-09-19T11:23:50Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1535,
+      "id" : "F1B2B25B-D842-4266-BBB6-14D6099C7C74",
+      "processedText" : "Why are you hyperlinking to the Chess Olympiad FIDE website or hyperlink it to the official website? Yeah, this is good, but one thing that might be worth adding into learning Rust: so I finally wanted to understand what actually makes this language infamous and hard to learn, and I am starting to understand the design choices that actually make some things insanely difficult and stuff like that. Just like throw in some flavor, right? Or like some insights about—I mean, that's what it is. The language is like—I started learning Rust because I wanted to understand what is so special about this language, how compile-time memory safety and stuff is guaranteed, and why people say it's so difficult to learn. It's more or less like a cult, honestly, from the limited time I learned Rust internals. It's like a cult because Rust invents a lot of jargon and terminology which is completely valid for that language, right? It's not a terminology that you can reuse or reapply in other languages. I mean, if there is any other language like Rust, then in that case, yes, but otherwise, not. For example, this borrow checker and the idea of borrowing and ownership, this is not something that exists in most languages. I mean, I don't know if it exists in anything other than Rust, but I'm speaking too much here. I mean, we don't want to include all these things, but I was just giving you some context. I mean, like, I said all of this, I just told you so that you can understand the situation better and what you need to add better. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I mean why are you like similink? Why are you hyperlinking to Chess Olympia FIDE website or hyperlink it to the official website and yeah, this is good but one thing that I would maybe worth adding into learning Rust. So I finally wanted to understand what actually makes this language infamous and hard to learn and I am starting to understand the design choices that actually makes some things insanely difficult and stuff like that. Just like throw in some flyer, right? Or like some insights about I mean that's what that's what it is. The language is like I I started learning Rust because I wanted to understand what is so special about this language how how is mem comp compile safety memory safety and stuff guaranteed and why is it like why people say so it's so difficult to learn. It's more or less like a cult, honestly, from the limited time I learned Rust internals. It's like a cult because Rust invents a lot of jargon and terminology which is completely valid for that language, right? It's not a terminology that you can reuse or reapply in other languages. I mean, if there is any other language like Rust, then in that case, yes, but otherwise, not. For example, this borrow checker and the idea of like what What you say, borrowing and owning ownership, this is not something that exists in like most languages. I mean, I don't know if it exists in anything other than trust, but I'm speaking too much here. I like we don't want to include all these things but I was just giving you some context. I mean like I said all of this I just told you so that you can understand the situation better and what you need to add better.",
+      "timestamp" : "2026-09-19T11:23:00Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 103,
+      "id" : "BFBDB2BC-487B-4757-84F1-4C83269ED5EC",
+      "processedText" : "The current version is okay, it's not very bad or anything, but I think there is scope of improvement. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "The current version is ok, it's not very bad or anything, but I think there is scope of improvement.",
+      "timestamp" : "2026-09-19T11:19:28Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 557,
+      "id" : "5490FB39-923D-4985-BE09-922CBBFBAB2F",
+      "processedText" : "Okay, for Rust I am learning it from the Rust book itself. And for database internals, actually, just reading documentation and stuff like that, and basically just, oh, actually, I was also trying out to understand SQLAlchemy and everything. So, I had SQLAlchemy cloned, so I was trying to understand source code as well. So, trying to understand interns, let's not say database interns, just trying to understand internals like popular open source repositories like SQLAlchemy, just cloning, spending some time with it, adding a debugger, stuff like that. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, for Rust I'm like learning it from the Rust book itself. And for database internals, I mean not really, like just reading documentation and and stuff like that, and basically just like Oh, actually, I was also trying out to understand SQL alchemy and everything. So, I had SQL Alchemy cloned, so I was like trying to understand source code as well. So, trying to understand interns, let's not say database interns, just trying to understand internals like popular open source repositories like secret alchemy, just cloning, spending some time with it, adding a debugger, stuff like that.",
+      "timestamp" : "2026-09-19T11:14:15Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1458,
+      "id" : "42D18648-24D2-4651-A31A-1E1FF8453BAC",
+      "processedText" : "Okay, I am trying to learn Rust these days. That is one thing. Trying to learn Rust, trying to understand more about database internals, systems in general, that is something that I have been spending time—understanding systems in general is not something that I picked up recently. I have always been trying for that. That is something. I have been trying, giving Rust a try. I don't know, I never knew Rust, so giving Rust a try, very interesting language. And maybe we can talk about agents and AI workflow a bit, right? Delegating everything into skills and crafting the right skills. I realize that markdown files are actually very powerful, and it is all about agentic engineering. I still have not tried the factory way of doing things, agent factory. I still want to be in complete control, crafting time into skills. Reading about—I was actually reading about this book, right? What was it? Refactoring by Martin Fowler. We can mention about that. And yeah, just, I am following chess as well, trying to gain back my enthusiasm into chess. I used to be a chess player. I do not think it is anywhere mentioned in the website, actually. So, I am trying to come back to some chess following the recent events that happened in chess, like Global Chess League and Chess Olympiad is happening right now. Something like that. I am just speaking my raw thoughts out. We need to consolidate this into the right version and write it in the style that I like. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, I'm trying to learn Rust these days, that is one thing. trying to learn Rust, trying to understand more about database internals, systems in general, that's something that I have been spending time, like since I mean, understanding systems in generals is not something that I picked up recently. I have been always trying for that. That is something. I have been trying, giving Rust a try. I don't know, I never knew Rust. So been trying Rust a try, very interesting language. And maybe we can talk about agents and AI workflow a bit, right? You know, delegating everything into skills and crafting the right skills. I realize that. Markdown files are actually very powerful and it's all about like agentic engineering. I still don't tried the factory way of doing things, agent factory. I still want to be in like complete control, like crafting time into skills. Reading about, okay, I was actually reading about this book, right? What was it? Refactoring by Martin Fowler. We can mention about that. And yeah, just like oh yeah, I'm like following chess as well, trying to gain back my enthusiasm into chess. I used to be a chess player, I don't think it's anywhere mentioned in the website actually. So yeah, I'm like trying to come back to some chess following the recent events that happened in chess, like Global Chess League and Chess Olympia is happening right now. Something like that. I'm just like speaking my raw thoughts out. We need to consolidate this into the right version and write it in the style that I like.",
+      "timestamp" : "2026-09-19T11:13:02Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1525,
+      "id" : "6CBD66F7-9175-488E-A04B-6179199D51B3",
+      "processedText" : "No, honestly, I don't know what to change. So, in work, nothing has really changed much. Still dealing with backend systems, caring about performance, all those things. I don't know what we should change here because this, I don't feel like there is nothing to change. I think we should rethink about this now page. Maybe curiosity is not the right place, or we should write heading, we should say something else. I don't really know. But most of the time in work, I am experimenting with agents. So I am trying out different tools. Open code is my go-to harness right now. I use Codex as well, Codex C-O-D-E-X. I tried experimenting a lot of tools like Py Coding Agent and Klein C L I N E. But I found that OpenCode has probably has the best of all worlds. It has like a great DUI and also configuration options. You need to control a lot of stuff. So, with respect to that, open code is good. And I stopped paying for clawed code. I don't know, like maybe that's not to be included. but yeah, and I started like investing a lot of time into like crafting skills and like trying to optimize my development workflow by taking control, being cautious about token usage, seeing, being more cautious about routing to the right model and all kinds of stuff. And outside of life, not much has changed actually. I mean, I honestly don't know what to change in this page. I think we should rewrite this page entirely. Maybe rethink about what all stuff should be actually in here, otherwise there is no point of this page existing. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, honestly, I don't know what to change. So, in work, nothing has really changed much. Still dealing with backend systems, caring about performance, all those things. I don't know what we should change here because this, I don't feel like there is nothing to change. I think we should rethink about this now page. Maybe curiosity is not the right place, or we should write heading, we should say something else. I don't really know. But most of the time in work, I am experimenting with agents. So I am trying out different tools. Open code is my go-to harness right now. I use Codex as well, Codex C-O-D-E-X. I tried experimenting a lot of tools like Py Coding Agent and Klein C L I N E. But I found that OpenCode has probably has the best of all worlds. It has like a great DUI and also configuration options. You need to control a lot of stuff. So, with respect to that, open code is good. And I stopped paying for clawed code. I don't know, like maybe that's not to be included. but yeah, and I started like investing a lot of time into like crafting skills and like trying to optimize my development workflow by taking control, being cautious about token usage, you know, seeing, you know, being more cautious about routing to the right model and all kinds of stuff. And outside of life, not much has changed actually. I mean, I honestly don't know what to change in this page. I think we should rewrite this page entirely. Maybe rethink about what all stuff should be actually in here, otherwise there is no point of this page existing.",
+      "timestamp" : "2026-09-19T11:10:26Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 526,
+      "id" : "510AAA0D-B999-4B64-B43B-31B4EE2F4C7A",
+      "processedText" : "Check online for Reddit and stuff to further improve the codecs configuration. Check all the little tricks and tips people often share on Reddit. Don actually grabbed outdated information. There is a very high chance that whatever we did 6 months back is outdated right now. So harness tuning, right? We need to tune the harness to our liking. That is the goal. So check Reddit, see ways where we can turn off unwanted stuff, improve the quality of output and stuff, and just tell me if there is anything else that we can do. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Check online for like reddit and stuff to further improve the codecs configuration. Check all the little tricks and tips like people often share on reddit. Don actually grabbed outdated information. There is a very high chance that like whatever we did six months back is like outdated right now. So harness tuning right. We need to tune the harness to our liking. That is the goal. so check reddit see ways where we can turn off unwanted stuff improve the quality of output and stuff and just tell me if there is anything else that we can do",
+      "timestamp" : "2026-09-19T10:59:08Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 102,
+      "id" : "83D4F2A4-BE5E-456C-A0E3-488157E92F47",
+      "processedText" : "If you have any doubt, just tell me. I use voice to text. If there is anything unclear, just tell me. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "If you have any doubt, just tell me. I use voice to text. If there is anything unclear, just tell me.",
+      "timestamp" : "2026-09-19T10:57:39Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 684,
+      "id" : "9316ACAC-5748-49FA-9CC9-C5E5337D51C5",
+      "processedText" : "Okay, let's also update the users page. So from the users page, change eyes, right? So eyes is mentioned in desktop apps, change that to THAW, T-H-A-W. Again, you can search it up online. For dictation, change SuperWhisper to Fluid Voice. For harness, make OpenCode the first one, remove CloudCode, keep Pi coding agent, also add CodeX to the list—actually, keep CloudCode, it's fine—add CodeX to the list. For browser extension, also add Vimium into dev section. Add WebScroller as well. And from VS Code extensions, we need to remove a lot of stuff, so remove Indent Rainbow, remove Color Highlight, remove File Utils, remove Bookmarks, remove Rainbow CSV, remove—yeah, that's all. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, let's also update the users page. So from the users page, change eyes, right? So eyes is mentioned in desktop apps, change that to THAW, T-H-A-W. Again, you can you can search it up online. For dictation, change super whisper to fluid voice for harness make open code the first one remove cloud code keep pi coding agent also add codecs to the list actually keep cloud code it's fine add codecs to the list. For browser extension also add vimium into dev section. Add web scroller as well and from vs code extensions we need to remove a lot of stuff so remove indent rainbow remove color highlight remove file utils remove bookmarks remove rainbow OCSV remove yeah that's all",
+      "timestamp" : "2026-09-19T10:57:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 159,
+      "id" : "82E57073-3C42-4736-858C-BE63EA6A04D1",
+      "processedText" : "Keep the skill really clear. An agent reading this skill should understand my writing style, and it should basically start emitting content in the way I want. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Keep the skill really clear. It should, an agent reading this skill should understand my writing style and it should basically start emitting content in the way I want.",
+      "timestamp" : "2026-09-19T10:53:03Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 343,
+      "id" : "B2B59153-4230-41B7-8FBB-C0CC2CAA835E",
+      "processedText" : "Okay, it's good to maybe turn this writing into a skill, this writing style. I need you to use this skill, create a skill and to capture the style of writing into a skill, right? This is basically my way of writing things. Turn it into a local skill inside the personal website repository. This is the path to the personal website repository: ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, it's good to maybe turn this writing into a skill, this writing style. I need you to use this skill, create a skill and to capture the style of writing into a skill, right? This is basically my way of writing things. turn it into a global skill or actually not a global skill but a local skill inside the personal website repository this is the path to the personal website repository",
+      "timestamp" : "2026-09-19T10:52:23Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 868,
+      "id" : "204B166E-B131-429F-A081-2B799C17C46C",
+      "processedText" : "I don't want all these skills. These skills being enabled basically would make the initial system prompt too big and unwantedly waste stuff. Check my codex, C-O-D-E-X codex configuration and remove all the unwanted stuff from there. I don't need all these unwanted skills and shit. If there is a way to disable them, check if there is a global setting to disable them, check online what is the right way. I want to keep it limited to my skills. I want complete control over it. I don't want nonsense from OpenAI coming into all these things. I have already tuned my config file to my liking by disabling a lot of stuff, but it seems like it's not enough, there is more stuff that's actually coming at all, and compare the system prompt before and after so that we save the tokens. I need to know how much exactly tokens is actually the system prompt having right now. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I don't want all these skills. These skills being enabled basically would make the initial system prompt too big and like unwantedly waste stuff. Check my codex, C-O-D-E-X codex configuration and remove all the unwanted stuff from there. I don't need all these unwanted skills and shit. If there is a way to disable them, check if there is a global setting to disable them, check online what is the right way. I want to keep it limited to my skills. I want complete control over it. I don't want nonsense from OpenAI coming into all these things. I have already tuned my config file to my liking by like disabling a lot of stuff but it seems like it's not enough there are there is more stuff that's actually coming at all and compare the system prompt before and after so that like we save the tokens i need to know how much exactly tokens is actually the system prompt having right now",
+      "timestamp" : "2026-09-19T10:51:25Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 60,
+      "id" : "75F36419-0C26-44B4-BAA4-D55532680CD7",
+      "processedText" : "I see all these unwanted skills in my codecs configuration. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "I see all these unwanted skills in my open code, in my not open code codecs configuration.",
+      "timestamp" : "2026-09-19T10:50:05Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Arc",
+      "characterCount" : 223,
+      "id" : "3693DC42-7606-447E-9EA1-09B412AB9318",
+      "processedText" : "And when you make such changes like removing some component or stuff like that, there is a lot of chance that leftover code will happen. We have to clean up that as well. Once you are done, let me know. I will test it out. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "And when you make such changes like removing some component or stuff like that, there is a lot of chance that leftover code will happen. We have to clean up that as well. Once you're done, let me know. I'll test it out.",
+      "timestamp" : "2026-09-19T10:31:10Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 430,
+      "id" : "12CEABEA-7C02-4EF3-903B-80ABEBD55100",
+      "processedText" : "No, actually I think you can still keep that shining effect. That is fine. But you can remove the zap icon altogether. I don't think that's necessarily required. Maybe that will improve things a little bit. The problem is that there are too much animation that was going on. The zap is overdone. It's zapping more than it should. So you can remove that and keep the shine intact. I think that will actually solve a lot of things. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, actually I think you can still keep that shining effect. That is fine. But you can remove the zap icon altogether. I don't think that's necessarily required. Maybe that will improve things a little bit. The problem is that there are too much animation that was going on. The zap is overdone. It's zapping more than it should. So you can remove that and keep the shine intact. I think that will actually solve a lot of things.",
+      "timestamp" : "2026-09-19T10:30:34Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1164,
+      "id" : "226343BE-BBE1-4ADC-89C1-E315AF4814F6",
+      "processedText" : "See, this is not it. I tend to stay with the problem. No, it's not. We should be talking about the philosophy. Like I said, it's tending to stay with the problem. I mean, it sounds performative. I don't like this. That's my problem, right? This feels like just another LinkedIn profile that's trying to be performative. That's the problem. The problem with performative profiles on LinkedIn is that it doesn't work anymore. That's the thing, right? I have seen a lot of profiles already, and I know a lot of these people in person. It never speaks reality. It never speaks the truth. Performative resumes and performative profiles are basically nonsense. I don't want it to be like that. My work is public, right? The other work that I've done is in my resume, so that speaks for itself. So, GitHub profile being mentioned here is one good thing because it speaks for itself. But for the other stuff, I think it should be talking about the philosophy, like what we actually care about. We need better wording. It's not good. Can we ultra think this and come up with better wording? You can search online if required, but I mean I need a better way to phrase this. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, no, no. See, this is not it. Like, I tend to stay with the problem. No, it's not. We should be talking about the philosophy. Like I said, it's tending to stay with the problem. I mean, it's like sounds performative. I don't like this. That's my problem, right? This feels like just another LinkedIn profile that's trying to be performative. That's the problem. The problem with performative profiles in LinkedIn is that it doesn't work anymore. That's the thing, right? you know like I have seen a lot of profiles already and I know a lot of these people in in person it never speaks reality it never speaks the truth performative resumes and performative profiles are basically nonsense I don't want it to be like that my work is public right the other work that I've done is in my resume so that speaks for itself so github profile being mentioned here is one good thing because it speaks for itself but for the other stuff I think it should be talking about the philosophy like what we actually care about. We need a better wording, it's not good. Can we like ultra think this and come up with a better wording. You can search online if required but I mean I need a better way to phrase this.",
+      "timestamp" : "2026-09-19T08:48:07Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 487,
+      "id" : "3E1FC4E3-5D6E-4BAB-A67A-83426AA54456",
+      "processedText" : "Maybe the second point I am particular about how software is put together. Can we make it better? Like, it is still not the style. I cannot explain the style I want, but you can understand, right, the kind of style I want. It should capture the core idea of the work that we have done, the philosophy that we follow. For example, the last point is pretty good. Outside work, I build tools, contribute to open source. That is an excellent line, but the first and second line is not good. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Maybe the second point I'm particular about how software is put together, can we make it better? Like it's still not the style, I cannot explain the style I want, but you can understand right, the kind of style I want. It just, it should, it should capture the core idea of the work that we have done, the philosophy that we follow. For example, the last point is pretty good. Outside work, I build tools, contribute to open source. That is an excellent line. but the first and second line is not good",
+      "timestamp" : "2026-09-19T08:45:41Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 906,
+      "id" : "36F13D55-A24E-46D1-AEAD-1B502D54A27F",
+      "processedText" : "Actually, it is not June, it is August, we should update the resume only. I just checked the acquisition happened on July 28th, you can also check it out online. The acquisition was actually announced on July 28th, so it makes sense to put it August. Now for the headline, software engineer at Sage that is good, then occasionally interesting I would drop that, I don't know why I added that. We should find a better headline that actually speaks about the work and the philosophy and in the about you don't have to again repeat about Kerala, India and stuff. You can just talk purely about work and open source and profiles. I don't think we need to talk about Libre and stuff again. This can be a little performative. LinkedIn can be a little performative. But like I said, let's keep it grounded. Let's not try to sell ourselves. Let's just speak facts. The GitHub and stuff speaks about itself, right? ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "Okay, actually it is not June, it is August, we should update the resume only. I just checked the acquisition happened in July 28th, you can also check it out online. The acquisition was actually announced on July 28th, so it makes sense to put it August. Now for the headline, software engineer at Sage that is good, then occasionally interesting I would drop that, I don't know why I added that. not occasionally interesting, I don't know where it came from but we should drop that out. We should find a better headline that actually speaks about the work and the philosophy and in the about you don't have to again repeat about Kerala, India and stuff. You can just like talk purely about work and open source and profiles. I don't think we need to talk about Libre and stuff again. This it can be a little performative. LinkedIn can be a little performative. But like I said, let's keep it grounded. Let's not try to sell ourselves. Let's just speak facts. The GitHub and stuff speaks about itself, right?",
+      "timestamp" : "2026-09-19T08:35:28Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
+    {
+      "appName" : "Ghostty",
+      "characterCount" : 1280,
+      "id" : "450D20CE-1B80-416A-862F-F50C92942A5C",
+      "processedText" : "No, I don't think so. The problem is that I don't want it to be just another LinkedIn profile. My work is open. My work is public. My resume has all the other details. I don't think it needs to be. This is still performative. I don't like this, honestly. That is a problem. I feel like LinkedIn has become a vanity numbing place where people fake things and they just create unwanted hype and stuff about their own profiles. I don't want that, right? I want to keep it real. My work is available, public work is available on GitHub. My resume is there. I mean, I don't want to make my resume public, but if I apply to a job, my resume has all the details, so I don't want my work and policy stuff and all to be in here that can actually belong in the resume. You can talk generically about the stuff I have done in the profile, right? In the LinkedIn profile, again, it's about the philosophy, the standards, the ethics that I maintain instead of things like this. So, I just want you to make it generic. I don't want to split into details and care to you about and all. I don't think it's required to mention the work is public, right? I mean, just link my GitHub. Work speaks more than words. That's, again, that's the philosophy we have. Work speaks more than words. So, yeah. ",
+      "processingModel" : "models\/gemini-flash-lite-latest",
+      "rawText" : "No, I don't think so. This is again, the problem is that I don't want it to be just another LinkedIn profile. My work is open. My work is public. My resume has all the other details. I don't think it needs to be. This is still like performative. I don't like this, honestly. That is a problem. I feel like LinkedIn has become a vanity numbing place where people fake things and they just like create unwanted hype and stuff about their own profiles. I don't want that, right? I wanted to keep it real. My work is available, public work is available on GitHub. My resume is there. I mean, I don't want to make my resume public, but like if I apply to a job, my resume has all the details. so I don't want my work and like policy stuff and all to be in here that can actually belong in the resume you can talk generic about the stuff I have done in the profile right in the LinkedIn profile again it's about the philosophy the standards the ethics that I maintain instead of you know things like this so i just like i just want you to like make it generic i don't want to like split in details and care to you about and all i don't think it's required to mention the work is like public right i mean just link my github work speaks more than words that's again that's the philosophy we have work speaks more than words so yeah",
+      "timestamp" : "2026-09-19T08:31:44Z",
+      "wasAIProcessed" : true,
+      "windowTitle" : ""
+    },
     {
       "appName" : "Ghostty",
       "characterCount" : 3346,

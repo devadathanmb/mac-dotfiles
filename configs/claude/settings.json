@@ -1,77 +1,87 @@
 {
+  "cleanupPeriodDays": 10,
+  "syncClaudeAiSkills": false,
+  "syncClaudeAiPlugins": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
-    "allow": [
-      "Bash(npm audit:*)",
-      "Bash(npm update:*)",
-      "Bash(npm info:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run format:check:*)",
-      "Bash(git rev-parse --short HEAD)",
-      "Bash(git remote get-url origin)",
-      "Bash(npm run build)"
-    ],
+    "allow": [],
     "deny": [
-      "Bash(gh * create*)",
-      "Bash(gh * edit*)"
+      "Read(/**/*.pem)",
+      "Read(/**/*.key)",
+      "Read(~/.aws/**)",
+      "Read(/.aws/**)",
+      "Read(~/.ssh/**)",
+      "Read(/.ssh/**)",
+      "Edit(/secrets/**)",
+      "Edit(/**/*.pem)",
+      "Edit(/**/*.key)",
+      "Edit(~/.aws/**)",
+      "Edit(/.aws/**)",
+      "Edit(~/.ssh/**)",
+      "Edit(/.ssh/**)",
+      "DesignSync",
+      "RemoteTrigger",
+      "PushNotification",
+      "ScheduleWakeup",
+      "ReportFindings"
     ],
     "ask": [
-      "Bash(git push *--force)",
-      "Bash(git push *--force *)",
-      "Bash(git push -f)",
-      "Bash(git push -f *)",
-      "Bash(git push * -f)",
-      "Bash(git push * -f *)",
-      "Bash(git push +*)",
-      "Bash(git push * +*)",
-      "Bash(git branch -D)",
-      "Bash(git branch -D *)",
-      "Bash(git push --delete *)",
-      "Bash(git push * --delete *)",
-      "Bash(git reset --hard)",
-      "Bash(git reset --hard *)",
-      "Bash(git clean -f *)",
-      "Bash(git clean -fd *)",
-      "Bash(git clean -fdx *)",
-      "Bash(rm *)",
-      "Bash(sudo *)"
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(rm -r *)",
+      "Bash(rm --recursive *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(nc *)",
+      "Bash(aws*)",
+      "Bash(db-*)",
+      "Bash(*rm *)"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "auto",
+    "additionalDirectories": [
+      "~/.mac-dots/configs/agents",
+      "/tmp/agent-gh"
+    ]
   },
-  "model": "fable[1m]",
-  "hooks": {
-    "PreToolUse": []
+  "model": "opus",
+  "disableBundledSkills": true,
+  "disableClaudeAiConnectors": true,
+  "disableArtifact": true,
+  "autoMemoryEnabled": false,
+  "autoDreamEnabled": false,
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
+  "env": {
+    "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
+    "CLAUDE_CODE_DISABLE_ADVISOR_TOOL": "1",
+    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
+    "CLAUDE_CODE_DISABLE_CRON": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL": "1",
+    "CLAUDE_CODE_DISABLE_CLAUDE_CODE_SKILL": "1"
   },
+  "enableWorkflows": false,
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash $HOME/.claude/statusline-command.sh"
   },
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": false,
-    "learning-output-style@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "claude-plugins-official": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/claude-plugins-official"
-      }
-    },
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
+  "enabledPlugins": {},
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
     }
   },
-  "effortLevel": "medium",
-  "tui": "default",
+  "fastMode": false,
+  "fastModePerSessionOptIn": true,
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
-  "editorMode": "normal",
-  "verbose": true,
-  "preferredNotifChannel": "ghostty",
+  "theme": "dark",
+  "verbose": false,
   "voiceEnabled": true
 }
