@@ -65,6 +65,12 @@
       "effect": "allow"
     },
     {
+      // Hide the built-in report skill from the model and reject loading it.
+      "action": "skill",
+      "resource": "report",
+      "effect": "deny"
+    },
+    {
       "action": "external_directory",
       "resource": "$HOME/.mac-dots/configs/agents/*",
       "effect": "allow"

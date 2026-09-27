@@ -2,6 +2,15 @@
   "cleanupPeriodDays": 10,
   "syncClaudeAiSkills": false,
   "syncClaudeAiPlugins": false,
+  "env": {
+    "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
+    "CLAUDE_CODE_DISABLE_ADVISOR_TOOL": "1",
+    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
+    "CLAUDE_CODE_DISABLE_CRON": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL": "1",
+    "CLAUDE_CODE_DISABLE_CLAUDE_CODE_SKILL": "1"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
@@ -46,23 +55,10 @@
       "/tmp/agent-gh"
     ]
   },
-  "model": "opus",
-  "disableBundledSkills": true,
+  "model": "haiku",
   "disableClaudeAiConnectors": true,
+  "disableBundledSkills": true,
   "disableArtifact": true,
-  "autoMemoryEnabled": false,
-  "autoDreamEnabled": false,
-  "promptSuggestionEnabled": false,
-  "awaySummaryEnabled": false,
-  "env": {
-    "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
-    "CLAUDE_CODE_DISABLE_ADVISOR_TOOL": "1",
-    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
-    "CLAUDE_CODE_DISABLE_CRON": "1",
-    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
-    "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL": "1",
-    "CLAUDE_CODE_DISABLE_CLAUDE_CODE_SKILL": "1"
-  },
   "enableWorkflows": false,
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
@@ -79,7 +75,11 @@
   },
   "fastMode": false,
   "fastModePerSessionOptIn": true,
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
+  "autoDreamEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "verbose": false,

@@ -9,8 +9,8 @@
 minimum_release_age_excludes = [
   "agy",
   "npm:@anthropic-ai/claude-code",
-  "npm:@cometix/codex",
   "npm:@earendil-works/pi-coding-agent",
+  "npm:@openai/codex",
   "npm:@opencode/cli",
 ]
 
@@ -25,11 +25,11 @@ node = "26.9.0"
 # directory, so the commands resolve regardless of which Node version a project
 # pins. Claude Code and OpenCode run a postinstall to select the platform
 # binary; OpenCode's package name is also new enough to trip aube's reputation
-# gate. Codex tracks the Cometix fork, which only publishes -cometix
-# prereleases, so the version is pinned instead of "latest".
+# gate. Codex is the official OpenAI package; it resolves its platform binary
+# through optional dependencies, so it needs no build step or version pin.
 "npm:@anthropic-ai/claude-code" = { version = "latest", allow_builds = ["@anthropic-ai/claude-code"] }
-"npm:@cometix/codex" = "0.154.0-cometix"
 "npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@openai/codex" = "latest"
 "npm:@opencode/cli" = { version = "latest", allow_low_downloads = true, allow_builds = ["@opencode/cli"] }
 
 python = "latest"
