@@ -33,8 +33,34 @@ fi
 
 # Check for Homebrew
 if ! command -v brew &> /dev/null; then
+    # The installer runs NONINTERACTIVE, so it calls sudo with -n and can never
+    # prompt for a password itself. Cache credentials first so creating
+    # /opt/homebrew succeeds instead of failing with insufficient permissions.
+    if ! sudo -n true 2> /dev/null; then
+        if [ ! -t 0 ]; then
+            echo "❌ sudo credentials are required to install Homebrew, but this shell is not interactive." >&2
+            exit 1
+        fi
+        echo "🔑 Administrator password required to install Homebrew to /opt/homebrew..."
+        sudo -v || {
+            echo "❌ sudo authentication failed." >&2
+            exit 1
+        }
+    fi
+
+    # Refresh the cached sudo ticket while the installer runs. On a slow
+    # network the download outlives the default 5-minute sudo timestamp, and
+    # the installer's later `sudo -n` calls would fail halfway through.
+    sudo_keepalive() { while sudo -n true 2> /dev/null; do sleep 30; done; }
+    sudo_keepalive &
+    sudo_keepalive_pid=$!
+    trap 'kill "$sudo_keepalive_pid" 2> /dev/null || true' EXIT
+
     echo "📦 Installing Homebrew..."
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    kill "$sudo_keepalive_pid" 2> /dev/null || true
+    trap - EXIT
 
     # Initialize Homebrew environment for this shell session
     setup_homebrew_shellenv
