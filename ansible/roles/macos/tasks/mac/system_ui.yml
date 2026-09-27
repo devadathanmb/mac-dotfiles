@@ -152,6 +152,15 @@
     value: true
   notify: Restart SystemUIServer
 
+- name: System UI | Use 24-hour time format on login and lock screen
+  tags: [macos]
+  community.general.osx_defaults:
+    domain: /Library/Preferences/.GlobalPreferences
+    key: AppleICUForce24HourTime
+    type: bool
+    value: true
+  become: true
+
 - name: System UI | Use 24-hour menu bar clock
   tags: [macos]
   community.general.osx_defaults:
