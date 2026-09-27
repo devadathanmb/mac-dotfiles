@@ -37,12 +37,10 @@
     ~/.config/opencode/opencode-quota/quota-toast.jsonc: configs/opencode/opencode-quota/quota-toast.jsonc
     ~/.config/opencode/opencode.jsonc: configs/opencode/opencode.jsonc
     ~/.config/opencode/themes/github-dark-default.json: configs/opencode/themes/github-dark-default.json
-    ~/.config/opencode/tui.jsonc: configs/opencode/tui.jsonc
     ~/.config/snapzy/config.toml: configs/snapzy/config.toml
     ~/.claude/:
       glob: true
       path: configs/claude/*
-    ~/.agents/.skill-lock.json: configs/agents/.skill-lock.json
     ~/.local/bin/:
       glob: true
       path: scripts/*/*
