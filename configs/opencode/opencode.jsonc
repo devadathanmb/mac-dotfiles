@@ -105,5 +105,8 @@
   "providers": {
     // Detected openai authentication; opencode-quota added this global provider declaration.
     "openai": {}
-  }
+  },
+  "plugin": [
+    "@slkiser/opencode-quota@latest"
+  ]
 }
