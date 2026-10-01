@@ -1,11 +1,10 @@
 ## Efficient Execution
 
 - Scope each tool call's output: use flags (`--stat`, `--name-only`, `-n`, `rg -l`, `-A/-B`), limits, and filters. If the output's shape is unknown (e.g., container logs), read a short tail first, then query the relevant range or pattern.
-- Combine predictable follow-ups into one command (`git status --short && git diff --stat`) rather than making repeated partial lookups.
-- Inspect only relevant files and ranges; avoid repeated or repository-wide reads. Re-read a file only if it changed.
-- Delegate wide, open-ended searches to a subagent so the raw output never enters the main context.
-- Use local code and documentation before searching the web.
-- Run one verification proportional to the change; expand only after a specific failure.
-- Diagnose failures from the exact error instead of retrying broadly.
-- For one-off data inspection/transforms or HTTP checks that do not need the app runtime, use globally available mise-managed `python` (stdlib `csv`/`json`; installed `pandas`, `numpy`, `ruamel.yaml`, `httpx`) instead of starting Docker. Use project tooling for app-specific behavior; check installed versions only when compatibility matters.
-- Ask only when ambiguity would materially change behavior; otherwise proceed.
+- Chain predictable follow-ups with `&&` (`git status --short && git diff --stat`) instead of repeated partial lookups.
+- Read only relevant files and ranges; re-read a file only if it changed.
+- Use a subagent only for wide, open-ended searches whose raw output would flood the context; do small lookups directly.
+- Check local code and docs before searching the web.
+- Run one verification proportional to the change; widen it only after a specific failure, diagnosing from the exact error.
+- For one-off data inspection/transforms or HTTP checks that don't need the app runtime, use mise-managed `python` (stdlib `csv`/`json`; `pandas`, `numpy`, `ruamel.yaml`, `httpx` installed) instead of Docker. Use project tooling for app-specific behavior.
+- Ask only when ambiguity would materially change the result; otherwise proceed and finish the task.

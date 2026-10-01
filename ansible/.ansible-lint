@@ -17,7 +17,9 @@ warn_list:
 
 # Enable offline mode to avoid checking for unknown modules
 # (assumes you know your requirements.yml is correct)
-offline: false
+# Also prevents ansible-lint from implicitly running
+# `ansible-galaxy collection install`, which can hang pre-commit on the network.
+offline: true
 
 # Exclude certain paths
 exclude_paths:
