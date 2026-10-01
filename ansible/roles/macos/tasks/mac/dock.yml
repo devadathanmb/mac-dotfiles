@@ -52,13 +52,13 @@
     value: 0.7
   notify: Restart Dock
 
-- name: Dock | Change minimize/maximize window effect to scale
+- name: Dock | Change minimize/maximize window effect to genie
   tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: mineffect
     type: string
-    value: scale
+    value: genie
   notify: Restart Dock
 
 - name: Dock | Minimize windows into their application icon
