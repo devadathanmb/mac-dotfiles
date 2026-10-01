@@ -1,34 +1,56 @@
-# Repository Instructions
+# mac-dots
 
-## Sources Of Truth
+Personal macOS provisioning with Ansible and Dotbot. This checkout manages the
+current machine: many files under `$HOME` are symlinks into it, so edits can affect
+active applications immediately.
 
-- This repository provisions the current Mac. `Makefile` drives Ansible; `install.conf.yaml` defines Dotbot links into `$HOME`.
-- Edit tracked sources, usually under `configs/`, rather than their linked copies in `$HOME`. Change `install.conf.yaml` when adding or removing managed paths.
-- Run direct Ansible commands from `ansible/` so its inventory and role paths load from `ansible.cfg`.
-- Do not edit `dotbot/`; it is an ignored-dirty submodule. Change `install`, `install.conf.yaml`, or `ansible/roles/dotbot/` instead.
-- Keep instruction files harness-specific. Do not consolidate or repoint OpenCode, Codex, and Claude instruction files without an explicit request.
-- Every source in `install.conf.yaml` must exist in Git. Never link ignored, generated, or machine-local files because a clean clone will not contain them.
+## Repository map
 
-## Working Standard
+| Path | Purpose |
+| --- | --- |
+| `Makefile` | Provisioning entry points; passes `ARGS` to Ansible. |
+| `ansible/playbooks/`, `ansible/roles/` | Orchestration and installation/configuration tasks. |
+| `install.conf.yaml`, `install` | Dotbot link manifest and launcher. |
+| `configs/`, root dotfiles | Tracked application and shell configuration linked into `$HOME`. |
+| `homebrew/brew_packages.txt`, `homebrew/brew_casks.txt` | Desired Homebrew formulae and casks. |
+| `configs/mise/config.toml` | Global runtime/tool versions; root `mise.toml` applies to this checkout. |
+| `scripts/` | Utilities linked into `~/.local/bin` and Git hook scripts. |
+| `exports/` | Application exports for manual import; not applied by provisioning. |
 
-- Keep changes scoped to one provisioning concern. Do not mix machine-state backups with unrelated config edits.
-- Keep Ansible idempotent: prefer modules to `command`/`shell`, set accurate `changed_when`, and use focused task names and tags.
-- Ignore failures only for optional work; register and report them.
-- Keep committed paths portable: use `$HOME`, `~`, Ansible home facts, Homebrew prefixes, or mise shims. Never commit an absolute username path or a version-specific mise installation path.
-- Treat Homebrew manifests as curated desired state, not disposable inventory. Check for formula/cask overlap and tracked configuration before adding or removing entries.
-- Do not run provisioning targets as validation. Preview applicable changes with `ARGS="--check --diff"`; macOS tasks may restart Finder, Dock, and SystemUIServer.
-- Dotbot uses `force: true`, `relink: true`, and `clean: ["~"]`; `make dotfiles` and `./install` can replace files and remove stale links in `$HOME`.
-- `make backup` rewrites tracked package and editor lists and refreshes `macos-defaults-latest.yml`. Review its entire diff so removed packages and stale state are not reintroduced.
-- Keep one authoritative latest export per application unless different export formats serve distinct restore paths. Credentials, shell history, SSH/GPG material, databases, and authentication state belong in encrypted external backups, never this repository.
-- Reproducibility includes Dock order, login items, file associations, runtime tools, and application preferences in addition to `defaults` values.
+macOS defaults live in `ansible/roles/macos/tasks/mac/`. The macOS role uses those
+tasks unless `macos_defaults_file` selects a backup to restore. Backups live in
+`configs/macos/backups/`.
 
-## Verification
+## Editing
 
-- Run a focused hook with `pre-commit run <hook-id> --files <paths>`; formatting hooks modify files. Use `make hooks-run` only when the full repository check is warranted.
-- Validate Ansible with `cd ansible && ./scripts/validate.sh`. If modules are missing, first run `ansible-galaxy collection install -r requirements.yml` there.
-- CI validates only Ansible. Use local hooks for shell, fish, repository-level YAML, and application config.
+- Edit repository sources rather than linked copies in `$HOME`. Update
+  `install.conf.yaml` when adding or removing managed links; every link source
+  must be tracked so it exists in a clean clone.
+- `dotbot/` is a third-party submodule with dirty changes ignored by Git. Make
+  integration changes in `install`, `install.conf.yaml`, or `ansible/roles/dotbot/`.
+- Keep paths portable: use home-directory variables, Homebrew prefixes, or mise
+  shims rather than a username or a version-specific tool installation path.
+- Keep Ansible tasks idempotent. Prefer modules; commands need accurate change
+  detection. Handle expected failures explicitly rather than suppressing errors.
+- Package manifests describe desired state. Check formula/cask overlap and
+  related configuration before changing entries.
+- This repository is public. Keep credentials and authentication state untracked.
 
-## Known Constraints
+## Execution and validation
 
-- `DOTFILES_REPO` resolves Ansible role paths; application settings must still avoid hard-coded home directories where the format supports portable paths.
-- OpenCode keys belong in untracked `~/.secrets/*` files, never `configs/opencode/opencode.jsonc`. Restart OpenCode after changing that config.
+- Run direct Ansible commands from `ansible/` so `ansible.cfg` loads the inventory
+  and roles. `dotfiles_repo` defaults to `~/.mac-dots`; set `DOTFILES_REPO` to the
+  checkout path when working elsewhere.
+- Do not apply provisioning as a test. For a preview, use a focused target such
+  as `make macos ARGS="--check --diff"`. Applying macOS settings can restart Dock,
+  Finder, and SystemUIServer. `make dotfiles` / `./install` can replace existing
+  files and remove stale home-directory links.
+- `make backup` overwrites tracked package lists, editor extension lists, and
+  preference snapshots from the current machine. Run it only for a backup task
+  and review the complete diff.
+- For Ansible changes, run `cd ansible && ./scripts/validate.sh` (syntax, lint,
+  and a check-mode deprecation probe). If required collections are missing, run
+  `ansible-galaxy collection install -r requirements.yml` from `ansible/` first.
+- For other changes, select the relevant hooks from `.pre-commit-config.yaml`:
+  `pre-commit run <hook-id> --files <paths>`. Formatting hooks modify files;
+  review their diff. CI covers Ansible only. `make hooks-run` checks the full repo.
