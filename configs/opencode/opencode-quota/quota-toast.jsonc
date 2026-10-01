@@ -7,7 +7,10 @@
   // Session token totals: "current" session only, or "tree" including descendants.
   "sessionTokenScope": "current",
   // Provider selection: "auto" detects providers; an array tracks only listed providers.
-  "enabledProviders": "auto",
+  "enabledProviders": [
+    "openai",
+    "opencode-go"
+  ],
   // Quota presentation and reset-period choices.
   "formatStyle": "allWindows",
   "percentDisplayMode": "remaining",
