@@ -7,7 +7,7 @@
     domain: NSGlobalDomain
     key: com.apple.trackpad.scaling
     type: float
-    value: 1.5
+    value: 2.0
 
 - name: Trackpad | Enable tap to click
   tags: [macos]

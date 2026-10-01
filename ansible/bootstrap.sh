@@ -77,6 +77,14 @@ echo "📦 Installing Ansible collections..."
 cd "$(dirname "$0")"
 ansible-galaxy collection install -r requirements.yml
 
+# ansible-lint ships its own ansible-core and cannot see the collections that
+# Homebrew's ansible bundles. Mirror them into the user collection path so
+# `.ansible-lint` can resolve modules without fetching from Galaxy at lint time.
+if [ ! -d "${HOME}/.ansible/collections/ansible_collections/community/general" ]; then
+    echo "📦 Installing Ansible collections for ansible-lint (user path)..."
+    ansible-galaxy collection install -r requirements.yml -p "${HOME}/.ansible/collections" --force
+fi
+
 # Run the main playbook
 echo "🚀 Running Ansible playbook..."
 ansible-playbook playbooks/main.yml "$@"
