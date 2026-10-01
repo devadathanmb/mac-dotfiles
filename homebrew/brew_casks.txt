@@ -24,13 +24,10 @@ mitmproxy
 obsidian
 ollama-app
 onlyoffice
-opencode-desktop
 paper
-postman
 protonvpn
 raspberry-pi-imager
 raycast
-slack
 snapzy
 stats
 tailscale-app
