@@ -5,4 +5,5 @@
 - Check local code and docs before searching the web.
 - Run one verification proportional to the change; widen it only after a specific failure, diagnosing from the exact error.
 - For one-off data inspection/transforms or HTTP checks that don't need the app runtime, run `python` directly (already mise-managed on PATH; don't wrap in `mise exec`) (stdlib `csv`/`json`; `pandas`, `numpy`, `ruamel.yaml`, `httpx`, `beautifulsoup4`, `duckdb`, `pymupdf` installed) instead of Docker. Use project tooling for app-specific behavior.
-- Run anything that may take over ~30s (eval batches, builds, full test suites, slow network jobs) as a background task using the harness's background option, and let its completion notification wake you; never foreground it with `sleep`/poll loops or hand-guessed timeouts. Launch non-interactive CLIs from scripts with stdin closed (`< /dev/null`) so they cannot block waiting for input.
+- Use background only when expected runtime exceeds ~30s, not based on timeout limits; otherwise use foreground. Wait for background completion notifications; never sleep or poll.
+- Close stdin (`< /dev/null`) when scripts launch non-interactive CLIs.
