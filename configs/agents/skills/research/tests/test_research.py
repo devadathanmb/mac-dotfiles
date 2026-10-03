@@ -1,20 +1,19 @@
 import contextlib
-import importlib.util
 import io
 import json
 import re
+import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import httpx
 
-spec = importlib.util.spec_from_file_location(
-    "research", Path(__file__).resolve().parents[1] / "scripts" / "research.py"
-)
-research = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(research)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+
+from research_cli import cache, cli, commands, config, mcp, pages
+from research_cli import output as out
 
 
 class ResearchTests(unittest.TestCase):
@@ -25,11 +24,11 @@ class ResearchTests(unittest.TestCase):
         for name in ("CACHE", "OUTPUT"):
             directory = root / name.lower()
             directory.mkdir()
-            self.enterContext(patch.object(research, name, directory))
+            self.enterContext(patch.object(config, name, directory))
 
     def args(self, *tokens):
-        args = research.build_parser().parse_args(tokens)
-        research.validate_args(args)
+        args = cli.build_parser().parse_args(tokens)
+        cli.validate_args(args)
         return args
 
     def capture(self, callback, *args, **kwargs):
@@ -67,7 +66,7 @@ class ResearchTests(unittest.TestCase):
             ("wiki", "read", "one/repo,two/repo"),
         ]
         for tokens in cases:
-            with self.subTest(tokens=tokens), self.assertRaises(research.ResearchError):
+            with self.subTest(tokens=tokens), self.assertRaises(config.ResearchError):
                 self.args(*tokens)
 
     def test_current_exa_categories(self):
@@ -76,48 +75,49 @@ class ResearchTests(unittest.TestCase):
 
     def test_explicit_chars_selects_advanced_search(self):
         args = self.args("web", "query", "--chars", "321")
-        with patch.object(research, "cached_call", return_value="result") as call:
-            self.capture(research.web, args)
+        with patch.object(commands, "cached_call", return_value="result") as call:
+            self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[1], "web_search_advanced_exa")
         self.assertEqual(call.call_args.args[2]["textMaxCharacters"], 321)
 
     def test_basic_search_preserves_objective(self):
         args = self.args("web", "query", "--objective", "goal")
-        with patch.object(research, "cached_call", return_value="result") as call:
-            self.capture(research.web, args)
+        with patch.object(commands, "cached_call", return_value="result") as call:
+            self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[1], "web_search_exa")
         self.assertEqual(call.call_args.args[2]["objective"], "goal")
 
     def test_filtered_search_default_extraction_limit(self):
         args = self.args("web", "query", "--domain", "example.com")
-        with patch.object(research, "cached_call", return_value="result") as call:
-            self.capture(research.web, args)
+        with patch.object(commands, "cached_call", return_value="result") as call:
+            self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[2]["textMaxCharacters"], 1500)
 
     def test_short_response_stays_inline(self):
         args = self.args("web", "query")
-        used, output = self.capture(research.emit_response, "short", args, "test")
+        used, output = self.capture(out.emit_response, "short", args, "test")
         self.assertEqual((used, output), (5, "short\n"))
-        self.assertEqual(list(research.OUTPUT.iterdir()), [])
+        self.assertEqual(list(config.OUTPUT.iterdir()), [])
 
     def test_large_response_saved_with_bounded_preview(self):
         args = self.args("web", "query", "--max-chars", "20")
         text = "a" * 100
-        used, output = self.capture(research.emit_response, text, args, "test")
+        used, output = self.capture(out.emit_response, text, args, "test")
         self.assertEqual(used, 20)
-        self.assertTrue(output.startswith("a" * 20 + "\n[saved:"))
-        self.assertEqual(next(research.OUTPUT.iterdir()).read_text(), text + "\n")
+        self.assertTrue(output.startswith("[saved:"))
+        self.assertTrue(output.rstrip().endswith("a" * 20))
+        self.assertEqual(next(config.OUTPUT.iterdir()).read_text(), text + "\n")
 
     def test_no_match_still_saves_full_response(self):
         args = self.args("web", "query", "--match", "missing")
-        _, output = self.capture(research.emit_response, "full response", args, "test")
+        _, output = self.capture(out.emit_response, "full response", args, "test")
         self.assertIn("No matching lines", output)
-        self.assertEqual(next(research.OUTPUT.iterdir()).read_text(), "full response\n")
+        self.assertEqual(next(config.OUTPUT.iterdir()).read_text(), "full response\n")
 
     def test_matching_lines_merge_context_and_keep_source_numbers(self):
         text = "a\nb\nmatch\nd\nmatch\nf\ng\nh\nmatch"
         self.assertEqual(
-            research.matching_lines(text, re.compile("match"), 1),
+            out.matching_lines(text, re.compile("match"), 1),
             "2: b\n3: match\n4: d\n5: match\n6: f\n...\n8: h\n9: match",
         )
 
@@ -130,55 +130,160 @@ class ResearchTests(unittest.TestCase):
             "--max-chars",
             "20",
         )
-        with patch.object(research, "cached_call", side_effect=["a" * 40, "b" * 40]):
-            _, output = self.capture(research.fetch, args)
+        with patch.object(commands, "cached_call", side_effect=["a" * 40, "b" * 40]):
+            _, output = self.capture(commands.fetch, args)
         self.assertIn("a" * 20, output)
         self.assertNotIn("b" * 20, output)
         self.assertIn("preview 0/40", output)
-        self.assertEqual(len(list(research.OUTPUT.iterdir())), 2)
+        self.assertEqual(len(list(config.OUTPUT.iterdir())), 2)
         self.assertEqual(
-            {path.read_text() for path in research.OUTPUT.iterdir()},
+            {path.read_text() for path in config.OUTPUT.iterdir()},
             {"a" * 40, "b" * 40},
         )
 
     def test_unlimited_preview_is_explicit(self):
         args = self.args("web", "query", "--max-chars", "0")
-        used, output = self.capture(research.emit_response, "a" * 5000, args, "test")
+        used, output = self.capture(out.emit_response, "a" * 5000, args, "test")
         self.assertEqual(used, 5000)
         self.assertNotIn("[saved:", output)
 
     def test_cache_hit_fresh_and_atomic_write(self):
         with patch.object(
-            research, "request_tool", side_effect=["first", "second"]
+            cache, "request_tool", side_effect=["first", "second"]
         ) as call:
-            self.assertEqual(research.cached_call("exa", "tool", {"q": "x"}), "first")
-            self.assertEqual(research.cached_call("exa", "tool", {"q": "x"}), "first")
+            self.assertEqual(cache.cached_call("exa", "tool", {"q": "x"}), "first")
+            self.assertEqual(cache.cached_call("exa", "tool", {"q": "x"}), "first")
             self.assertEqual(
-                research.cached_call("exa", "tool", {"q": "x"}, True), "second"
+                cache.cached_call("exa", "tool", {"q": "x"}, True), "second"
             )
         self.assertEqual(call.call_count, 2)
-        self.assertEqual(len(list(research.CACHE.iterdir())), 1)
+        self.assertEqual(len(list(config.CACHE.iterdir())), 1)
 
     def test_failed_response_is_not_cached(self):
-        with patch.object(
-            research, "request_tool", side_effect=research.ResearchError("failed")
+        with (
+            patch.object(
+                cache, "request_tool", side_effect=config.ResearchError("failed")
+            ),
+            self.assertRaises(config.ResearchError),
         ):
-            with self.assertRaises(research.ResearchError):
-                research.cached_call("exa", "tool", {})
-        self.assertEqual(list(research.CACHE.iterdir()), [])
+            cache.cached_call("exa", "tool", {})
+        self.assertEqual(list(config.CACHE.iterdir()), [])
 
     def test_raw_cache_preserves_line_endings(self):
         text = "first\r\nlast\r\n"
-        with patch.object(research, "fetch_raw", return_value=text) as fetch:
+        fetch = Mock(return_value=text)
+        with patch.dict(cache.DIRECT_FETCHERS, {"raw": fetch}):
             self.assertEqual(
-                research.cached_call("raw", "fetch", {"url": "https://example.com"}),
+                cache.cached_call("raw", "fetch", {"url": "https://example.com"}),
                 text,
             )
             self.assertEqual(
-                research.cached_call("raw", "fetch", {"url": "https://example.com"}),
+                cache.cached_call("raw", "fetch", {"url": "https://example.com"}),
                 text,
             )
         self.assertEqual(fetch.call_count, 1)
+
+    def test_html_converts_to_main_content_markdown(self):
+        html = (
+            "<html><head><title>t</title><script>var x=1</script></head><body>"
+            "<nav><a href='/nav'>Navigation</a></nav>"
+            "<main><h1>Title</h1><p>" + "Body text. " * 30 + "</p>"
+            "<a href='/guide'>guide</a> <a href='#frag'>frag</a>"
+            "<pre><code>print('hi')</code></pre><img src='x.png' alt='pic'></main>"
+            "<footer>Copyright</footer></body></html>"
+        )
+        markdown = pages.html_to_markdown(html, "https://example.com/docs/")
+        self.assertIn("# Title", markdown)
+        self.assertIn("(https://example.com/guide)", markdown)
+        self.assertIn("(#frag)", markdown)
+        self.assertIn("```", markdown)
+        for noise in ("Navigation", "Copyright", "var x", "x.png"):
+            self.assertNotIn(noise, markdown)
+
+    def test_fetch_page_passes_markdown_through_and_rejects_empty_html(self):
+        with patch.object(pages, "download", return_value=("# Doc\n", "text/markdown")):
+            self.assertEqual(pages.fetch_page("https://example.com"), "# Doc\n")
+        shell = "<html><body><div id='root'></div><script>app()</script></body></html>"
+        with (
+            patch.object(pages, "download", return_value=(shell, "text/html")),
+            self.assertRaisesRegex(config.ResearchError, "little static content"),
+        ):
+            pages.fetch_page("https://example.com")
+
+    def test_fetch_page_pretty_prints_json(self):
+        with patch.object(
+            pages, "download", return_value=('{"a":{"b":1}}', "application/json")
+        ):
+            self.assertEqual(
+                pages.fetch_page("https://example.com/x"),
+                '{\n  "a": {\n    "b": 1\n  }\n}',
+            )
+
+    def test_code_prepends_compact_index(self):
+        hit = "Repository: o/{n}\nPath: src/{n}.tsx\nURL: u\nLicense: MIT\n\nSnippets:\n--- Snippet 1 (Line {l}) ---\n  code\n\n"
+        result = hit.format(n="a", l=5) + hit.format(n="b", l=9)
+        index = commands.code_index(result)
+        self.assertIn("Index (2 hits):", index)
+        self.assertIn("o/a src/a.tsx:5", index)
+        self.assertIn("o/b src/b.tsx:9", index)
+        self.assertEqual(commands.code_index(hit.format(n="a", l=5)), "")
+
+    def test_fetch_defaults_to_direct_markdown(self):
+        args = self.args("fetch", "https://example.com")
+        with patch.object(commands, "cached_call", return_value="# Page") as call:
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual(call.call_args.args[:2], ("page", "fetch"))
+        self.assertIn("[direct HTTP, markdown]", output)
+
+    def test_fetch_falls_back_to_exa_per_url(self):
+        args = self.args("fetch", "https://example.com")
+        with patch.object(
+            commands,
+            "cached_call",
+            side_effect=[config.ResearchError("blocked"), "exa text"],
+        ) as call:
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual(call.call_args.args[:2], ("exa", "web_fetch_exa"))
+        self.assertIn("falling back to Exa", output)
+        self.assertIn("exa text", output)
+
+    def test_fetch_404_skips_exa_and_continues_batch(self):
+        args = self.args("fetch", "https://a.test/x", "https://b.test/y")
+        missing = config.ResearchError("HTTP 404", "fix the URL", final=True)
+        with patch.object(
+            commands, "cached_call", side_effect=[missing, "# Page"]
+        ) as call:
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual([c.args[0] for c in call.call_args_list], ["page", "page"])
+        self.assertIn("[error: HTTP 404", output)
+        self.assertIn("# Page", output)
+        with (
+            patch.object(commands, "cached_call", side_effect=missing),
+            self.assertRaises(config.ResearchError),
+        ):
+            self.capture(commands.fetch, self.args("fetch", "https://a.test/x"))
+
+    def test_fetch_exa_flag_skips_direct_fetch(self):
+        args = self.args("fetch", "--exa", "https://example.com")
+        with patch.object(commands, "cached_call", return_value="exa text") as call:
+            self.capture(commands.fetch, args)
+        call.assert_called_once()
+        self.assertEqual(call.call_args.args[1], "web_fetch_exa")
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+            self.args("fetch", "--raw", "--exa", "https://example.com")
+
+    def test_code_without_matches_gives_actionable_error(self):
+        args = self.args("code", "nope(", "--repo", "a/b")
+        with (
+            patch.object(
+                commands,
+                "cached_call",
+                return_value="No results found for your query.\n",
+            ),
+            self.assertRaisesRegex(config.ResearchError, "no matches") as caught,
+        ):
+            commands.code(args)
+        self.assertIn("drop --repo", caught.exception.hint)
 
     def test_json_and_sse_tool_responses(self):
         response = json.dumps(
@@ -188,7 +293,7 @@ class ResearchTests(unittest.TestCase):
             response,
             'data: {"method":"notification"}\n\ndata: ' + response + "\n\n",
         ):
-            self.assertEqual(research.parse_tool_response(body, "tool"), "ok")
+            self.assertEqual(mcp.parse_tool_response(body, "tool"), "ok")
 
     def test_tool_errors_and_empty_responses(self):
         responses = [
@@ -205,22 +310,24 @@ class ResearchTests(unittest.TestCase):
         for response in responses:
             with (
                 self.subTest(response=response),
-                self.assertRaises(research.ResearchError),
+                self.assertRaises(config.ResearchError),
             ):
-                research.parse_tool_response(json.dumps(response), "tool")
+                mcp.parse_tool_response(json.dumps(response), "tool")
 
     def test_timeout_does_not_repeat_expensive_call(self):
-        with patch.object(
-            research.httpx, "post", side_effect=httpx.ReadTimeout("timeout")
-        ) as post:
-            with self.assertRaisesRegex(research.ResearchError, "timeout"):
-                research.request_tool("dw", "ask_wiki_question", {})
+        with (
+            patch.object(
+                httpx, "post", side_effect=httpx.ReadTimeout("timeout")
+            ) as post,
+            self.assertRaisesRegex(config.ResearchError, "timeout"),
+        ):
+            mcp.request_tool("dw", "ask_wiki_question", {})
         self.assertEqual(post.call_count, 1)
 
     def test_raw_fetch_rejects_credentials_and_non_http(self):
         for url in ("file:///etc/passwd", "https://user:pass@example.com", "not-a-url"):
-            with self.subTest(url=url), self.assertRaises(research.ResearchError):
-                research.fetch_raw(url)
+            with self.subTest(url=url), self.assertRaises(config.ResearchError):
+                pages.fetch_raw(url)
 
     def test_raw_fetch_ignores_extraction_limit(self):
         self.args("fetch", "--raw", "https://example.com", "--chars", "0")
@@ -233,10 +340,10 @@ class ResearchTests(unittest.TestCase):
             request=httpx.Request("GET", "https://example.com"),
         )
         with patch.object(
-            research.httpx, "stream", return_value=contextlib.nullcontext(response)
+            httpx, "stream", return_value=contextlib.nullcontext(response)
         ):
             self.assertEqual(
-                research.fetch_raw("https://example.com"), "  first\r\nlast\n\n"
+                pages.fetch_raw("https://example.com"), "  first\r\nlast\n\n"
             )
 
     def test_raw_fetch_rejects_binary_and_oversized_text(self):
@@ -255,40 +362,40 @@ class ResearchTests(unittest.TestCase):
             with (
                 self.subTest(mime=mime, limit=limit),
                 patch.object(
-                    research.httpx,
+                    httpx,
                     "stream",
                     return_value=contextlib.nullcontext(response),
                 ),
-                patch.object(research, "MAX_RAW_BYTES", limit),
+                patch.object(config, "MAX_RAW_BYTES", limit),
+                self.assertRaises(config.ResearchError),
             ):
-                with self.assertRaises(research.ResearchError):
-                    research.fetch_raw("https://example.com")
+                pages.fetch_raw("https://example.com")
 
     def test_filesystem_errors_are_concise(self):
         stderr = io.StringIO()
         with (
-            patch.object(research.sys, "argv", ["research", "web", "query"]),
+            patch.object(sys, "argv", ["research", "web", "query"]),
             patch.object(
-                research,
+                cli,
                 "remove_expired_files",
                 side_effect=PermissionError("no access"),
             ),
             contextlib.redirect_stderr(stderr),
         ):
-            self.assertEqual(research.main(), 1)
+            self.assertEqual(cli.main(), 1)
         self.assertIn("error: no access | hint:", stderr.getvalue())
         self.assertNotIn("Traceback", stderr.getvalue())
 
     def test_direct_docs_emit_selected_id(self):
         args = self.args("docs", "/encode/httpx", "timeout defaults")
-        with patch.object(research, "cached_call", return_value="answer"):
-            _, output = self.capture(research.docs, args)
+        with patch.object(commands, "cached_call", return_value="answer"):
+            _, output = self.capture(commands.docs, args)
         self.assertTrue(output.startswith("# Context7: /encode/httpx\n"))
 
     def test_wiki_normalizes_repository_list(self):
         args = self.args("wiki", "ask", "one/repo, two/repo", "question")
-        with patch.object(research, "cached_call", return_value="answer") as call:
-            self.capture(research.wiki, args)
+        with patch.object(commands, "cached_call", return_value="answer") as call:
+            self.capture(commands.wiki, args)
         self.assertEqual(call.call_args.args[2]["repoName"], ["one/repo", "two/repo"])
 
 
