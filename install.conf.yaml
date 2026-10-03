@@ -60,5 +60,9 @@
     ~/.pi/agent/damage-control-rules.yaml: configs/pi/damage-control-rules.yaml
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
+    # Agent skills: single source of truth for all coding agents
+    ~/.agents/skills: configs/agents/skills
+    ~/.claude/skills: configs/agents/skills
+
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

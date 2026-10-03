@@ -1,0 +1,5 @@
+interface:
+  display_name: "Web Artifacts Builder"
+  short_description: "Design and build a polished single-file HTML artifact"
+policy:
+  allow_implicit_invocation: false
