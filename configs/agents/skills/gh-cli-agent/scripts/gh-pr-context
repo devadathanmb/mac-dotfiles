@@ -1,0 +1,346 @@
+#!/usr/bin/env python3
+"""gh-pr-context — condensed GitHub PR feedback for agents (wraps the `gh` CLI; stdlib only).
+
+Commands (PR = number | PR URL | OWNER/REPO#N | omitted for the current branch's PR):
+  comments [PR] [--user L]... [--bots | --copilot | --human]   all comment surfaces, compact
+  threads  [PR] [--all]                                        review threads (unresolved by default)
+  checks   [PR] [--failed]                                     check status, one line each
+  logs     [PR]                                                failing CI logs, condensed per failing step
+
+Output contract: small results print inline; large ones print a preview plus the path
+of a file holding the full output. Data is always fetched fresh. Errors: one line on
+stderr (`error: ... | hint: ...`), exit 1.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+OUT = Path("/tmp") / f"gh-pr-context-{os.environ.get('USER', 'agent')}"
+KEEP_SECONDS = 24 * 3600
+ANSI = re.compile(r"(?:\x1b|\^\[)\[[0-9;]*[A-Za-z]")  # gh prints ESC as literal "^[" when not a TTY
+TS = re.compile(r"^\d{4}-\d\d-\d\dT[\d:.]+Z ?")
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+COPILOT = {"Copilot", "copilot-pull-request-reviewer[bot]"}
+
+
+class Fail(Exception):
+    def __init__(self, msg: str, hint: str = ""):
+        super().__init__(msg)
+        self.hint = hint
+
+
+# ----------------------------------------------------------------------------- gh plumbing
+
+def gh(*args: str, ok_codes: tuple[int, ...] = (0,)) -> str:
+    try:
+        p = subprocess.run(["gh", *args], capture_output=True, text=True)
+    except FileNotFoundError:
+        raise Fail("`gh` not found", "install GitHub CLI: https://cli.github.com")
+    if p.returncode not in ok_codes:
+        err = (p.stderr or p.stdout).strip().splitlines()
+        msg = err[-1] if err else f"gh exited {p.returncode}"
+        low = (p.stderr or "").lower()
+        hint = ""
+        if "auth login" in low or "not logged" in low or "gh_token" in low:
+            hint = "run `gh auth login` (ask the user)"
+        elif "no pull requests found" in low or "could not determine" in low:
+            hint = "pass a PR number, URL, or OWNER/REPO#N"
+        elif "not found" in low or "could not resolve" in low:
+            hint = "check the PR number and repo"
+        elif "not a git repository" in low:
+            hint = "run inside the repo or pass OWNER/REPO#N"
+        raise Fail(msg, hint)
+    return p.stdout
+
+
+def gh_json(*args: str, ok_codes: tuple[int, ...] = (0,)):
+    out = gh(*args, ok_codes=ok_codes)
+    try:
+        return json.loads(out) if out.strip() else []
+    except ValueError:
+        raise Fail("gh returned non-JSON output", out.strip()[:120])
+
+
+def paginate(endpoint: str) -> list:
+    pages = gh_json("api", "--paginate", "--slurp", endpoint)
+    return [item for page in pages for item in (page if isinstance(page, list) else [page])]
+
+
+class Target:
+    """Resolved repo + PR number."""
+
+    def __init__(self, ref: str | None):
+        self.repo = None
+        number = None
+        if ref:
+            m = (re.match(r"^https://github\.com/([^/]+/[^/]+)/pull/(\d+)", ref)
+                 or re.match(r"^([^/\s#]+/[^/\s#]+)#(\d+)$", ref)
+                 or re.match(r"^()#?(\d+)$", ref))
+            if not m:
+                raise Fail(f"unrecognized PR reference '{ref}'", "use a number, PR URL, or OWNER/REPO#N")
+            self.repo, number = (m.group(1) or None), m.group(2)
+        if not self.repo:
+            self.repo = gh_json("repo", "view", "--json", "nameWithOwner")["nameWithOwner"]
+        if not number:
+            number = str(gh_json("pr", "view", "-R", self.repo, "--json", "number")["number"])
+        self.number = number
+        self.label = f"{self.repo}#{number}"
+
+
+# ----------------------------------------------------------------------------- formatting
+
+def clean(body: str | None, limit: int) -> str:
+    text = HTML_COMMENT.sub("", (body or "").replace("\r", "")).strip()
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    if limit and len(text) > limit:
+        text = text[:limit].rstrip() + f" …[+{len(text) - limit:,} chars; see full output file]"
+    return "\n".join("  " + l for l in text.splitlines()) or "  (empty)"
+
+
+def when(ts: str | None) -> str:
+    return (ts or "")[:16].replace("T", " ") + "Z" if ts else ""
+
+
+def sweep() -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    cutoff = time.time() - KEEP_SECONDS
+    for p in OUT.iterdir():
+        try:
+            if p.stat().st_mtime < cutoff:
+                p.unlink()
+        except OSError:
+            pass
+
+
+def save(name: str, text: str) -> Path:
+    path = OUT / name
+    path.write_text(text if text.endswith("\n") else text + "\n")
+    return path
+
+
+def emit(text: str, a: argparse.Namespace, label: str) -> None:
+    """Print inline if small; otherwise preview + full text in a file."""
+    text = text.strip()
+    if not a.max_chars or len(text) <= a.max_chars:
+        print(text)
+        return
+    cut = text.rfind("\n\n", 0, a.max_chars)
+    if cut < a.max_chars * 0.5:
+        cut = text.rfind("\n", 0, a.max_chars)
+    if cut < a.max_chars * 0.5:
+        cut = a.max_chars
+    path = save(f"{label}-{hashlib.sha1(text.encode()).hexdigest()[:6]}.md", text)
+    print(text[:cut].rstrip())
+    print(f"\n[preview {cut:,}/{len(text):,} chars | full output, {text.count(chr(10)) + 1} lines: {path} | Read with offset/limit, or rg -n]")
+
+
+# ----------------------------------------------------------------------------- commands
+
+def cmd_comments(a):
+    t = Target(a.pr)
+    items = []
+    for c in paginate(f"repos/{t.repo}/issues/{t.number}/comments"):
+        items.append(dict(kind="general", user=c["user"]["login"], bot=c["user"]["type"] == "Bot",
+                          at=c["created_at"], url=c["html_url"], body=c["body"]))
+    for c in paginate(f"repos/{t.repo}/pulls/{t.number}/comments"):
+        loc = c["path"] + (f":{c.get('line') or c.get('original_line')}" if c.get("line") or c.get("original_line") else "")
+        items.append(dict(kind="inline" + (" reply" if c.get("in_reply_to_id") else ""), user=c["user"]["login"],
+                          bot=c["user"]["type"] == "Bot", at=c["created_at"], url=c["html_url"], body=c["body"], loc=loc))
+    for r in paginate(f"repos/{t.repo}/pulls/{t.number}/reviews"):
+        if (r.get("body") or "").strip():
+            items.append(dict(kind=f"review {r['state'].lower()}", user=r["user"]["login"], bot=r["user"]["type"] == "Bot",
+                              at=r["submitted_at"], url=r["html_url"], body=r["body"]))
+    users = set(a.user or [])
+    if users:
+        items = [i for i in items if i["user"] in users]
+    if a.copilot:
+        items = [i for i in items if i["user"] in COPILOT]
+    if a.bots:
+        items = [i for i in items if i["bot"] or i["user"] in COPILOT]
+    if a.human:
+        items = [i for i in items if not (i["bot"] or i["user"] in COPILOT)]
+    items.sort(key=lambda i: i["at"] or "")
+    flt = " ".join(f for f, on in (("user=" + ",".join(sorted(users)), users), ("copilot", a.copilot), ("bots", a.bots), ("human", a.human)) if on)
+    head = f"{t.label}: {len(items)} comment(s)" + (f" [{flt}]" if flt else "")
+    if not items:
+        print(head)
+        return
+    blocks = [f"[{i['kind']}] {i['user']}{('  ' + i['loc']) if i.get('loc') else ''}  {when(i['at'])}\n{i['url']}\n{clean(i['body'], a.max_body)}"
+              for i in items]
+    emit(head + "\n\n" + "\n\n".join(blocks), a, f"comments-{t.number}")
+
+
+THREADS_Q = ("query($o:String!,$n:String!,$pr:Int!,$c:String){repository(owner:$o,name:$n){pullRequest(number:$pr){"
+             "reviewThreads(first:100,after:$c){nodes{id isResolved isOutdated path line "
+             "comments(first:50){nodes{author{login} body createdAt url}}} pageInfo{hasNextPage endCursor}}}}}")
+
+
+def cmd_threads(a):
+    t = Target(a.pr)
+    owner, name = t.repo.split("/")
+    threads, cursor = [], None
+    for _ in range(20):
+        args = ["api", "graphql", "-f", f"query={THREADS_Q}", "-f", f"o={owner}", "-f", f"n={name}", "-F", f"pr={t.number}"]
+        args += ["-f", f"c={cursor}"] if cursor else []
+        data = gh_json(*args)["data"]["repository"]["pullRequest"]["reviewThreads"]
+        threads += data["nodes"]
+        if not data["pageInfo"]["hasNextPage"]:
+            break
+        cursor = data["pageInfo"]["endCursor"]
+    shown = [x for x in threads if a.all or not x["isResolved"]]
+    head = f"{t.label}: {len(shown)} {'thread(s)' if a.all else 'unresolved thread(s)'} of {len(threads)}"
+    if not shown:
+        print(head)
+        return
+    blocks = []
+    for x in shown:
+        flags = " ".join(f for f, on in (("resolved", x["isResolved"]), ("outdated", x["isOutdated"])) if on)
+        loc = (x["path"] or "?") + (f":{x['line']}" if x["line"] else "")
+        cs = "\n".join(f"- {(c['author'] or {}).get('login', 'unknown')}  {when(c['createdAt'])}  {c['url']}\n{clean(c['body'], a.max_body)}"
+                       for c in x["comments"]["nodes"])
+        blocks.append(f"## {loc}{' [' + flags + ']' if flags else ''}  id={x['id']}\n{cs}")
+    emit(head + "\n\n" + "\n\n".join(blocks), a, f"threads-{t.number}")
+
+
+def get_checks(t: Target) -> list:
+    # gh exits 1 (failures) or 8 (pending) while still printing valid JSON.
+    return gh_json("pr", "checks", t.number, "-R", t.repo, "--json", "bucket,name,workflow,link,state", ok_codes=(0, 1, 8))
+
+
+def cmd_checks(a):
+    t = Target(a.pr)
+    checks = get_checks(t)
+    counts: dict[str, int] = {}
+    for c in checks:
+        counts[c["bucket"]] = counts.get(c["bucket"], 0) + 1
+    summary = ", ".join(f"{n} {b}" for b, n in sorted(counts.items())) or "no checks"
+    shown = [c for c in checks if not a.failed or c["bucket"] == "fail"]
+    lines = [f"- [{c['bucket']}] {c['name']}" + (f" ({c['workflow']})" if c.get("workflow") else "") + (f"  {c['link']}" if c.get("link") else "")
+             for c in sorted(shown, key=lambda c: (c["bucket"] != "fail", c["name"]))]
+    emit(f"{t.label}: {summary}\n\n" + ("\n".join(lines) or "(none match)"), a, f"checks-{t.number}")
+
+
+def condense(raw: str, tail: int) -> tuple[str, str]:
+    """`gh run view --log-failed` -> (full cleaned log, condensed per job/step summary)."""
+    groups: dict[tuple[str, str], list[str]] = {}
+    cleaned = []
+    for line in raw.splitlines():
+        parts = line.split("\t", 2)
+        job, step, msg = (parts + ["", ""])[:3] if len(parts) == 3 else ("", "", line)
+        msg = TS.sub("", ANSI.sub("", msg)).rstrip()
+        if msg.startswith(("##[group]", "##[endgroup]", "##[start-action", "##[end-action")):
+            continue
+        groups.setdefault((job, step), []).append(msg)
+        cleaned.append(f"{job} | {step} | {msg}")
+    out = []
+    for (job, step), lines in groups.items():
+        if len(lines) > 2 * tail:
+            # Anchor on GitHub's ##[error] marker: show the lines leading up to it; else the tail.
+            anchors = [i for i, l in enumerate(lines) if l.startswith("##[error]")][:3]
+            spans = [(max(0, i - tail), i + 1) for i in anchors] or [(len(lines) - tail, len(lines))]
+            merged: list[list[int]] = []
+            for lo, hi in spans:
+                if merged and lo <= merged[-1][1]:
+                    merged[-1][1] = max(merged[-1][1], hi)
+                else:
+                    merged.append([lo, hi])
+            lines = [x for k, (lo, hi) in enumerate(merged) for x in (["…"] if k else []) + lines[lo:hi]]
+        out.append(f"### {job} / {step}\n" + "\n".join(lines))
+    return "\n".join(cleaned), "\n\n".join(out)
+
+
+def cmd_logs(a):
+    t = Target(a.pr)
+    failed = [c for c in get_checks(t) if c["bucket"] == "fail"]
+    runs: dict[str, str] = {}
+    for c in failed:
+        m = re.search(r"actions/runs/(\d+)", c.get("link") or "")
+        if m:
+            runs.setdefault(m.group(1), c["name"])
+    if not failed:
+        print(f"{t.label}: no failing checks")
+        return
+    if not runs:
+        print(f"{t.label}: {len(failed)} failing check(s) with no GitHub Actions run (external CI):")
+        print("\n".join(f"- {c['name']}  {c.get('link') or ''}" for c in failed))
+        return
+    blocks = []
+    for run_id in runs:
+        meta = gh_json("run", "view", run_id, "-R", t.repo, "--json", "workflowName,displayTitle,conclusion,url,headSha", ok_codes=(0, 1))
+        title = f"## Run {run_id}: {meta.get('workflowName', '?')} ({meta.get('conclusion', '?')})  {meta.get('url', '')}"
+        try:
+            raw = gh("run", "view", run_id, "-R", t.repo, "--log-failed")
+        except Fail as e:
+            blocks.append(f"{title}\nlog unavailable: {e}" + (" (run may still be in progress)" if "progress" in str(e).lower() else ""))
+            continue
+        if not raw.strip():
+            blocks.append(f"{title}\n(no failed-step log; the failure may be a cancelled/skipped job)")
+            continue
+        full, summary = condense(raw, a.tail)
+        path = save(f"logs-{t.number}-run{run_id}.log", full)
+        blocks.append(f"{title}\nfull cleaned log: {path}\n\n{summary}")
+    emit(f"{t.label}: {len(runs)} failing run(s)\n\n" + "\n\n".join(blocks), a, f"logs-{t.number}")
+
+
+# ----------------------------------------------------------------------------- cli
+
+def parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="gh-pr-context", description=__doc__.split("\n\n")[0])
+    sub = argparse.ArgumentParser(add_help=False)
+    for parent, d in ((p, False), (sub, True)):
+        sup = (lambda v: argparse.SUPPRESS) if d else (lambda v: v)
+        parent.add_argument("--max-chars", type=int, default=sup(6000), help="inline limit before spilling to a file (default 6000, 0=never)")
+    s = p.add_subparsers(dest="cmd", required=True, metavar="command")
+
+    def add(name, **kw):
+        sp = s.add_parser(name, parents=[sub], **kw)
+        sp.add_argument("pr", nargs="?", help="number | URL | OWNER/REPO#N (default: current branch's PR)")
+        return sp
+
+    c = add("comments", help="all PR comments (general, inline, review summaries)")
+    c.add_argument("--user", action="append", help="only this login (repeatable)")
+    g = c.add_mutually_exclusive_group()
+    g.add_argument("--bots", action="store_true")
+    g.add_argument("--copilot", action="store_true")
+    g.add_argument("--human", action="store_true", help="exclude bots and Copilot")
+    c.add_argument("--max-body", type=int, default=1500, help="chars per comment (default 1500, 0=all)")
+    c.set_defaults(f=cmd_comments)
+
+    th = add("threads", help="review threads with resolution state (unresolved by default)")
+    th.add_argument("--all", action="store_true", help="include resolved threads")
+    th.add_argument("--max-body", type=int, default=1500)
+    th.set_defaults(f=cmd_threads)
+
+    ck = add("checks", help="check status")
+    ck.add_argument("--failed", action="store_true")
+    ck.set_defaults(f=cmd_checks)
+
+    lg = add("logs", help="failing GitHub Actions logs, condensed per failing step")
+    lg.add_argument("--tail", type=int, default=25, help="lines of context kept before each ##[error] (default 25)")
+    lg.set_defaults(f=cmd_logs)
+    return p
+
+
+def main() -> int:
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    sweep()
+    a = parser().parse_args()
+    try:
+        a.f(a)
+    except Fail as e:
+        print(f"error: {e}" + (f" | hint: {e.hint}" if e.hint else ""), file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

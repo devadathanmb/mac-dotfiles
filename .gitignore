@@ -14,3 +14,6 @@ untracked/*
 .sisyphus/*
 configs/codex/config.toml
 configs/zoxide/db.zo
+
+# Private agent skills (local only; name them private-<name>)
+configs/agents/skills/private-*/
