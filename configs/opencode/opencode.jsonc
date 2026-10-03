@@ -37,7 +37,8 @@
     "servers": {
       "context7": {
         "type": "remote",
-        "url": "https://mcp.context7.com/mcp"
+        "url": "https://mcp.context7.com/mcp",
+        "disabled": true,
       },
       "deepwiki": {
         "type": "remote",
@@ -47,6 +48,7 @@
       "exa": {
         "type": "remote",
         "url": "https://mcp.exa.ai/mcp",
+        "disabled": true,
         "headers": {
           "x-api-key": "{file:~/.secrets/exa-api-key}"
         }
