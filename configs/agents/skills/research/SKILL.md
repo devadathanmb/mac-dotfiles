@@ -37,7 +37,7 @@ Check local evidence first, then pick one command for the missing fact; these ar
   - A 404/410 is reported per URL (the rest of a batch still runs). A blocked, binary, or JS-rendered page falls back to Exa automatically (`--chars` sets Exa's per-page limit, default 20,000; its text may be incomplete).
   - `--exa` forces Exa. `--raw` returns the unmodified body (HTML source, whitespace-sensitive files); never use it just to read an HTML page.
 - `code`: literal text (`useOptimistic(`), not a description. Supports `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; there is no `-n`. Output starts with an `Index` of every hit (repo, path:lines), so pick candidates from it instead of re-listing with `rg`. "no matches" means loosen the snippet or filters; don't probe repos one by one.
-- `wiki ask`: accepts comma-separated repos; usually 10–60s, up to 4 min. Run it in the background (or with a ≥260s timeout) and use its result when it arrives; don't re-derive the answer by hand or duplicate the call while it runs. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
+- `wiki ask`: accepts comma-separated repos; usually 10–60s. Always run in background, never foreground. Wait for completion notifications; do not poll, duplicate the lookup, or re-derive the answer while it runs. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
 
 ## Method
 
