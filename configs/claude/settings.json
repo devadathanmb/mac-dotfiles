@@ -42,8 +42,6 @@
       "Bash(rm -fr *)",
       "Bash(rm -r *)",
       "Bash(rm --recursive *)",
-      "Bash(curl *)",
-      "Bash(wget *)",
       "Bash(nc *)",
       "Bash(aws*)",
       "Bash(*rm *)"
