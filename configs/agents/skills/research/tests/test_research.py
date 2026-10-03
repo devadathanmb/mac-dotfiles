@@ -12,7 +12,16 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from research_cli import cache, cli, commands, config, mcp, pages
+from research_cli import (
+    cache,
+    cli,
+    commands,
+    config,
+    credentials,
+    firecrawl,
+    mcp,
+    pages,
+)
 from research_cli import output as out
 
 
@@ -271,6 +280,265 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(call.call_args.args[1], "web_fetch_exa")
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
             self.args("fetch", "--raw", "--exa", "https://example.com")
+
+    def test_fetch_firecrawl_flag_skips_other_backends(self):
+        args = self.args("fetch", "--firecrawl", "https://example.com")
+        with patch.object(commands, "cached_call", return_value="# Page") as call:
+            _, output = self.capture(commands.fetch, args)
+        call.assert_called_once_with(
+            "firecrawl", "scrape", {"url": "https://example.com"}, False
+        )
+        self.assertIn("[Firecrawl]", output)
+        for other in ("--raw", "--exa"):
+            with (
+                self.assertRaises(SystemExit),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                self.args("fetch", "--firecrawl", other, "https://example.com")
+
+    def test_fetch_falls_back_to_firecrawl_after_exa_failure(self):
+        args = self.args("fetch", "https://example.com", "--fresh")
+        with (
+            patch.object(commands, "api_key", return_value="test-key"),
+            patch.object(
+                commands,
+                "cached_call",
+                side_effect=[
+                    config.ResearchError("blocked"),
+                    config.ResearchError("Exa blocked"),
+                    "# Scraped page",
+                ],
+            ) as call,
+        ):
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual(
+            [c.args[0] for c in call.call_args_list], ["page", "exa", "firecrawl"]
+        )
+        self.assertTrue(call.call_args.args[3])
+        self.assertIn("falling back to Firecrawl", output)
+
+    def test_fetch_skips_unconfigured_firecrawl_and_continues_batch(self):
+        args = self.args("fetch", "https://one.test", "https://two.test")
+        with (
+            patch.object(commands, "api_key", return_value=None),
+            patch.object(
+                commands,
+                "cached_call",
+                side_effect=[
+                    config.ResearchError("blocked"),
+                    config.ResearchError("Exa failed"),
+                    "# Second page",
+                ],
+            ) as call,
+        ):
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual(
+            [c.args[0] for c in call.call_args_list], ["page", "exa", "page"]
+        )
+        self.assertIn("# Second page", output)
+
+    def test_firecrawl_request_returns_markdown_and_bypasses_provider_cache(self):
+        response = httpx.Response(
+            200,
+            json={
+                "success": True,
+                "data": {"markdown": " # Page\n", "metadata": {"statusCode": 200}},
+            },
+            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+        )
+        with (
+            patch.object(firecrawl, "api_key", return_value="test-key"),
+            patch.object(httpx, "post", return_value=response) as post,
+        ):
+            self.assertEqual(
+                firecrawl.scrape_page("https://example.com", True), "# Page"
+            )
+        self.assertEqual(post.call_args.kwargs["json"]["maxAge"], 0)
+        self.assertEqual(post.call_args.kwargs["json"]["formats"], ["markdown"])
+        self.assertEqual(
+            post.call_args.kwargs["headers"], {"Authorization": "Bearer test-key"}
+        )
+
+    def test_firecrawl_default_request_allows_provider_cache(self):
+        response = httpx.Response(
+            200,
+            json={"success": True, "data": {"markdown": "# Page"}},
+            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+        )
+        with (
+            patch.object(firecrawl, "api_key", return_value="test-key"),
+            patch.object(httpx, "post", return_value=response) as post,
+        ):
+            firecrawl.scrape_page("https://example.com")
+        self.assertNotIn("maxAge", post.call_args.kwargs["json"])
+
+    def test_firecrawl_rejects_failed_empty_and_blocked_results(self):
+        results = [
+            [],
+            {"success": False},
+            {"success": True, "data": []},
+            {"success": True, "data": {}},
+            {"success": True, "data": {"markdown": "  "}},
+            {
+                "success": True,
+                "data": {"markdown": "blocked", "metadata": {"statusCode": 403}},
+            },
+        ]
+        for result in results:
+            response = httpx.Response(
+                200,
+                json=result,
+                request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+            )
+            with (
+                self.subTest(result=result),
+                patch.object(firecrawl, "api_key", return_value="test-key"),
+                patch.object(httpx, "post", return_value=response),
+                self.assertRaises(config.ResearchError),
+            ):
+                firecrawl.scrape_page("https://example.com")
+
+    def test_firecrawl_missing_key_and_timeout_do_not_retry(self):
+        with (
+            patch.object(firecrawl, "api_key", return_value=None),
+            patch.object(httpx, "post") as post,
+            self.assertRaisesRegex(config.ResearchError, "key not configured"),
+        ):
+            firecrawl.scrape_page("https://example.com")
+        post.assert_not_called()
+        with (
+            patch.object(firecrawl, "api_key", return_value="test-key"),
+            patch.object(
+                httpx, "post", side_effect=httpx.ReadTimeout("timeout")
+            ) as post,
+            self.assertRaisesRegex(config.ResearchError, "timeout"),
+        ):
+            firecrawl.scrape_page("https://example.com")
+        self.assertEqual(post.call_count, 1)
+
+    def test_firecrawl_cache_dispatch_preserves_fresh(self):
+        with patch.object(cache, "scrape_page", return_value="# Page") as scrape:
+            args = ("firecrawl", "scrape", {"url": "https://example.com"})
+            cache.cached_call(*args)
+            cache.cached_call(*args)
+            cache.cached_call(*args, fresh=True)
+        self.assertEqual(scrape.call_count, 2)
+        scrape.assert_called_with("https://example.com", fresh=True)
+
+    def test_firecrawl_http_errors_are_actionable_and_redact_response(self):
+        cases = {
+            401: "check",
+            402: "credits exhausted",
+            429: "rate limited",
+            500: "another source",
+        }
+        for status, hint in cases.items():
+            response = httpx.Response(
+                status,
+                text="provider echoed secret-key",
+                request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+            )
+            with (
+                self.subTest(status=status),
+                patch.object(firecrawl, "api_key", return_value="secret-key"),
+                patch.object(httpx, "post", return_value=response) as post,
+                self.assertRaises(config.ResearchError) as caught,
+            ):
+                firecrawl.scrape_page("https://example.com")
+            self.assertIn(f"HTTP {status}", str(caught.exception))
+            self.assertIn(hint, caught.exception.hint)
+            self.assertNotIn("secret-key", str(caught.exception))
+            self.assertEqual(post.call_count, 1)
+
+    def test_firecrawl_bad_json_and_network_error_are_concise(self):
+        response = httpx.Response(
+            200,
+            text="not JSON",
+            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+        )
+        for failure in (None, httpx.ConnectError("network unavailable")):
+            with (
+                self.subTest(failure=failure),
+                patch.object(firecrawl, "api_key", return_value="test-key"),
+                patch.object(httpx, "post", return_value=response, side_effect=failure),
+                self.assertRaisesRegex(
+                    config.ResearchError, "request or response failed"
+                ),
+            ):
+                firecrawl.scrape_page("https://example.com")
+
+    def test_invalid_fetch_urls_never_reach_providers(self):
+        urls = (
+            "file:///etc/passwd",
+            "https://user:secret@example.com",
+            "https://[",
+            "not-a-url",
+        )
+        for url in urls:
+            for mode in ((), ("--raw",), ("--exa",), ("--firecrawl",)):
+                args = self.args("fetch", url, *mode)
+                with (
+                    self.subTest(url=url, mode=mode),
+                    patch.object(commands, "cached_call") as call,
+                    self.assertRaises(config.ResearchError),
+                ):
+                    self.capture(commands.fetch, args)
+                call.assert_not_called()
+
+    def test_firecrawl_failure_does_not_abort_next_url(self):
+        args = self.args("fetch", "--firecrawl", "https://one.test", "https://two.test")
+        with patch.object(
+            commands,
+            "cached_call",
+            side_effect=[config.ResearchError("blocked"), "# Page"],
+        ) as call:
+            _, output = self.capture(commands.fetch, args)
+        self.assertEqual(call.call_count, 2)
+        self.assertIn("[error: blocked", output)
+        self.assertIn("# Page", output)
+
+    def test_firecrawl_failure_is_not_cached(self):
+        with (
+            patch.object(
+                cache, "scrape_page", side_effect=config.ResearchError("blocked")
+            ),
+            self.assertRaises(config.ResearchError),
+        ):
+            cache.cached_call("firecrawl", "scrape", {"url": "https://example.com"})
+        self.assertEqual(list(config.CACHE.iterdir()), [])
+
+    def test_api_key_environment_precedence_and_file_fallback(self):
+        secrets = Path(self.temp.name) / "secrets"
+        secrets.mkdir()
+        (secrets / "test-key").write_text(" file-key\n")
+        with patch.object(credentials, "SECRETS", secrets):
+            for value, expected in (
+                (" env-key ", "env-key"),
+                ("  ", "file-key"),
+                ("", "file-key"),
+            ):
+                with (
+                    self.subTest(value=value),
+                    patch.dict("os.environ", {"TEST_API_KEY": value}),
+                ):
+                    self.assertEqual(
+                        credentials.api_key("TEST_API_KEY", "test-key"), expected
+                    )
+            with patch.dict("os.environ", {}, clear=True):
+                self.assertIsNone(credentials.api_key("TEST_API_KEY", "missing"))
+
+    def test_fetch_page_rejects_loading_error_placeholder(self):
+        html = (
+            "<html><body>A required part of this site couldn’t load. "
+            "This may be due to a browser extension, network issues, or browser settings. "
+            "Please check your connection, disable any ad blockers, or try using a "
+            "different browser.</body></html>"
+        )
+        with (
+            patch.object(pages, "download", return_value=(html, "text/html")),
+            self.assertRaisesRegex(config.ResearchError, "loading error"),
+        ):
+            pages.fetch_page("https://example.com")
 
     def test_code_without_matches_gives_actionable_error(self):
         args = self.args("code", "nope(", "--repo", "a/b")

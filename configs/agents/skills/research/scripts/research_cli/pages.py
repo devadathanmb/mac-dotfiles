@@ -22,7 +22,7 @@ TEXT_MIMES = (
 )
 # Servers that support markdown negotiation (e.g. Cloudflare) return it directly.
 PAGE_ACCEPT = "text/markdown, text/html;q=0.9, text/plain;q=0.8, */*;q=0.5"
-# Below this the page is likely JS-rendered or blocked; callers fall back to Exa.
+# Below this the page is likely JS-rendered or blocked; callers use scraping fallbacks.
 MIN_PAGE_CHARS = 200
 NOISE = (
     "script, style, noscript, template, svg, canvas, iframe, form, button, "
@@ -31,8 +31,7 @@ NOISE = (
 )
 
 
-def download(url: str, accept: str = "*/*") -> tuple[str, str]:
-    """Return (text, lowercase mime) for an HTTP(S) URL, enforcing size/text limits."""
+def validate_url(url: str) -> None:
     try:
         parts = urlsplit(url)
         if (
@@ -41,7 +40,17 @@ def download(url: str, accept: str = "*/*") -> tuple[str, str]:
             or parts.username
             or parts.password
         ):
-            raise ResearchError("raw fetch requires an HTTP(S) URL without credentials")
+            raise ValueError
+    except ValueError as error:
+        raise ResearchError(
+            "fetch requires an HTTP(S) URL without credentials", final=True
+        ) from error
+
+
+def download(url: str, accept: str = "*/*") -> tuple[str, str]:
+    """Return (text, lowercase mime) for an HTTP(S) URL, enforcing size/text limits."""
+    validate_url(url)
+    try:
         with httpx.stream(
             "GET",
             url,
@@ -150,6 +159,10 @@ def fetch_page(url: str) -> str:
     if mime not in HTML_MIMES:
         return text
     markdown = html_to_markdown(text, url)
+    if len(markdown) < 1000 and "a required part of this site couldn't load" in (
+        markdown.lower().replace("’", "'")
+    ):
+        raise ResearchError("page returned a loading error", "try a scraping fallback")
     if len(markdown) < MIN_PAGE_CHARS:
         raise ResearchError(
             f"page has little static content ({len(markdown)} chars after conversion)",

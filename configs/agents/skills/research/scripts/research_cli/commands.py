@@ -6,7 +6,9 @@ import re
 
 from .cache import cached_call
 from .config import ResearchError
+from .credentials import api_key
 from .output import emit_response
+from .pages import validate_url
 
 
 def library_field(block: str, name: str) -> str:
@@ -100,6 +102,8 @@ def web(args: argparse.Namespace) -> None:
 
 
 def exa_fetch(args: argparse.Namespace, urls: list[str]) -> str:
+    for url in urls:
+        validate_url(url)
     print(f"[Exa extraction: ≤{args.chars:,} chars/page requested; may be incomplete]")
     return cached_call(
         "exa",
@@ -109,6 +113,31 @@ def exa_fetch(args: argparse.Namespace, urls: list[str]) -> str:
     )
 
 
+def fetch_url(args: argparse.Namespace, url: str) -> tuple[str, str]:
+    validate_url(url)
+    if args.raw:
+        return cached_call(
+            "raw", "fetch", {"url": url}, args.fresh
+        ), "direct HTTP, unmodified"
+    if args.firecrawl:
+        return cached_call("firecrawl", "scrape", {"url": url}, args.fresh), "Firecrawl"
+    try:
+        return cached_call(
+            "page", "fetch", {"url": url}, args.fresh
+        ), "direct HTTP, markdown"
+    except ResearchError as error:
+        if error.final:
+            raise
+        print(f"[direct fetch failed: {error}; falling back to Exa]")
+    try:
+        return exa_fetch(args, [url]), "Exa"
+    except ResearchError as error:
+        if not api_key("FIRECRAWL_API_KEY", "firecrawl-api-key"):
+            raise
+        print(f"[Exa failed: {error}; falling back to Firecrawl]")
+    return cached_call("firecrawl", "scrape", {"url": url}, args.fresh), "Firecrawl"
+
+
 def fetch(args: argparse.Namespace) -> None:
     if args.exa:
         emit_response(exa_fetch(args, args.urls), args, f"fetch-{args.urls[0]}")
@@ -116,21 +145,13 @@ def fetch(args: argparse.Namespace) -> None:
     budget = args.max_chars or None
     failures = 0
     for url in args.urls:
-        if args.raw:
-            result = cached_call("raw", "fetch", {"url": url}, args.fresh)
-            print(f"URL: {url} [direct HTTP, unmodified]")
-        else:
-            try:
-                result = cached_call("page", "fetch", {"url": url}, args.fresh)
-                print(f"URL: {url} [direct HTTP, markdown]")
-            except ResearchError as error:
-                if error.final:
-                    print(f"URL: {url} [error: {error} | hint: {error.hint}]")
-                    failures += 1
-                    continue
-                print(f"[direct fetch failed: {error}; falling back to Exa]")
-                result = exa_fetch(args, [url])
-                print(f"URL: {url} [Exa]")
+        try:
+            result, source = fetch_url(args, url)
+        except ResearchError as error:
+            print(f"URL: {url} [error: {error} | hint: {error.hint}]")
+            failures += 1
+            continue
+        print(f"URL: {url} [{source}]")
         used = emit_response(result, args, f"fetch-{url}", raw=args.raw, budget=budget)
         if budget is not None:
             budget -= used
