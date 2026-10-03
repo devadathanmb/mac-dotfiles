@@ -11,7 +11,7 @@ Run `uv run ~/.agents/skills/research/scripts/research.py <command>` via the she
 | --- | --- | --- |
 | Library/framework/SDK docs | `research docs <name or /org/repo[/version]> "<question>"` | Context7 |
 | Find pages, issues, changelogs, errors | `research web "<query>"` | Exa |
-| Read any URL (HTML → markdown, full page) | `research fetch <url>... [--match "<regex>"]` | direct HTTP, Exa fallback |
+| Read any URL (HTML → markdown, full page) | `research fetch <url>... [--match "<regex>"]` | direct HTTP → Exa → Firecrawl |
 | API usage examples from docs/blogs | `research examples "<query>"` | Exa |
 | OSS architecture and repo Q&A | `research wiki ask owner/repo "<question>"` | DeepWiki |
 | Literal public GitHub code | `research code "<snippet>" [--repo owner/repo] [--lang TypeScript]` | grep.app |
@@ -34,8 +34,8 @@ Check local evidence first, then pick one command for the missing fact; these ar
 - `fetch <url>...`:
   - Returns the full page, not a truncated extract. HTML is converted to markdown locally (nav, scripts and images stripped, links made absolute); Markdown, `llms.txt`, source files and plain text pass through; JSON is pretty-printed so `--match` works on APIs. Binary and >10 MiB responses are rejected.
   - For a long page, `--match` it instead of reading it whole.
-  - A 404/410 is reported per URL (the rest of a batch still runs). A blocked, binary, or JS-rendered page falls back to Exa automatically (`--chars` sets Exa's per-page limit, default 20,000; its text may be incomplete).
-  - `--exa` forces Exa. `--raw` returns the unmodified body (HTML source, whitespace-sensitive files); never use it just to read an HTML page.
+  - A 404/410 is reported per URL (the rest of a batch still runs). A blocked, binary, or JS-rendered page falls back to Exa, then Firecrawl if Exa fails and a Firecrawl key is configured. `--chars` sets Exa's per-page limit (default 20,000; its text may be incomplete), not Firecrawl's.
+  - `--exa` forces Exa; `--firecrawl` forces Firecrawl. Firecrawl uses `FIRECRAWL_API_KEY` or `~/.secrets/firecrawl-api-key`; scraping uses credits. `--fresh` bypasses its page cache too. `--raw` returns the unmodified HTTP body; never use it just to read an HTML page.
 - `code`: literal text (`useOptimistic(`), not a description. Supports `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; there is no `-n`. Output starts with an `Index` of every hit (repo, path:lines), so pick candidates from it instead of re-listing with `rg`. "no matches" means loosen the snippet or filters; don't probe repos one by one.
 - `wiki ask`: accepts comma-separated repos; usually 10–60s. Always run in background, never foreground. Wait for completion notifications; do not poll, duplicate the lookup, or re-derive the answer while it runs. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
 

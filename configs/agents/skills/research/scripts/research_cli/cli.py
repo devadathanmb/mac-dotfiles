@@ -109,7 +109,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     fetch_parser = command(
         "fetch",
-        "read page(s) as markdown (HTML converted locally; Exa fallback)",
+        "read page(s) as markdown (direct HTTP → Exa → Firecrawl)",
         handlers.fetch,
     )
     fetch_parser.add_argument("urls", nargs="+")
@@ -129,6 +129,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--exa",
         action="store_true",
         help="use Exa extraction instead of direct fetch (JS-rendered or blocked pages)",
+    )
+    mode.add_argument(
+        "--firecrawl",
+        action="store_true",
+        help="use Firecrawl scraping directly (requires FIRECRAWL_API_KEY)",
     )
 
     examples_parser = command(

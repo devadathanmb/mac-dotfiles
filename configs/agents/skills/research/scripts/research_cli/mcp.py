@@ -1,21 +1,12 @@
 """JSON-RPC calls to the hosted MCP services (Context7, Exa, DeepWiki, grep.app)."""
 
 import json
-import os
 import time
 
 import httpx
 
-from .config import ENDPOINTS, REQUEST_TIMEOUT_SECONDS, SECRETS, ResearchError
-
-
-def api_key(environment_variable: str, filename: str) -> str | None:
-    if value := os.environ.get(environment_variable):
-        return value.strip()
-    try:
-        return (SECRETS / filename).read_text().strip() or None
-    except OSError:
-        return None
+from .config import ENDPOINTS, REQUEST_TIMEOUT_SECONDS, ResearchError
+from .credentials import api_key
 
 
 def auth_headers(service: str) -> dict[str, str]:

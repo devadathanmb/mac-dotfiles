@@ -24,8 +24,9 @@ CACHE_TTL_SECONDS = {
     "exa": 3600,
     "raw": 3600,
     "page": 3600,
+    "firecrawl": 3600,
 }
-REQUEST_TIMEOUT_SECONDS = {"dw": 240, "exa": 90, "c7": 60, "grep": 60}
+REQUEST_TIMEOUT_SECONDS = {"dw": 240, "exa": 90, "c7": 60, "grep": 60, "firecrawl": 75}
 DEFAULT_MAX_CHARS = 4000
 
 

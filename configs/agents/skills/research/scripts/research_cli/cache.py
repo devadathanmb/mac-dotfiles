@@ -9,6 +9,7 @@ from pathlib import Path
 
 from . import config
 from .config import CACHE_TTL_SECONDS, RETENTION_SECONDS
+from .firecrawl import scrape_page
 from .mcp import request_tool
 from .pages import fetch_page, fetch_raw
 
@@ -38,11 +39,12 @@ def cached_call(service: str, tool: str, arguments: dict, fresh: bool = False) -
         and time.time() - path.stat().st_mtime < CACHE_TTL_SECONDS[service]
     ):
         return path.read_bytes().decode("utf-8")
-    text = (
-        DIRECT_FETCHERS[service](arguments["url"])
-        if service in DIRECT_FETCHERS
-        else request_tool(service, tool, arguments)
-    )
+    if service in DIRECT_FETCHERS:
+        text = DIRECT_FETCHERS[service](arguments["url"])
+    elif service == "firecrawl":
+        text = scrape_page(arguments["url"], fresh=fresh)
+    else:
+        text = request_tool(service, tool, arguments)
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", newline="", dir=config.CACHE, delete=False
     ) as pending:
