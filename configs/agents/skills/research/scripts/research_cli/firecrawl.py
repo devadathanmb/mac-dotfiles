@@ -4,7 +4,7 @@ import httpx
 
 from .config import ResearchError
 from .credentials import api_key
-from .network import request_timeout
+from .network import open_client, request_timeout
 from .pages import validate_url
 
 
@@ -22,14 +22,14 @@ def scrape_page(
     if fresh:
         payload["maxAge"] = 0
     try:
-        post = client.post if client is not None else httpx.post
-        response = post(
-            "https://api.firecrawl.dev/v2/scrape",
-            headers={"Authorization": f"Bearer {key}"},
-            json=payload,
-            timeout=request_timeout("firecrawl"),
-            follow_redirects=False,
-        )
+        with open_client(client) as http:
+            response = http.post(
+                "https://api.firecrawl.dev/v2/scrape",
+                headers={"Authorization": f"Bearer {key}"},
+                json=payload,
+                timeout=request_timeout("firecrawl"),
+                follow_redirects=False,
+            )
         response.raise_for_status()
         result = response.json()
     except httpx.HTTPStatusError as error:
