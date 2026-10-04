@@ -1,6 +1,6 @@
 ---
 name: research
-description: Research current library/SDK docs, API examples, errors, changelogs, OSS internals, and public GitHub code via Context7, Exa, DeepWiki, and grep.app. Use when local evidence is insufficient or version-sensitive facts need verification.
+description: Research current library/SDK docs, API examples, errors, changelogs, OSS internals, and public GitHub code via Context7, Exa, DeepWiki, and grep.app. Use when local evidence is insufficient, a quick web lookup doesn't settle it, or version-sensitive facts need verification.
 ---
 
 # research
@@ -35,7 +35,7 @@ Check local evidence first, then pick one command for the missing fact; these ar
 - `code`: literal text (`useOptimistic(`), not a description. Supports `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; there is no `-n`.
   - Output starts with an `Index` of every hit (repo, path:lines); pick candidates from it, not another `rg` listing. For "find N examples", one search plus its Index is enough: read 2–3 candidate files with `fetch --match`, then answer.
   - On "no matches", loosen the snippet or filters; don't probe repos one by one. After two misses, switch to `examples`/`web`.
-- `wiki ask`: accepts comma-separated repos; usually 10–60s. Always run in background, never foreground. Wait for completion notifications; do not poll, duplicate the lookup, or re-derive the answer while it runs. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
+- `wiki ask`: accepts comma-separated repos; usually 10–60s. It indexes only the default branch; for other branches, tags, or unreleased work, `fetch` the raw source or use `gh`. Always run in background, never foreground. Wait for completion notifications; do not poll, duplicate the lookup, or re-derive the answer while it runs. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
 
 ## Reading output
 
