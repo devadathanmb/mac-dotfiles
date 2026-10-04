@@ -1,0 +1,19 @@
+{
+  "pluginVersion": "0.5.0",
+  "keymapFile": {
+    "path": "Settings/Keybindings.md",
+    "format": "auto",
+    "extend": false,
+    "autoReload": true
+  },
+  "modal": {
+    "delay": 250,
+    "execDelay": 100,
+    "showInvalid": true,
+    "backspaceReverts": true,
+    "backspaceCloses": true,
+    "trimDescriptions": true,
+    "dimBackground": false
+  },
+  "activateOnSpace": "markdown_only"
+}

@@ -48,6 +48,21 @@
     "~/Library/Application Support/Code/User/settings.json": configs/vscode/settings.json
     "~/Library/Application Support/Code/User/keybindings.json": configs/vscode/keybindings.json
 
+    # Obsidian: reusable settings only; notes and workspace state stay in the vault.
+    ~/repos/notes/.obsidian/app.json: configs/obsidian/app.json
+    ~/repos/notes/.obsidian/appearance.json: configs/obsidian/appearance.json
+    ~/repos/notes/.obsidian/community-plugins.json: configs/obsidian/community-plugins.json
+    ~/repos/notes/.obsidian/core-plugins.json: configs/obsidian/core-plugins.json
+    ~/repos/notes/.obsidian/hotkeys.json: configs/obsidian/hotkeys.json
+    ~/repos/notes/.obsidian.vimrc: configs/obsidian/vimrc
+    ~/repos/notes/Settings/Keybindings.md: configs/obsidian/Keybindings.md
+    ~/repos/notes/.obsidian/snippets/vscode-style.css: configs/obsidian/snippets/vscode-style.css
+    ~/repos/notes/.obsidian/plugins/spacekeys/data.json: configs/obsidian/plugins/spacekeys/data.json
+    ~/repos/notes/.obsidian/plugins/obsidian-vimrc-support/data.json: configs/obsidian/plugins/obsidian-vimrc-support/data.json
+    ~/repos/notes/.obsidian/plugins/sidebar-keyboard-navigation/data.json: configs/obsidian/plugins/sidebar-keyboard-navigation/data.json
+    ~/repos/notes/.obsidian/plugins/global-vim-navigation: configs/obsidian/plugins/global-vim-navigation
+    ~/repos/notes/.obsidian/plugins/document-comments/data.json: configs/obsidian/plugins/document-comments/data.json
+
     # Pi Coding Agent
     ~/.pi/agent/settings.json: configs/pi/settings.json
     ~/.pi/agent/keybindings.json: configs/pi/keybindings.json
@@ -67,3 +82,4 @@
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
+    - [python configs/obsidian/install-plugins.py, Installing pinned Obsidian plugins]

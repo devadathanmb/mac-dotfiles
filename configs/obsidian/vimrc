@@ -1,0 +1,22 @@
+" Match VS Code's system clipboard behavior.
+set clipboard=unnamed
+
+" H/L switch tabs rather than jumping within the document.
+exmap previousTab obcommand workspace:previous-tab
+exmap nextTab obcommand workspace:next-tab
+nmap H :previousTab<CR>
+nmap L :nextTab<CR>
+
+" Ctrl+N clears highlights in normal mode (not in completion menus).
+nmap <C-n> :nohl<CR>
+
+" VS Code's Ctrl+X closes the editor only in normal mode.
+exmap closeTab obcommand workspace:close
+nmap <C-x> :closeTab<CR>
+
+" Preserve the yank register when replacing a visual selection.
+vmap p P
+
+" Keep visual selections active after indentation.
+vmap > >gv
+vmap < <gv

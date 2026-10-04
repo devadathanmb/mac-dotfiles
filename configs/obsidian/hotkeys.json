@@ -1,0 +1,17 @@
+{
+  "spacekeys:leader": [
+    { "modifiers": ["Ctrl"], "key": "m" }
+  ],
+  "app:toggle-left-sidebar": [
+    { "modifiers": ["Mod"], "key": "e" }
+  ],
+  "file-explorer:open": [
+    { "modifiers": ["Ctrl"], "key": "e" }
+  ],
+  "editor:focus-left": [
+    { "modifiers": ["Ctrl"], "key": "h" }
+  ],
+  "editor:focus-right": [
+    { "modifiers": ["Ctrl"], "key": "l" }
+  ]
+}

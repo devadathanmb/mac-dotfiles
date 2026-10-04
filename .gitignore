@@ -17,3 +17,8 @@ configs/zoxide/db.zo
 
 # Private agent skills (local only; name them private-<name>)
 configs/agents/skills/private-*/
+
+# Obsidian third-party code is downloaded into the vault; only settings belong here.
+configs/obsidian/plugins/*/*
+!configs/obsidian/plugins/*/data.json
+!configs/obsidian/plugins/global-vim-navigation/*
