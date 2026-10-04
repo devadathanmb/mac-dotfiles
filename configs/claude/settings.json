@@ -35,7 +35,10 @@
       "RemoteTrigger",
       "PushNotification",
       "ScheduleWakeup",
-      "ReportFindings"
+      "ReportFindings",
+      "Agent(claude-code-guide)",
+      "Agent(statusline-setup)",
+      "Agent(claude)"
     ],
     "ask": [
       "Bash(rm -rf *)",
