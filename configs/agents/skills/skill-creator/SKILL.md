@@ -57,6 +57,11 @@ how the skill used to work or why it changed. Mention an unwanted behavior only
 when naming it prevents a realistic, recurring failure. Do not introduce
 irrelevant terms that may bias later output.
 
+Scope instructions to the decision they govern. When defining when to use an
+approach, specify its trigger without prescribing alternatives already governed
+elsewhere. Check that the wording does not unintentionally redirect adjacent
+behavior.
+
 Use `must`, `always`, `never`, and `only` when the rule is deliberately
 absolute. Preserve the user's intended rule strength.
 
