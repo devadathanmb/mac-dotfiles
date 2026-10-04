@@ -3,10 +3,17 @@
 import argparse
 import json
 import re
+from collections import Counter
+from collections.abc import Generator
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
+from dataclasses import dataclass, field
+from itertools import islice
 
 from .cache import cached_call
-from .config import ResearchError
+from .config import MAX_FETCH_WORKERS, ResearchError
 from .credentials import api_key
+from .network import ClientFactory, shared_client
 from .output import emit_response
 from .pages import validate_url
 
@@ -16,8 +23,33 @@ def library_field(block: str, name: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+def library_summary(block: str) -> str:
+    fields = (
+        ("Source Reputation", "reputation"),
+        ("Code Snippets", "snippets"),
+        ("Benchmark Score", "score"),
+    )
+    metadata = "; ".join(
+        f"{label}: {value}"
+        for name, label in fields
+        if (value := library_field(block, name))
+    )
+    versions = library_field(block, "Versions") or "not listed"
+    return "\n".join(
+        line
+        for line in (
+            f"### {library_field(block, 'Title')} — {library_field(block, 'Context7-compatible library ID')}",
+            library_field(block, "Description"),
+            metadata,
+            f"Versions: {versions}",
+        )
+        if line
+    )
+
+
 def docs(args: argparse.Namespace) -> None:
     library = args.library
+    selection = ""
     if not library.startswith("/"):
         result = cached_call(
             "c7",
@@ -35,17 +67,21 @@ def docs(args: argparse.Namespace) -> None:
                 f"no library matches '{library}'", "try a different name, or `web`"
             )
         if args.list or not args.query:
-            listing = "\n".join(
-                f"{library_field(block, 'Context7-compatible library ID')}  {library_field(block, 'Title')}  "
-                f"[{library_field(block, 'Source Reputation')}]  {library_field(block, 'Description')[:90]}"
-                for block in blocks[:8]
+            listing = (
+                f"# Context7 candidates ({len(blocks)})\n"
+                'Next: `docs <id> "<question>"`; pin versions with '
+                "`<id>/<exact-listed-version>`.\n\n"
             )
+            listing += "\n\n".join(library_summary(block) for block in blocks)
             emit_response(listing, args, f"docs-list-{library}")
-            if not args.query:
-                print('\n(pass a query to fetch docs: research docs <id> "<question>")')
             return
         library = library_field(blocks[0], "Context7-compatible library ID")
+        selection = f"Selection: first match of {len(blocks)}; use --list to compare.\n"
     print(f"# Context7: {library}")
+    if len(library.strip("/").split("/")) == 2:
+        selection += (
+            "Version: unpinned; a version in the question does not pin the index.\n"
+        )
     result = cached_call(
         "c7", "query-docs", {"libraryId": library, "query": args.query}, args.fresh
     )
@@ -54,7 +90,11 @@ def docs(args: argparse.Namespace) -> None:
             f"library id '{library}' not found",
             "use `research docs <name> --list` to find valid ids",
         )
-    emit_response(result, args, f"docs-{library}-{args.query}")
+    emit_response(
+        (selection + "\n" if selection else "") + result,
+        args,
+        f"docs-{library}-{args.query}",
+    )
 
 
 def format_search_results(response: str) -> str:
@@ -101,60 +141,137 @@ def web(args: argparse.Namespace) -> None:
     emit_response(result, args, f"web-{args.query}")
 
 
-def exa_fetch(args: argparse.Namespace, urls: list[str]) -> str:
+def exa_fetch(
+    args: argparse.Namespace,
+    urls: list[str],
+    *,
+    client: ClientFactory | None = None,
+    notices: list[str] | None = None,
+) -> str:
     for url in urls:
         validate_url(url)
-    print(f"[Exa extraction: ≤{args.chars:,} chars/page requested; may be incomplete]")
+    notice = (
+        f"[Exa extraction: ≤{args.chars:,} chars/page requested; may be incomplete]"
+    )
+    if notices is None:
+        print(notice)
+    else:
+        notices.append(notice)
     return cached_call(
         "exa",
         "web_fetch_exa",
         {"urls": urls, "maxCharacters": args.chars},
         args.fresh,
+        client=client,
     )
 
 
-def fetch_url(args: argparse.Namespace, url: str) -> tuple[str, str]:
+def fetch_url(
+    args: argparse.Namespace,
+    url: str,
+    client: ClientFactory,
+    notices: list[str],
+) -> tuple[str, str]:
     validate_url(url)
     if args.raw:
         return cached_call(
-            "raw", "fetch", {"url": url}, args.fresh
+            "raw", "fetch", {"url": url}, args.fresh, client=client
         ), "direct HTTP, unmodified"
     if args.firecrawl:
-        return cached_call("firecrawl", "scrape", {"url": url}, args.fresh), "Firecrawl"
+        return cached_call(
+            "firecrawl", "scrape", {"url": url}, args.fresh, client=client
+        ), "Firecrawl"
     try:
         return cached_call(
-            "page", "fetch", {"url": url}, args.fresh
+            "page", "fetch", {"url": url}, args.fresh, client=client
         ), "direct HTTP, markdown"
     except ResearchError as error:
         if error.final:
             raise
-        print(f"[direct fetch failed: {error}; falling back to Exa]")
+        notices.append(f"[direct fetch failed: {error}; falling back to Exa]")
     try:
-        return exa_fetch(args, [url]), "Exa"
+        return exa_fetch(args, [url], client=client, notices=notices), "Exa"
     except ResearchError as error:
         if not api_key("FIRECRAWL_API_KEY", "firecrawl-api-key"):
             raise
-        print(f"[Exa failed: {error}; falling back to Firecrawl]")
-    return cached_call("firecrawl", "scrape", {"url": url}, args.fresh), "Firecrawl"
+        notices.append(f"[Exa failed: {error}; falling back to Firecrawl]")
+    return cached_call(
+        "firecrawl", "scrape", {"url": url}, args.fresh, client=client
+    ), "Firecrawl"
+
+
+@dataclass
+class FetchResult:
+    text: str = ""
+    source: str = ""
+    notices: list[str] = field(default_factory=list)
+    error: ResearchError | None = None
+
+
+def fetch_result(
+    args: argparse.Namespace, url: str, client: ClientFactory
+) -> FetchResult:
+    result = FetchResult()
+    try:
+        result.text, result.source = fetch_url(args, url, client, result.notices)
+    except ResearchError as error:
+        result.error = error
+    return result
+
+
+def fetch_results(
+    args: argparse.Namespace, client: ClientFactory
+) -> Generator[tuple[str, FetchResult]]:
+    urls = iter(dict.fromkeys(args.urls))
+    remaining = Counter(args.urls)
+    repeated = {}
+    with ThreadPoolExecutor(max_workers=MAX_FETCH_WORKERS) as executor:
+        pending = {
+            url: executor.submit(fetch_result, args, url, client)
+            for url in islice(urls, MAX_FETCH_WORKERS)
+        }
+        for url in args.urls:
+            if url in repeated:
+                result = repeated[url]
+            else:
+                result = pending.pop(url).result()
+                next_url = next(urls, None)
+                if next_url is not None:
+                    pending[next_url] = executor.submit(
+                        fetch_result, args, next_url, client
+                    )
+                if remaining[url] > 1:
+                    repeated[url] = result
+            remaining[url] -= 1
+            if not remaining[url]:
+                repeated.pop(url, None)
+            yield url, result
 
 
 def fetch(args: argparse.Namespace) -> None:
     if args.exa:
-        emit_response(exa_fetch(args, args.urls), args, f"fetch-{args.urls[0]}")
+        emit_response(
+            exa_fetch(args, list(dict.fromkeys(args.urls))),
+            args,
+            f"fetch-{args.urls[0]}",
+        )
         return
     budget = args.max_chars or None
     failures = 0
-    for url in args.urls:
-        try:
-            result, source = fetch_url(args, url)
-        except ResearchError as error:
-            print(f"URL: {url} [error: {error} | hint: {error.hint}]")
-            failures += 1
-            continue
-        print(f"URL: {url} [{source}]")
-        used = emit_response(result, args, f"fetch-{url}", raw=args.raw, budget=budget)
-        if budget is not None:
-            budget -= used
+    with shared_client() as client, closing(fetch_results(args, client)) as results:
+        for url, result in results:
+            for notice in result.notices:
+                print(notice)
+            if result.error is not None:
+                print(f"URL: {url} [error: {result.error} | hint: {result.error.hint}]")
+                failures += 1
+                continue
+            print(f"URL: {url} [{result.source}]")
+            used = emit_response(
+                result.text, args, f"fetch-{url}", raw=args.raw, budget=budget
+            )
+            if budget is not None:
+                budget -= used
     if failures == len(args.urls):
         raise ResearchError("no URL could be fetched", "see the errors above")
 

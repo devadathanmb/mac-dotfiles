@@ -11,6 +11,7 @@ from . import config
 from .config import CACHE_TTL_SECONDS, RETENTION_SECONDS
 from .firecrawl import scrape_page
 from .mcp import request_tool
+from .network import ClientFactory
 from .pages import fetch_page, fetch_raw
 
 DIRECT_FETCHERS = {"raw": fetch_raw, "page": fetch_page}
@@ -28,7 +29,14 @@ def remove_expired_files() -> None:
                 pass
 
 
-def cached_call(service: str, tool: str, arguments: dict, fresh: bool = False) -> str:
+def cached_call(
+    service: str,
+    tool: str,
+    arguments: dict,
+    fresh: bool = False,
+    *,
+    client: ClientFactory | None = None,
+) -> str:
     key = hashlib.sha1(
         json.dumps([service, tool, arguments], sort_keys=True).encode()
     ).hexdigest()
@@ -39,12 +47,13 @@ def cached_call(service: str, tool: str, arguments: dict, fresh: bool = False) -
         and time.time() - path.stat().st_mtime < CACHE_TTL_SECONDS[service]
     ):
         return path.read_bytes().decode("utf-8")
+    options = {"client": client()} if client is not None else {}
     if service in DIRECT_FETCHERS:
-        text = DIRECT_FETCHERS[service](arguments["url"])
+        text = DIRECT_FETCHERS[service](arguments["url"], **options)
     elif service == "firecrawl":
-        text = scrape_page(arguments["url"], fresh=fresh)
+        text = scrape_page(arguments["url"], fresh=fresh, **options)
     else:
-        text = request_tool(service, tool, arguments)
+        text = request_tool(service, tool, arguments, **options)
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", newline="", dir=config.CACHE, delete=False
     ) as pending:

@@ -8,7 +8,8 @@ from html_to_markdown import convert
 from selectolax.lexbor import LexborHTMLParser
 
 from . import config
-from .config import REQUEST_TIMEOUT_SECONDS, ResearchError
+from .config import ResearchError
+from .network import open_client, request_timeout
 
 HTML_MIMES = ("text/html", "application/xhtml+xml")
 TEXT_MIMES = (
@@ -47,53 +48,18 @@ def validate_url(url: str) -> None:
         ) from error
 
 
-def download(url: str, accept: str = "*/*") -> tuple[str, str]:
+def download(
+    url: str,
+    accept: str = "*/*",
+    *,
+    client: httpx.Client | None = None,
+    compress: bool = False,
+) -> tuple[str, str]:
     """Return (text, lowercase mime) for an HTTP(S) URL, enforcing size/text limits."""
     validate_url(url)
     try:
-        with httpx.stream(
-            "GET",
-            url,
-            headers={
-                "User-Agent": "research-cli/2.0",
-                "Accept": accept,
-                "Accept-Encoding": "identity",
-            },
-            timeout=REQUEST_TIMEOUT_SECONDS["exa"],
-            follow_redirects=True,
-        ) as response:
-            response.raise_for_status()
-            mime = (
-                response.headers.get("Content-Type", "text/plain")
-                .split(";", 1)[0]
-                .strip()
-                .lower()
-            )
-            if not (
-                mime.startswith("text/")
-                or mime.endswith(("+json", "+xml"))
-                or mime in TEXT_MIMES
-                or mime in HTML_MIMES
-            ):
-                raise ResearchError(
-                    f"raw fetch expected text, got {mime}",
-                    "use fetch --exa for page extraction",
-                )
-            body = bytearray()
-            for chunk in response.iter_bytes(chunk_size=64 * 1024):
-                if len(body) + len(chunk) > config.MAX_RAW_BYTES:
-                    raise ResearchError(
-                        "raw response exceeds 10 MiB",
-                        "fetch a smaller source file or use fetch --exa",
-                    )
-                body.extend(chunk)
-            text = body.decode(response.charset_encoding or "utf-8")
-            if "\x00" in text:
-                raise ResearchError(
-                    "raw response contains binary data",
-                    "use a text source or fetch --exa",
-                )
-            return text, mime
+        with open_client(client) as http:
+            return download_response(http, url, accept, compress)
     except httpx.HTTPStatusError as error:
         status = error.response.status_code
         if status in (404, 410):
@@ -115,8 +81,56 @@ def download(url: str, accept: str = "*/*") -> tuple[str, str]:
         ) from error
 
 
-def fetch_raw(url: str) -> str:
-    return download(url)[0]
+def download_response(
+    client: httpx.Client, url: str, accept: str, compress: bool
+) -> tuple[str, str]:
+    with client.stream(
+        "GET",
+        url,
+        headers={
+            "User-Agent": "research-cli/2.0",
+            "Accept": accept,
+            "Accept-Encoding": "gzip, deflate" if compress else "identity",
+        },
+        timeout=request_timeout("exa"),
+        follow_redirects=True,
+    ) as response:
+        response.raise_for_status()
+        mime = (
+            response.headers.get("Content-Type", "text/plain")
+            .split(";", 1)[0]
+            .strip()
+            .lower()
+        )
+        if not (
+            mime.startswith("text/")
+            or mime.endswith(("+json", "+xml"))
+            or mime in TEXT_MIMES
+            or mime in HTML_MIMES
+        ):
+            raise ResearchError(
+                f"raw fetch expected text, got {mime}",
+                "use fetch --exa for page extraction",
+            )
+        body = bytearray()
+        for chunk in response.iter_bytes(chunk_size=64 * 1024):
+            if len(body) + len(chunk) > config.MAX_RAW_BYTES:
+                raise ResearchError(
+                    "raw response exceeds 10 MiB",
+                    "fetch a smaller source file or use fetch --exa",
+                )
+            body.extend(chunk)
+        text = body.decode(response.charset_encoding or "utf-8")
+        if "\x00" in text:
+            raise ResearchError(
+                "raw response contains binary data",
+                "use a text source or fetch --exa",
+            )
+        return text, mime
+
+
+def fetch_raw(url: str, *, client: httpx.Client | None = None) -> str:
+    return download(url, client=client)[0]
 
 
 def html_to_markdown(html: str, base_url: str) -> str:
@@ -139,17 +153,17 @@ def html_to_markdown(html: str, base_url: str) -> str:
                 node.decompose()
         for link in root.css("a[href]"):
             href = link.attrs["href"]
-            if not href.startswith("#"):
+            if href is not None and not href.startswith("#"):
                 link.attrs["href"] = urljoin(base_url, href)
-        result = str(convert(root.html).content).strip()
+        result = str(convert(root.html or "").content).strip()
         if len(result) >= MIN_PAGE_CHARS:
             break
     return result
 
 
-def fetch_page(url: str) -> str:
+def fetch_page(url: str, *, client: httpx.Client | None = None) -> str:
     """Fetch a URL; markdown/plain text passes through, HTML is converted."""
-    text, mime = download(url, PAGE_ACCEPT)
+    text, mime = download(url, PAGE_ACCEPT, client=client, compress=True)
     if mime == "application/json" or mime.endswith("+json"):
         # Minified JSON is one line, which defeats --match and line-based reads.
         try:
