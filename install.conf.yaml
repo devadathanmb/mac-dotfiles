@@ -38,6 +38,7 @@
     ~/.config/opencode/opencode.jsonc: configs/opencode/opencode.jsonc
     ~/.config/opencode/themes/github-dark-default.json: configs/opencode/themes/github-dark-default.json
     ~/.config/snapzy/config.toml: configs/snapzy/config.toml
+    ~/.codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.claude/:
       glob: true
       path: configs/claude/*
