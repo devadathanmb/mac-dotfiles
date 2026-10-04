@@ -10,6 +10,8 @@ CACHE = WORK / "cache"
 OUTPUT = WORK / "out"
 RETENTION_SECONDS = 24 * 3600
 MAX_RAW_BYTES = 10 * 1024 * 1024
+MAX_FETCH_WORKERS = 6
+CONNECT_TIMEOUT_SECONDS = 5
 
 ENDPOINTS = {
     "exa": "https://mcp.exa.ai/mcp?tools=web_search_exa,web_search_advanced_exa,web_fetch_exa,get_code_context_exa",

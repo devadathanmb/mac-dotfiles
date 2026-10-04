@@ -29,11 +29,20 @@ class ResearchTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
+        transport = patch.object(
+            httpx.HTTPTransport,
+            "handle_request",
+            side_effect=AssertionError("unit tests must not make live HTTP requests"),
+        )
+        transport.start()
+        self.addCleanup(transport.stop)
         root = Path(self.temp.name)
         for name in ("CACHE", "OUTPUT"):
             directory = root / name.lower()
             directory.mkdir()
-            self.enterContext(patch.object(config, name, directory))
+            patcher = patch.object(config, name, directory)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def args(self, *tokens):
         args = cli.build_parser().parse_args(tokens)
@@ -139,7 +148,11 @@ class ResearchTests(unittest.TestCase):
             "--max-chars",
             "20",
         )
-        with patch.object(commands, "cached_call", side_effect=["a" * 40, "b" * 40]):
+
+        def retrieve(service, tool, arguments, fresh, **options):
+            return ("a" if arguments["url"] == "https://one.test" else "b") * 40
+
+        with patch.object(commands, "cached_call", side_effect=retrieve):
             _, output = self.capture(commands.fetch, args)
         self.assertIn("a" * 20, output)
         self.assertNotIn("b" * 20, output)
@@ -259,9 +272,13 @@ class ResearchTests(unittest.TestCase):
     def test_fetch_404_skips_exa_and_continues_batch(self):
         args = self.args("fetch", "https://a.test/x", "https://b.test/y")
         missing = config.ResearchError("HTTP 404", "fix the URL", final=True)
-        with patch.object(
-            commands, "cached_call", side_effect=[missing, "# Page"]
-        ) as call:
+
+        def retrieve(service, tool, arguments, fresh, **options):
+            if arguments["url"] == "https://a.test/x":
+                raise missing
+            return "# Page"
+
+        with patch.object(commands, "cached_call", side_effect=retrieve) as call:
             _, output = self.capture(commands.fetch, args)
         self.assertEqual([c.args[0] for c in call.call_args_list], ["page", "page"])
         self.assertIn("[error: HTTP 404", output)
@@ -285,9 +302,11 @@ class ResearchTests(unittest.TestCase):
         args = self.args("fetch", "--firecrawl", "https://example.com")
         with patch.object(commands, "cached_call", return_value="# Page") as call:
             _, output = self.capture(commands.fetch, args)
-        call.assert_called_once_with(
-            "firecrawl", "scrape", {"url": "https://example.com"}, False
+        self.assertEqual(
+            call.call_args.args,
+            ("firecrawl", "scrape", {"url": "https://example.com"}, False),
         )
+        self.assertTrue(callable(call.call_args.kwargs["client"]))
         self.assertIn("[Firecrawl]", output)
         for other in ("--raw", "--exa"):
             with (
@@ -319,20 +338,22 @@ class ResearchTests(unittest.TestCase):
 
     def test_fetch_skips_unconfigured_firecrawl_and_continues_batch(self):
         args = self.args("fetch", "https://one.test", "https://two.test")
+
+        def retrieve(service, tool, arguments, fresh, **options):
+            if arguments.get("url") == "https://two.test":
+                return "# Second page"
+            raise config.ResearchError("blocked" if service == "page" else "Exa failed")
+
         with (
             patch.object(commands, "api_key", return_value=None),
             patch.object(
                 commands,
                 "cached_call",
-                side_effect=[
-                    config.ResearchError("blocked"),
-                    config.ResearchError("Exa failed"),
-                    "# Second page",
-                ],
+                side_effect=retrieve,
             ) as call,
         ):
             _, output = self.capture(commands.fetch, args)
-        self.assertEqual(
+        self.assertCountEqual(
             [c.args[0] for c in call.call_args_list], ["page", "exa", "page"]
         )
         self.assertIn("# Second page", output)
@@ -487,10 +508,16 @@ class ResearchTests(unittest.TestCase):
 
     def test_firecrawl_failure_does_not_abort_next_url(self):
         args = self.args("fetch", "--firecrawl", "https://one.test", "https://two.test")
+
+        def retrieve(service, tool, arguments, fresh, **options):
+            if arguments["url"] == "https://one.test":
+                raise config.ResearchError("blocked")
+            return "# Page"
+
         with patch.object(
             commands,
             "cached_call",
-            side_effect=[config.ResearchError("blocked"), "# Page"],
+            side_effect=retrieve,
         ) as call:
             _, output = self.capture(commands.fetch, args)
         self.assertEqual(call.call_count, 2)
@@ -585,7 +612,7 @@ class ResearchTests(unittest.TestCase):
     def test_timeout_does_not_repeat_expensive_call(self):
         with (
             patch.object(
-                httpx, "post", side_effect=httpx.ReadTimeout("timeout")
+                httpx.Client, "post", side_effect=httpx.ReadTimeout("timeout")
             ) as post,
             self.assertRaisesRegex(config.ResearchError, "timeout"),
         ):
@@ -608,7 +635,7 @@ class ResearchTests(unittest.TestCase):
             request=httpx.Request("GET", "https://example.com"),
         )
         with patch.object(
-            httpx, "stream", return_value=contextlib.nullcontext(response)
+            httpx.Client, "stream", return_value=contextlib.nullcontext(response)
         ):
             self.assertEqual(
                 pages.fetch_raw("https://example.com"), "  first\r\nlast\n\n"
@@ -630,7 +657,7 @@ class ResearchTests(unittest.TestCase):
             with (
                 self.subTest(mime=mime, limit=limit),
                 patch.object(
-                    httpx,
+                    httpx.Client,
                     "stream",
                     return_value=contextlib.nullcontext(response),
                 ),
@@ -659,6 +686,91 @@ class ResearchTests(unittest.TestCase):
         with patch.object(commands, "cached_call", return_value="answer"):
             _, output = self.capture(commands.docs, args)
         self.assertTrue(output.startswith("# Context7: /encode/httpx\n"))
+
+    def library_result(self, index=0, versions="v14.0.0, v15.0.0"):
+        return (
+            f"- Title: Next.js {index}\n"
+            f"- Context7-compatible library ID: /vercel/next{index}\n"
+            "- Description: Full-stack React framework\n"
+            "- Code Snippets: 5115\n"
+            "- Source Reputation: High\n"
+            "- Benchmark Score: 89.01\n"
+            f"- Versions: {versions}\n----------"
+        )
+
+    def test_docs_listing_preserves_selection_metadata_and_all_candidates(self):
+        args = self.args(
+            "docs",
+            "Next.js",
+            "Next.js 14 authentication",
+            "--list",
+            "--max-chars",
+            "500",
+        )
+        result = "\n".join(self.library_result(i) for i in range(10))
+        with patch.object(commands, "cached_call", return_value=result) as call:
+            _, output = self.capture(commands.docs, args)
+        call.assert_called_once()
+        self.assertEqual(call.call_args.args[2]["query"], args.query)
+        saved = next(config.OUTPUT.iterdir()).read_text()
+        for expected in (
+            "/vercel/next9",
+            "reputation: High; snippets: 5115; score: 89.01",
+            "Versions: v14.0.0, v15.0.0",
+        ):
+            self.assertIn(expected, saved)
+        self.assertIn("[saved:", output)
+
+    def test_docs_auto_selection_is_explicit_and_unpinned(self):
+        args = self.args("docs", "Next.js", "Next.js 14 authentication")
+        with patch.object(
+            commands, "cached_call", side_effect=[self.library_result(), "answer"]
+        ) as call:
+            _, output = self.capture(commands.docs, args)
+        self.assertEqual(call.call_args.args[2]["libraryId"], "/vercel/next0")
+        self.assertIn("Selection: first match of 1; use --list to compare.", output)
+        self.assertIn("Version: unpinned", output)
+        self.assertNotIn("Versions:", output)
+        self.assertNotIn("snippets:", output)
+        self.assertTrue(output.endswith("answer\n"))
+
+    def test_docs_versioned_id_is_passed_through_without_resolution(self):
+        args = self.args("docs", "/vercel/next.js/v14.0.0", "authentication")
+        with patch.object(commands, "cached_call", return_value="answer") as call:
+            _, output = self.capture(commands.docs, args)
+        call.assert_called_once_with(
+            "c7",
+            "query-docs",
+            {"libraryId": args.library, "query": args.query},
+            False,
+        )
+        self.assertNotIn("unpinned", output)
+
+    def test_docs_listing_missing_metadata_does_not_invent_versions(self):
+        args = self.args("docs", "Example", "--list")
+        result = "- Title: Example\n- Context7-compatible library ID: /org/example"
+        with patch.object(commands, "cached_call", return_value=result):
+            _, output = self.capture(commands.docs, args)
+        self.assertIn("Versions: not listed", output)
+        self.assertNotIn("score:", output)
+
+    def test_docs_listing_next_step_is_visible_once_without_question(self):
+        args = self.args("docs", "Next.js")
+        with patch.object(commands, "cached_call", return_value=self.library_result()):
+            _, output = self.capture(commands.docs, args)
+        self.assertTrue(output.startswith("# Context7 candidates (1)\nNext:"))
+        self.assertEqual(output.count('docs <id> "<question>"'), 1)
+
+    def test_docs_compact_selection_preserves_full_saved_documentation(self):
+        args = self.args("docs", "Next.js", "authentication", "--max-chars", "250")
+        result = "### Example\n\n" + "example body\n" * 100
+        with patch.object(
+            commands, "cached_call", side_effect=[self.library_result(), result]
+        ):
+            _, output = self.capture(commands.docs, args)
+        self.assertIn("### Example", output)
+        saved = next(config.OUTPUT.iterdir()).read_text()
+        self.assertTrue(saved.endswith(result))
 
     def test_wiki_normalizes_repository_list(self):
         args = self.args("wiki", "ask", "one/repo, two/repo", "question")

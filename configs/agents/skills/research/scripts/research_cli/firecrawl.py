@@ -2,12 +2,15 @@
 
 import httpx
 
-from .config import REQUEST_TIMEOUT_SECONDS, ResearchError
+from .config import ResearchError
 from .credentials import api_key
+from .network import request_timeout
 from .pages import validate_url
 
 
-def scrape_page(url: str, fresh: bool = False) -> str:
+def scrape_page(
+    url: str, fresh: bool = False, *, client: httpx.Client | None = None
+) -> str:
     validate_url(url)
     key = api_key("FIRECRAWL_API_KEY", "firecrawl-api-key")
     if not key:
@@ -19,11 +22,13 @@ def scrape_page(url: str, fresh: bool = False) -> str:
     if fresh:
         payload["maxAge"] = 0
     try:
-        response = httpx.post(
+        post = client.post if client is not None else httpx.post
+        response = post(
             "https://api.firecrawl.dev/v2/scrape",
             headers={"Authorization": f"Bearer {key}"},
             json=payload,
-            timeout=REQUEST_TIMEOUT_SECONDS["firecrawl"],
+            timeout=request_timeout("firecrawl"),
+            follow_redirects=False,
         )
         response.raise_for_status()
         result = response.json()
