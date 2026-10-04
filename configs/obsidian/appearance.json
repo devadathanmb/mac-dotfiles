@@ -1,0 +1,11 @@
+{
+  "theme": "obsidian",
+  "textFontFamily": "Maple Mono",
+  "interfaceFontFamily": "Maple Mono NF Medium, Maple Mono",
+  "monospaceFontFamily": "Maple Mono NF, Maple Mono",
+  "baseFontSize": 16,
+  "accentColor": "#61DAFB",
+  "enabledCssSnippets": [
+    "vscode-style"
+  ]
+}

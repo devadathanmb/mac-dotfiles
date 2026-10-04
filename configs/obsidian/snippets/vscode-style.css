@@ -1,0 +1,37 @@
+/* Match the user's GitHub Dark Default palette without another theme plugin. */
+.theme-dark {
+  --background-primary: #06090d;
+  --background-primary-alt: #0d1117;
+  --background-secondary: #0d1117;
+  --background-secondary-alt: #161b22;
+  --text-normal: #d7d8da;
+  --text-muted: #8b949e;
+  --background-modifier-border: #21262d;
+}
+
+body {
+  --font-text-size: 16px !important;
+  --font-text-weight: 500;
+  --font-interface-size: 13px;
+}
+
+body,
+body * {
+  letter-spacing: -0.5px !important;
+}
+
+.markdown-source-view,
+.markdown-preview-view {
+  font-feature-settings: "cv01", "zero", "cr41", "cv02", "cv08", "cv34", "cv62", "ss05", "ss07", "ss08", "ss09", "ss10", "ss11", "calt";
+}
+
+body:not(.is-mobile) .workspace {
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace * {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+}

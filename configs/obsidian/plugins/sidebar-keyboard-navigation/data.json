@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "excludedKeys": "D",
+    "enableDuplicateOpenedFilesFiltering": true,
+    "enableBackgroundOpenVisualHelp": true
+  }
+}

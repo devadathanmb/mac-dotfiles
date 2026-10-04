@@ -1,0 +1,43 @@
+{
+  "plugins": [
+    {
+      "id": "spacekeys",
+      "repo": "jlumpe/obsidian-spacekeys",
+      "version": "0.5.0",
+      "files": {
+        "main.js": "3b89abfeba20bdd6120e4a3232729f4475a586b24fd583587889998c6bd9d026",
+        "manifest.json": "875c9e4015ed33cd92a1eeb3300596c59a36829535be779d3d35459977a91fd7",
+        "styles.css": "97d44e9de1ac507a960ab4ef96e0b480f7ce81c26feafb335df4de69d7f1a1b8"
+      }
+    },
+    {
+      "id": "obsidian-vimrc-support",
+      "repo": "esm7/obsidian-vimrc-support",
+      "version": "0.10.2",
+      "files": {
+        "main.js": "6863734e19eef2505e054250ca821bc532f6d6271e6f50172b1e8a04734e6ce2",
+        "manifest.json": "b2de5a4be391b88ebd9289e381562d1491a587979fd08bbda6a7ff51be27d056"
+      }
+    },
+    {
+      "id": "sidebar-keyboard-navigation",
+      "repo": "denvolok/obsidian-sidebar-keyboard-navigation",
+      "version": "1.1.2",
+      "files": {
+        "main.js": "7b8839bc404df9cf673f684d5113e82e1dcf23010279e6c4ea91cebef7221209",
+        "manifest.json": "d6126c300878bfc06700dd3ec8ced4ab159485a8f79d98659cddaffe6a2f89c0",
+        "styles.css": "a19ac123485bf20cb908daa10f43c7b7a37eb0a228fe0c4a1aefa1ffe2c627db"
+      }
+    },
+    {
+      "id": "document-comments",
+      "repo": "kylemcd/obsidian-document-comments",
+      "version": "0.1.15",
+      "files": {
+        "main.js": "256cd7e3257f8feae337f73f58cc50868aa74a051ab4507d44b6da59616aa8dc",
+        "manifest.json": "7660606ec03aa90c9f8ef21253e922470718a553fc33475763bb50e7cfccffc2",
+        "styles.css": "e99550b4be24884dd9a0c247f1ba40cb909d634673b957c284ff3fab7874f492"
+      }
+    }
+  ]
+}

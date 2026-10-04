@@ -1,0 +1,9 @@
+{
+  "id": "global-vim-navigation",
+  "name": "Global Vim Navigation",
+  "version": "1.0.0",
+  "minAppVersion": "1.7.0",
+  "description": "Treat Ctrl+J/K as Down/Up across editors, suggestions, palettes and sidebars.",
+  "author": "Local vault configuration",
+  "isDesktopOnly": true
+}
