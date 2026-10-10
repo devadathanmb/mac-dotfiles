@@ -1,9 +1,7 @@
 ---
-name: gh-pr
+name: create-pull-request
 description: >
-  Create or update a GitHub pull request when the user explicitly asks to open,
-  edit, or prepare a PR. Do not use for GitHub investigation, review comments,
-  checks, or Actions failures.
+  Create, draft, or update GitHub pull requests.
 ---
 
 # GitHub Pull Requests

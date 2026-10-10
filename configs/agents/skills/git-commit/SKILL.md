@@ -1,8 +1,7 @@
 ---
 name: git-commit
 description: >
-  Create a git commit or draft a conventional commit message when the user
-  explicitly asks to commit, requests a commit message, or invokes /commit.
+  Create git commits or draft conventional commit messages.
 ---
 
 # Git Commits

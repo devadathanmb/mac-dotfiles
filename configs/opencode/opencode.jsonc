@@ -83,6 +83,36 @@
       "effect": "allow"
     },
     {
+      "action": "read",
+      "resource": "$HOME/.aws/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "$HOME/.aws/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "$HOME/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "$HOME/.ssh/**",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "$HOME/.secrets/**",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "$HOME/.secrets/**",
+      "effect": "deny"
+    },
+    {
       "action": "shell",
       "resource": "*",
       "effect": "allow"
