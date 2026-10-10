@@ -7,17 +7,29 @@
   --text-normal: #d7d8da;
   --text-muted: #8b949e;
   --background-modifier-border: #21262d;
+
+  /* GitHub Dark syntax-style colors so markup stands out from body text. */
+  --h1-color: #79c0ff;
+  --h2-color: #79c0ff;
+  --h3-color: #a5d6ff;
+  --h4-color: #a5d6ff;
+  --h5-color: #d2a8ff;
+  --h6-color: #d2a8ff;
+  --bold-color: #ffa657;
+  --italic-color: #d2a8ff;
+  --link-color: #58a6ff;
+  --link-external-color: #58a6ff;
+  --code-normal: #ff7b72;
+  --code-background: #161b22;
+  --list-marker-color: #8b949e;
+  --blockquote-border-color: #3d444d;
+  --text-selection: rgba(56, 139, 253, 0.4);
+  --text-highlight-bg: rgba(210, 153, 34, 0.4);
+  --background-modifier-active-hover: rgba(110, 118, 129, 0.25);
 }
 
 body {
-  --font-text-size: 16px !important;
   --font-text-weight: 500;
-  --font-interface-size: 13px;
-}
-
-body,
-body * {
-  letter-spacing: -0.5px !important;
 }
 
 .markdown-source-view,

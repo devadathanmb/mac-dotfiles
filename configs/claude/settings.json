@@ -55,7 +55,7 @@
       "/tmp/agent-gh"
     ]
   },
-  "model": "sonnet",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "disableArtifact": true,
