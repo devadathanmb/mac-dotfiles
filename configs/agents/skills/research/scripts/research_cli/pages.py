@@ -10,6 +10,7 @@ from selectolax.lexbor import LexborHTMLParser
 
 from . import config, github
 from .config import ResearchError
+from .dates import iso_timestamp
 from .network import open_client, request_timeout
 
 HTML_MIMES = ("text/html", "application/xhtml+xml")
@@ -180,20 +181,22 @@ def fetch_raw(url: str, *, client: httpx.Client | None = None) -> str:
     return download(url, client=client)[0]
 
 
-def page_heading(tree: LexborHTMLParser) -> tuple[str, str]:
-    """(title, publication date) from the document, which often sit outside <main>."""
+def page_heading(tree: LexborHTMLParser) -> tuple[str, list[str]]:
+    """(title, publication dates) from the document, which often sit outside <main>.
+
+    Several dates mean a feed or thread that dates every post; the first may not
+    be the page's own.
+    """
     node = tree.css_first("title")
     title = " ".join(node.text().split()) if node else ""
-    published = ""
     for selector, attribute in DATE_SOURCES:
-        node = tree.css_first(selector)
-        value = (
-            (node.attrs.get(attribute) if attribute else node.text()) if node else ""
-        )
-        if value and (match := re.search(r"\d{4}-\d{2}-\d{2}", value)):
-            published = match.group()
-            break
-    return title, published
+        stamps = [
+            iso_timestamp(node.attrs.get(attribute) if attribute else node.text())
+            for node in tree.css(selector)
+        ]
+        if published := list(dict.fromkeys(filter(None, stamps))):
+            return title, published
+    return title, []
 
 
 def main_content(body, base_url: str) -> str:
@@ -233,8 +236,10 @@ def html_to_markdown(html: str, base_url: str) -> str:
     # Site names follow a separator in <title>; the page's own name comes first.
     name = re.split(r"\s+[|·–—]\s+", title)[0]
     lead = [f"# {title}"] if name and name.lower() not in result[:400].lower() else []
-    if published and published not in result[:400]:
-        lead.append(f"Published: {published}")
+    if published and published[0] not in result[:400]:
+        count = len(published)
+        note = f" (first of {count} timestamps on the page)" if count > 1 else ""
+        lead.append(f"Published: {published[0]}{note}")
     return "\n\n".join([*lead, result])
 
 

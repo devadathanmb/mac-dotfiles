@@ -17,6 +17,7 @@ from research_cli import (
     cli,
     commands,
     config,
+    dates,
     firecrawl,
     github,
     pages,
@@ -246,8 +247,26 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(fetched.call_count, 1)
         self.assertIn("[lines 16-16 | Proxies]\nSet trust_env to False", output)
         self.assertNotIn("snippet", output)
+        folder = re.search(r"pages saved in (\S+)\]", output).group(1)
         saved = re.search(r"page saved: (\S+)", output).group(1)
-        self.assertEqual(Path(saved).read_text(), PAGE)
+        self.assertEqual(Path(folder, saved).read_text(), PAGE)
+
+    def test_a_result_repeating_an_earlier_one_is_collapsed_in_the_preview(self):
+        doc = " ".join(f"word{number}" for number in range(60))
+        results = [
+            hit("https://docs.test/a", doc),
+            hit(
+                "https://github.test/a.md",
+                f"[lines 30-41 | H]\n[a](https://x.test) {doc}",
+            ),
+            hit("https://other.test", doc[::-1]),
+        ]
+        full, compact, fitted = search.layout_results(results, 0, False)
+        self.assertEqual(full.count("word59"), 2)
+        self.assertEqual(fitted[1], "[same text as result 1; saved line 7]")
+        self.assertEqual(full.splitlines()[6], "[lines 30-41 | H]")
+        self.assertEqual((fitted[0], fitted[2]), (doc, doc[::-1]))
+        self.assertIn(fitted[1], compact)
 
     def test_outline_lists_numbered_headings_outside_code_fences(self):
         outline = out.page_outline(PAGE, 1000)
@@ -384,7 +403,7 @@ class SearchTests(unittest.TestCase):
                 {
                     "title": "A & B",
                     "url": "https://a.test",
-                    "date": "2026-05-06",
+                    "date": "2026-05-06T01:02:03",
                     "text": 'say "hi"',
                 }
             ],
@@ -513,13 +532,18 @@ class SearchTests(unittest.TestCase):
 
     def test_dates_normalize_to_iso_or_empty(self):
         cases = {
-            "2026-05-06T01:02:03Z": "2026-05-06",
-            "Mon, 05 Oct 2026 10:00:00 GMT": "2026-10-05",
+            "2026-05-06T01:02:03Z": "2026-05-06T01:02:03Z",
+            "2026-05-06T01:02:03.456+05:30": "2026-05-06T01:02:03+05:30",
+            "2026-05-06 01:02": "2026-05-06T01:02",
+            "2026-05-06T00:00:00.000Z": "2026-05-06",
+            "2026-05-06": "2026-05-06",
+            "Mon, 05 Oct 2026 10:00:00 GMT": "2026-10-05T10:00:00Z",
+            "Mon, 05 Oct 2026 00:00:00 GMT": "2026-10-05",
             "3 days ago": "",
             None: "",
         }
         for value, expected in cases.items():
-            self.assertEqual(providers.iso_date(value), expected)
+            self.assertEqual(dates.iso_timestamp(value), expected)
 
     def test_github_file_pages_are_read_as_raw_source_with_page_fallback(self):
         url = "https://github.com/o/r/blob/main/src/a.py"
@@ -621,6 +645,25 @@ class SearchTests(unittest.TestCase):
             pages.html_to_markdown(titled, "https://jepsen.test/a").startswith(
                 "Published: 2022-04-29\n\n# Redpanda"
             )
+        )
+
+    def test_page_timestamps_keep_their_offset_and_flag_several_posts(self):
+        post = "<article><time datetime='{}'>Oct 6</time><p>{}</p></article>"
+        page = "<html><head><title>Results</title></head><body>{}</body></html>"
+        body = "text " * 80
+        single = page.format(post.format("2026-10-07T05:09:04.000Z", body))
+        self.assertIn(
+            "Published: 2026-10-07T05:09:04Z\n",
+            pages.html_to_markdown(single, "https://a.test"),
+        )
+        feed = page.format(
+            post.format("2026-10-07T05:09:04Z", body)
+            + post.format("2026-10-07T05:09:04Z", body)
+            + post.format("2026-10-01T09:00:00Z", body)
+        )
+        self.assertIn(
+            "Published: 2026-10-07T05:09:04Z (first of 2 timestamps on the page)",
+            pages.html_to_markdown(feed, "https://a.test"),
         )
 
     def test_redirected_pages_say_where_they_came_from(self):

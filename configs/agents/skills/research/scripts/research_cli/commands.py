@@ -10,6 +10,7 @@ from contextlib import closing
 from dataclasses import dataclass, field
 from itertools import islice
 
+from . import config
 from .cache import cached_call
 from .config import EXA_PAGE_CHARS, MAX_FETCH_WORKERS, ResearchError
 from .credentials import api_key
@@ -190,6 +191,8 @@ def web(args: argparse.Namespace) -> None:
     summary = f"[web: {len(results)} results via {', '.join(providers)}"
     if len(args.queries) > 1:
         summary += f" | {len(args.queries)} queries"
+    if any(result.get("page") for result in results):
+        summary += f" | pages saved in {config.OUTPUT}/"
     print(summary + "]")
     if args.match:
         emit_response(full, args, label)

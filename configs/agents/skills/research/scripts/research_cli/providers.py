@@ -2,16 +2,15 @@
 
 import html
 import json
-import re
 import threading
 import time
 from datetime import date
-from email.utils import parsedate_to_datetime
 
 import httpx
 
 from .config import ResearchError
 from .credentials import api_key
+from .dates import iso_timestamp
 from .network import open_client, request_timeout
 
 # name: (environment variable, ~/.secrets filename)
@@ -88,22 +87,11 @@ def request_json(
     return result
 
 
-def iso_date(value: object) -> str:
-    """YYYY-MM-DD from an ISO or RFC 2822 timestamp, or "" when unrecognised."""
-    text = str(value or "").strip()
-    if re.match(r"\d{4}-\d{2}-\d{2}", text):
-        return text[:10]
-    try:
-        return parsedate_to_datetime(text).date().isoformat()
-    except (TypeError, ValueError):
-        return ""
-
-
 def result(title: object, url: object, published: object, text: object) -> dict:
     return {
         "title": html.unescape(str(title or "")).strip(),
         "url": str(url or "").strip(),
-        "date": iso_date(published),
+        "date": iso_timestamp(published),
         "text": html.unescape(str(text or "")).strip(),
     }
 
