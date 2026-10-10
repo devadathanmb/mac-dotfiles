@@ -6,4 +6,4 @@
 - Run one verification proportional to the change; widen it only after a specific failure, diagnosing from the exact error.
 - Use `python` directly (no `mise exec`) for one-off data processing, HTTP requests, or multi-step parsing and conditional logic—not for tasks handled by a single tool call or simple shell command. Prefer installed libraries where applicable: `pandas`, `numpy`, `ruamel.yaml`, `httpx`, `beautifulsoup4`, `duckdb`, `pymupdf`.
 - Use background only when expected runtime exceeds ~30s, not based on timeout limits; otherwise use foreground. Wait for background completion notifications; never sleep or poll.
-- Close stdin (`< /dev/null`) when scripts launch non-interactive CLIs.
+- Redirect stdin (`< /dev/null`) only for commands that may prompt.

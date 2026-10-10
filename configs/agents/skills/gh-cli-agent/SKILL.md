@@ -1,7 +1,8 @@
 ---
 name: gh-cli-agent
 description: >
-  Investigate GitHub PR feedback and CI: review comments (human, bot, Copilot), unresolved review threads, failing checks, and failing GitHub Actions logs. Use when the user asks what reviewers said, what feedback remains, or why a PR's CI failed. Do not use for creating/editing/viewing/listing PRs; use `gh` directly for those.
+  Investigate GitHub PR review comments, unresolved threads, failing checks,
+  and Actions logs.
 ---
 
 # gh-cli-agent
