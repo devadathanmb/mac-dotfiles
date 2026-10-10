@@ -203,7 +203,7 @@ class FetchTests(unittest.TestCase):
         with (
             patch.object(network, "create_client", return_value=client),
             patch.object(commands, "fetch_result", side_effect=retrieve),
-            patch.object(commands, "emit_response", side_effect=fail_output),
+            patch.object(commands, "render_response", side_effect=fail_output),
             ThreadPoolExecutor(max_workers=1) as driver,
         ):
             future = driver.submit(self.capture, args)

@@ -1,22 +1,23 @@
 ---
 name: research
-description: Research current library/SDK docs, API examples, errors, changelogs, OSS internals, and public GitHub code via Context7, Exa, DeepWiki, and grep.app. Use when local evidence is insufficient, a quick web lookup doesn't settle it, or version-sensitive facts need verification.
+description: Research current library/SDK docs, API examples, errors, changelogs, OSS internals, public GitHub code, and multi-source deep-research questions via Context7, multi-provider web search (Exa, Parallel, Brave, Tavily), DeepWiki, and grep.app. Use when local evidence is insufficient, a quick web lookup doesn't settle it, or version-sensitive facts need verification.
 ---
 
 # research
 
 Run `uv run ~/.agents/skills/research/scripts/research.py <command>` via the shell. `research` below is shorthand, not an installed command. Use `<command> --help` for uncommon options.
 
-| Need                                      | Command                                                             | Backend                       |
-| ----------------------------------------- | ------------------------------------------------------------------- | ----------------------------- |
-| Library/framework/SDK docs                | See `docs` under [Commands](#commands)                              | Context7                      |
-| Find pages, issues, changelogs, errors    | `research web "<query>"`                                            | Exa                           |
-| Read any URL (HTML → markdown, full page) | `research fetch <url>... [--match "<regex>"]`                       | direct HTTP → Exa → Firecrawl |
-| API usage examples from docs/blogs        | `research examples "<query>"`                                       | Exa                           |
-| OSS architecture and repo Q&A             | `research wiki ask owner/repo "<question>"`                         | DeepWiki                      |
-| Literal public GitHub code                | `research code "<snippet>" [--repo owner/repo] [--lang TypeScript]` | grep.app                      |
+| Need                                   | Command                                                                |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| Library/framework/SDK docs             | See `docs` under [Commands](#commands)                                 |
+| Find pages, issues, changelogs, errors | `research web "<query>" ["<query>"...]`                                |
+| Search and read the top pages at once  | `research web "<query>" --read 2`                                      |
+| Read any URL as markdown               | `research fetch <url>... [--query "<words>" \| --section "<heading>"]` |
+| API usage examples from docs/blogs     | `research examples "<query>"`                                          |
+| OSS architecture and repo Q&A          | `research wiki ask owner/repo "<question>"`                            |
+| Literal public GitHub code             | `research code "<snippet>" [--repo owner/repo] [--lang TypeScript]`    |
 
-Check local evidence first, then pick one command for the missing fact; these are alternatives, not a sequence. Already have a URL? `fetch` it. Use `examples` when docs lack examples, `code` for real implementations.
+Check local evidence first, then pick one command for the missing fact; these are alternatives, not a sequence. Already have a URL? `fetch` it. Use `examples` when docs lack examples, `code` for real implementations. For a comparison, a feasibility check, or any question needing several independent sources, read `deep-research.md` in this skill's directory first.
 
 ## Commands
 
@@ -26,12 +27,23 @@ Check local evidence first, then pick one command for the missing fact; these ar
   - **No requested version:** `docs <name-or-id> "<question>"` auto-selects the first match for a name or queries a returned/user-provided ID directly. For an ambiguous library, list first. Never guess IDs from repo names.
   - `--list` accepts names, not IDs; include the question for ranking. Choose by relevance and reputation, with snippet counts and scores as supporting signals, not guarantees. For a requested version, query only a matching listed release with `docs <returned-id>/<exact-listed-version> "<question>"`; copy the suffix verbatim, without normalizing dots/underscores or inventing versions.
   - **Requested release absent:** stop Context7 lookups for this request. Use official versioned docs/source via `web`/`fetch` and disclose the index gap. A canary/prerelease is not a stable match; do not query nearest/latest/canary as a substitute, even with a disclaimer.
-- `web` / `examples`: `web -n` defaults to 5, `examples -n` to 3. `web` filters: `--domain D` / `--exclude D` (repeatable), `--after` / `--before` (YYYY-MM-DD). Fetch only the 1–2 relevant results.
+- `web`:
+  - Pass several queries (different phrasings or sub-questions) in one call, not separate calls; results are deduplicated and alternate between queries. `-n` is the total (default 5; with several queries, 3 per query up to 20).
+  - `--read N` (≤5) also fetches the top N pages and shows each page's most relevant passages; use it instead of `web` followed by `fetch`. Otherwise fetch only the 1–2 relevant results.
+  - `--backend auto` (default) falls through Exa → Parallel → Brave → Tavily until one returns results. `--backend all` or a comma list (`exa,brave`) fuses them and tags each result with its providers; use it when one index may miss (obscure, new, or contested topics), as it spends quota on each. Brave is a keyword index: prefer it for exact error strings.
+  - Filters: `--domain D` / `--exclude D` (repeatable), `--after` / `--before` (YYYY-MM-DD).
+- `examples`: `-n` defaults to 3.
 - `fetch <url>...`:
-  - Returns the full page, not a truncated extract. HTML is converted to markdown locally (nav, scripts and images stripped, links made absolute); Markdown, `llms.txt`, source files and plain text pass through; JSON is pretty-printed so `--match` works on APIs. Binary and >10 MiB responses are rejected.
-  - Pass several URLs in one call; a batch is fetched concurrently and printed in argument order. For a long page, `--match` it instead of reading it whole.
-  - A 404/410 is reported per URL (the rest of a batch still runs). A blocked, binary, or JS-rendered page falls back to Exa, then Firecrawl if Exa fails and a Firecrawl key is configured. `--chars` sets Exa's per-page limit (default 20,000; its text may be incomplete), not Firecrawl's.
-  - `--exa` forces Exa; `--firecrawl` forces Firecrawl. Firecrawl uses `FIRECRAWL_API_KEY` or `~/.secrets/firecrawl-api-key`; scraping uses credits. `--fresh` bypasses its page cache too. `--raw` returns the unmodified HTTP body; never use it just to read an HTML page.
+  - Returns the full page as markdown, not a truncated extract, and reads any text URL: raw source, `llms.txt`, JSON APIs (pretty-printed). A GitHub `blob` URL returns the raw file; an issue or pull-request URL returns its state (merged or not), dates and every comment, with maintainers marked. Binary and >10 MiB responses are rejected; for a huge API response request a narrower endpoint.
+  - Pass several URLs in one call, quoting any that contain `?` or `&`; a batch is fetched concurrently, printed in argument order, and shares the inline limit evenly.
+  - A long page previews as a line-numbered outline of its headings. Select from it instead of reading it whole, one selector per call (re-selecting a fetched page is served from cache):
+    - `--section "<heading regex>"`: whole sections (`"install|upgrade"` takes several).
+    - `--query "<words>"`: the paragraphs sharing the most words with them. It is word overlap, not meaning: use the page's vocabulary and one topic per call.
+    - `--lines A-B`: the range an outline or excerpt cites.
+    - `--match "<regex>"` (any command): source-numbered lines with `--context N` lines around each (default 2); `(?i)` ignores case. Keep it narrow: when matches exceed the preview, lines matching the rarest alternative are shown first.
+    - An empty selection is not evidence of absence; check the outline or the saved file.
+  - A 404/410 is reported per URL (the rest of a batch still runs); don't guess repository paths, follow the hint to list the directory. A blocked, JS-rendered, or PDF page falls back to Exa, then Firecrawl if Exa fails or returns almost nothing and a Firecrawl key is configured.
+  - `--exa` forces Exa; `--firecrawl` forces Firecrawl, which uses credits. `--raw` returns the unmodified HTTP body; never use it just to read an HTML page.
 - `code`: literal text (`useOptimistic(`), not a description. Supports `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; there is no `-n`.
   - Output starts with an `Index` of every hit (repo, path:lines); pick candidates from it, not another `rg` listing. For "find N examples", one search plus its Index is enough: read 2–3 candidate files with `fetch --match`, then answer.
   - On "no matches", loosen the snippet or filters; don't probe repos one by one. After two misses, switch to `examples`/`web`.
@@ -39,10 +51,10 @@ Check local evidence first, then pick one command for the missing fact; these ar
 
 ## Reading output
 
-- Inline output is capped at 4,000 characters per command (shared across a `fetch` batch). Oversized output and every `--match` result are saved; the notice gives the path and size. `--max-chars N` changes the preview limit, never the saved text. Don't pipe capped output through `head`/`tail`.
-- `--match "<regex>"` shows source-numbered lines with `--context N` lines around each (default 2); `(?i)` ignores case. The saved file stays complete and unfiltered, even with no matches.
-- Need different matches or more context? Use `rg -n -m 20 -C 2 '<pattern>' <saved-path>` or Read with `limit` ≤100. Changing matches/context is a local-read task, not another `fetch`. Don't `cat`/`sed` large ranges, re-fetch saved text, or raise `--max-chars` to reread it.
-- Results are cached; `--fresh` bypasses the local cache, not provider caches (except Firecrawl's page cache, as noted above).
+- Inline output is capped at 4,000 characters per command. Oversized output and every selector result are saved complete and unfiltered, even with no matches; the notice gives the path and size. `--max-chars N` changes the preview limit, never the saved text. Don't pipe capped output through `head`/`tail`.
+- Need different matches or more context? Use `rg -n -m 20 -C 2 '<pattern>' <saved-path>` or Read with `offset`/`limit` ≤100 at the cited lines. Don't `cat`/`sed` large ranges or raise `--max-chars` to reread saved text.
+- For scripts: `web --json` prints one object and `fetch --json` one object per line, each with `saved` paths and `text` capped by the inline limit. Pipe into `jq`/`python`; don't read it raw.
+- Results are cached; `--fresh` bypasses the local cache and Firecrawl's page cache, not other provider caches.
 
 ## Evidence and answer
 

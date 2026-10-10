@@ -11,11 +11,25 @@ from dataclasses import dataclass, field
 from itertools import islice
 
 from .cache import cached_call
-from .config import MAX_FETCH_WORKERS, ResearchError
+from .config import EXA_PAGE_CHARS, MAX_FETCH_WORKERS, ResearchError
 from .credentials import api_key
 from .network import ClientFactory, shared_client
-from .output import emit_response
+from .output import (
+    NO_PASSAGES,
+    Rendered,
+    emit_response,
+    ranked_passages,
+    render_response,
+    save_text,
+    saved_notice,
+)
 from .pages import validate_url
+from .search import layout_results, search
+
+# Below this an extraction is probably an unrendered shell, not the page.
+THIN_PAGE_CHARS = 400
+# Passage text kept per page read by `web --read`.
+READ_PASSAGE_CHARS = 3000
 
 
 def library_field(block: str, name: str) -> str:
@@ -97,48 +111,94 @@ def docs(args: argparse.Namespace) -> None:
     )
 
 
-def format_search_results(response: str) -> str:
-    try:
-        results = json.loads(response)["results"]
-        return (
-            "\n\n".join(
-                f"{(result.get('title') or '').strip()} {result.get('publishedDate') or ''}".strip()
-                + f"\n{result['url']}\n{(result.get('text') or '').strip()}"
-                for result in results
+def read_pages(
+    args: argparse.Namespace, results: list[dict], client: ClientFactory
+) -> list[str]:
+    """Fetch the top `--read` results and swap their snippets for page passages."""
+    targets = [result for result in results if result["url"]][: args.read]
+    if not targets:
+        return []
+    options = argparse.Namespace(
+        urls=[result["url"] for result in targets],
+        raw=False,
+        firecrawl=False,
+        chars=EXA_PAGE_CHARS,
+        fresh=args.fresh,
+    )
+    question = " ".join([*args.queries, args.objective or ""])
+    notices = []
+    with closing(fetch_results(options, client)) as pages:
+        for result, (url, page) in zip(targets, pages):
+            notices.extend(page.notices)
+            if page.error is not None:
+                notices.append(f"[read failed: {url}: {page.error}]")
+                continue
+            text = page.text.strip()
+            result.update(
+                page=str(save_text(text, f"fetch-{url}")),
+                page_chars=len(text),
+                source=page.source,
             )
-            or response
-        )
-    except (ValueError, KeyError, TypeError, AttributeError):
-        return response
+            passages = ranked_passages(text, question, READ_PASSAGE_CHARS)
+            if passages != NO_PASSAGES:
+                result["text"] = passages
+    return notices
+
+
+def web_record(
+    args: argparse.Namespace,
+    results: list[dict],
+    fitted: list[str],
+    providers: list[str],
+    notices: list[str],
+    saved: str | None,
+) -> dict:
+    fields = ("title", "url", "date", "providers", "page", "source")
+    return {
+        "queries": args.queries,
+        "providers": providers,
+        "saved": saved,
+        "notices": notices,
+        "results": [
+            {
+                "rank": rank,
+                **{key: result[key] for key in fields if result.get(key)},
+                "text": text,
+                "chars": len(result["text"]),
+            }
+            for rank, (result, text) in enumerate(zip(results, fitted), 1)
+        ],
+    }
 
 
 def web(args: argparse.Namespace) -> None:
-    arguments = {"query": args.query, "numResults": args.n}
-    if (
-        any((args.domain, args.exclude, args.after, args.before, args.category))
-        or args.chars is not None
-    ):
-        chars = args.chars if args.chars is not None else 1500
-        print(f"[Exa extraction: ≤{chars:,} chars/result requested; may be incomplete]")
-        arguments.update(textMaxCharacters=chars, enableHighlights=False, type="auto")
-        for value, name in (
-            (args.domain, "includeDomains"),
-            (args.exclude, "excludeDomains"),
-            (args.after, "startPublishedDate"),
-            (args.before, "endPublishedDate"),
-            (args.category, "category"),
-        ):
-            if value:
-                arguments[name] = value
-        result = cached_call("exa", "web_search_advanced_exa", arguments, args.fresh)
-        result = format_search_results(result)
+    with shared_client() as client:
+        results, providers, notices = search(args, client)
+        if args.read:
+            notices += read_pages(args, results, client)
+    label = f"web-{args.queries[0]}"
+    full, compact, fitted = layout_results(
+        results, args.max_chars, show_providers=len(providers) > 1
+    )
+    if args.json:
+        saved = str(save_text(full, label)) if compact != full else None
+        record = web_record(args, results, fitted, providers, notices, saved)
+        print(json.dumps(record, ensure_ascii=False))
+        return
+    for notice in notices:
+        print(notice)
+    summary = f"[web: {len(results)} results via {', '.join(providers)}"
+    if len(args.queries) > 1:
+        summary += f" | {len(args.queries)} queries"
+    print(summary + "]")
+    if args.match:
+        emit_response(full, args, label)
+    elif compact == full:
+        print(full)
     else:
-        arguments["objective"] = args.objective or args.query
-        result = cached_call("exa", "web_search_exa", arguments, args.fresh)
-        result = re.sub(
-            r"^(Title|Published|Author): N/A\n", "", result, flags=re.MULTILINE
-        )
-    emit_response(result, args, f"web-{args.query}")
+        path = save_text(full, label)
+        print(saved_notice(path, full, "preview", len(compact), len(full)))
+        print(compact)
 
 
 def exa_fetch(
@@ -189,15 +249,27 @@ def fetch_url(
         if error.final:
             raise
         notices.append(f"[direct fetch failed: {error}; falling back to Exa]")
+    firecrawl = api_key("FIRECRAWL_API_KEY", "firecrawl-api-key")
+    thin = None
     try:
-        return exa_fetch(args, [url], client=client, notices=notices), "Exa"
+        text = exa_fetch(args, [url], client=client, notices=notices)
+        if len(text) >= THIN_PAGE_CHARS or not firecrawl:
+            return text, "Exa"
+        # Exa indexed the same unrendered shell; only a browser will get the page.
+        thin = text
+        notices.append(f"[Exa returned only {len(text)} chars; trying Firecrawl]")
     except ResearchError as error:
-        if not api_key("FIRECRAWL_API_KEY", "firecrawl-api-key"):
+        if not firecrawl:
             raise
         notices.append(f"[Exa failed: {error}; falling back to Firecrawl]")
-    return cached_call(
-        "firecrawl", "scrape", {"url": url}, args.fresh, client=client
-    ), "Firecrawl"
+    try:
+        return cached_call(
+            "firecrawl", "scrape", {"url": url}, args.fresh, client=client
+        ), "Firecrawl"
+    except ResearchError:
+        if thin is None:
+            raise
+        return thin, "Exa"
 
 
 @dataclass
@@ -248,28 +320,76 @@ def fetch_results(
             yield url, result
 
 
+def fetch_record(url: str, result: FetchResult, rendered: Rendered) -> dict:
+    return {
+        "url": url,
+        "source": result.source,
+        "chars": rendered.chars,
+        "lines": rendered.lines,
+        "saved": str(rendered.path),
+        "notices": result.notices,
+        "text": rendered.shown,
+    }
+
+
+def fetch_with_exa(args: argparse.Namespace) -> None:
+    """`fetch --exa`: every URL in one Exa request, reported as one response."""
+    urls = list(dict.fromkeys(args.urls))
+    label = f"fetch-{urls[0]}"
+    if not args.json:
+        emit_response(exa_fetch(args, urls), args, label, outline=True)
+        return
+    notices: list[str] = []
+    text = exa_fetch(args, urls, notices=notices)
+    rendered = render_response(text, args, label, save=True)
+    record = fetch_record(urls[0], FetchResult(source="Exa", notices=notices), rendered)
+    print(json.dumps({**record, "urls": urls}, ensure_ascii=False))
+
+
+def print_fetched(
+    args: argparse.Namespace, url: str, result: FetchResult, share: int | None
+) -> int:
+    """Print one URL's outcome; return the inline characters it used."""
+    if result.error is not None:
+        if args.json:
+            error = {"error": str(result.error), "hint": result.error.hint}
+            print(json.dumps({"url": url, **error, "notices": result.notices}))
+        else:
+            for notice in result.notices:
+                print(notice)
+            print(f"URL: {url} [error: {result.error} | hint: {result.error.hint}]")
+        return 0
+    rendered = render_response(
+        result.text,
+        args,
+        f"fetch-{url}",
+        raw=args.raw,
+        budget=share,
+        outline=True,
+        save=args.json,
+    )
+    if args.json:
+        print(json.dumps(fetch_record(url, result, rendered), ensure_ascii=False))
+    else:
+        lines = [*result.notices, f"URL: {url} [{result.source}]"]
+        print("\n".join([*lines, *filter(None, (rendered.notice, rendered.shown))]))
+    return rendered.used
+
+
 def fetch(args: argparse.Namespace) -> None:
     if args.exa:
-        emit_response(
-            exa_fetch(args, list(dict.fromkeys(args.urls))),
-            args,
-            f"fetch-{args.urls[0]}",
-        )
+        fetch_with_exa(args)
         return
     budget = args.max_chars or None
+    pending = len(args.urls)
     failures = 0
     with shared_client() as client, closing(fetch_results(args, client)) as results:
         for url, result in results:
-            for notice in result.notices:
-                print(notice)
-            if result.error is not None:
-                print(f"URL: {url} [error: {result.error} | hint: {result.error.hint}]")
-                failures += 1
-                continue
-            print(f"URL: {url} [{result.source}]")
-            used = emit_response(
-                result.text, args, f"fetch-{url}", raw=args.raw, budget=budget
-            )
+            # Each page gets an equal share of what is left, so none is starved.
+            share = None if budget is None else budget // pending
+            pending -= 1
+            failures += result.error is not None
+            used = print_fetched(args, url, result, share)
             if budget is not None:
                 budget -= used
     if failures == len(args.urls):
