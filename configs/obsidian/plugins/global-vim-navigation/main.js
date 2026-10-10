@@ -1,6 +1,146 @@
-const { Plugin, Notice } = require("obsidian");
+const { Plugin, Notice, View } = require("obsidian");
 
 module.exports = class GlobalVimNavigation extends Plugin {
+  // Ctrl+H/L move to the neighbouring split, entering or leaving the left sidebar at the edges.
+  // Returns false when there is nothing to move to so the keypress is left alone.
+  moveBetweenSidebarAndEditor(toLeft) {
+    const workspace = this.app.workspace;
+    const active = workspace.getActiveViewOfType(View)?.leaf;
+    if (!active) return false;
+    const inSidebar = active.getRoot() === workspace.leftSplit;
+    const focus = (leaf) => {
+      // Focus left in the editor would otherwise make its leaf active again.
+      document.activeElement?.blur?.();
+      workspace.setActiveLeaf(leaf, { focus: true });
+    };
+
+    if (inSidebar) {
+      if (toLeft) return false;
+      const editor = workspace.getMostRecentLeaf(workspace.rootSplit);
+      if (!editor) return false;
+      focus(editor);
+      return true;
+    }
+
+    const adjacent = workspace.getAdjacentLeafInDirection(active, toLeft ? "left" : "right");
+    if (adjacent && adjacent.getRoot() !== workspace.leftSplit) {
+      focus(adjacent);
+      return true;
+    }
+    if (!toLeft || workspace.leftSplit.collapsed) return false;
+    const explorer = workspace.getLeavesOfType("file-explorer")[0];
+    if (!explorer) return false;
+    focus(explorer);
+    // Activating the leaf alone leaves no focused row, so arrow keys do nothing.
+    const { tree, fileItems } = explorer.view;
+    const current = workspace.getActiveFile();
+    const item = tree.focusedItem ?? (current && fileItems[current.path]) ?? Object.values(fileItems)[0];
+    if (item) tree.setFocusedItem(item);
+    return true;
+  }
+
+  // VS Code-style single-key file explorer actions; true when the key was handled.
+  explorerKey(event) {
+    const workspace = this.app.workspace;
+    const view = workspace.getActiveViewOfType(View);
+    if (view?.getViewType() !== "file-explorer" || document.querySelector(".modal")) return false;
+    const field = document.activeElement;
+    if (field && (field.tagName === "INPUT" || field.tagName === "TEXTAREA" || field.isContentEditable)) return false;
+    if (event.metaKey || event.altKey) return false;
+
+    const { tree } = view;
+    const item = tree.focusedItem;
+    if (!item) return false;
+    const file = item.file;
+    const folder = file.children ? file : file.parent;
+    const vault = this.app.vault;
+    const copy = (text) => navigator.clipboard.writeText(text).then(() => new Notice(`Copied: ${text}`, 2000));
+
+    if (event.ctrlKey) {
+      if (event.shiftKey || (event.key !== "d" && event.key !== "u")) return false;
+      const arrow = event.key === "d" ? "ArrowDown" : "ArrowUp";
+      for (let i = 0; i < 10; i++) {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: arrow, bubbles: true, cancelable: true }));
+      }
+      return true;
+    }
+
+    switch (event.key) {
+      case "a":
+        view.createAbstractFile("file", folder, false);
+        return true;
+      case "A":
+      case "f":
+        view.createAbstractFile("folder", folder, false);
+        return true;
+      case "r":
+        view.startRenameFile(file);
+        return true;
+      case "d": {
+        const siblings = (item.parent ?? tree.root).vChildren.children;
+        const index = siblings.indexOf(item);
+        const nextPath = (siblings[index + 1] ?? siblings[index - 1] ?? item.parent)?.file?.path;
+        // The prompt resolves before the file is removed, so wait for the delete event.
+        const ref = vault.on("delete", (deleted) => {
+          if (deleted !== file) return;
+          vault.offref(ref);
+          setTimeout(() => {
+            const nextItem = view.fileItems[nextPath];
+            if (nextItem) tree.setFocusedItem(nextItem);
+          }, 200);
+        });
+        this.app.fileManager.promptForDeletion(file);
+        // Stop listening if the prompt is declined.
+        setTimeout(() => vault.offref(ref), 60000);
+        return true;
+      }
+      case "x":
+        this.cutFile = file;
+        new Notice(`Cut: ${file.path}`, 2000);
+        return true;
+      case "p": {
+        const source = this.cutFile;
+        if (!source) return true;
+        this.cutFile = null;
+        const prefix = folder.path === "/" ? "" : `${folder.path}/`;
+        this.app.fileManager.renameFile(source, `${prefix}${source.name}`);
+        return true;
+      }
+      case "y":
+        copy(file.path);
+        return true;
+      case "Y":
+        copy(vault.adapter.getFullPath(file.path));
+        return true;
+      case "o":
+        item.setCollapsed?.(!item.collapsed);
+        return true;
+      // Obsidian's native Enter renames the row, and the sidebar plugin's `l` forwards Enter.
+      case "Enter":
+      case "l": {
+        if (event.key === "l" && event.shiftKey) return false;
+        if (file.children) {
+          if (event.key === "Enter") item.setCollapsed?.(!item.collapsed);
+          else item.setCollapsed?.(false);
+          return true;
+        }
+        let target = null;
+        workspace.iterateAllLeaves((leaf) => {
+          if (!target && leaf.view.file === file && leaf.getRoot() !== workspace.leftSplit) target = leaf;
+        });
+        target ??= workspace.getMostRecentLeaf(workspace.rootSplit) ?? workspace.getLeaf(true);
+        const open = target.view.file === file ? Promise.resolve() : target.openFile(file);
+        open.then(() => {
+          document.activeElement?.blur?.();
+          workspace.setActiveLeaf(target, { focus: true });
+        });
+        return true;
+      }
+      default:
+        return false;
+    }
+  }
+
   onload() {
     this.addCommand({
       id: "copy-context-link",
@@ -51,8 +191,19 @@ module.exports = class GlobalVimNavigation extends Plugin {
       if (!doc || documents.has(doc)) return;
       documents.add(doc);
       this.registerDomEvent(doc, "keydown", (event) => {
-        if (event.isComposing || !event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+        if (event.isComposing) return;
+        if (this.explorerKey(event)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        if (!event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
         const key = event.key.toLowerCase();
+        if ((key === "h" || key === "l") && this.moveBetweenSidebarAndEditor(key === "h")) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
         if (key !== "j" && key !== "k") return;
 
         const target = event.target;

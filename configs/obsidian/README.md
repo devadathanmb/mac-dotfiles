@@ -13,7 +13,10 @@ global application state are intentionally not managed here.
 - `snippets/vscode-style.css`: Maple Mono / GitHub Dark-style customization.
 - `plugins/`: plugin settings, plus the local Global Vim
   Navigation plugin implementing app-wide Ctrl+J/K as Down/Up, comments-sidebar
-  toggling, and `Space y` context references for selected/current lines.
+  toggling, `Space y` context references for selected/current lines,
+  Ctrl+H/L focus movement between splits and the file explorer, and VS Code-style
+  file explorer keys (`a` new file, `f`/`A` new folder, `r` rename, `d` delete, `x`/`p` cut/paste,
+  `y`/`Y` copy relative/full path, `o` toggle folder, `Ctrl+D`/`Ctrl+U` page).
 
 ## Third-party plugins
 
