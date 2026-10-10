@@ -38,7 +38,9 @@
       "ReportFindings",
       "Agent(claude-code-guide)",
       "Agent(statusline-setup)",
-      "Agent(claude)"
+      "Agent(claude)",
+      "NotebookEdit",
+      "SendFeedback"
     ],
     "ask": [
       "Bash(rm -rf *)",
@@ -55,7 +57,7 @@
       "/tmp/agent-gh"
     ]
   },
-  "model": "opus",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "disableArtifact": true,
@@ -65,7 +67,10 @@
     "type": "command",
     "command": "bash $HOME/.claude/statusline-command.sh"
   },
-  "enabledPlugins": {},
+  "enabledPlugins": {
+    "cc-plugin-plugin-authoring@builtin": false,
+    "cc-plugin-telemetry@builtin": false
+  },
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
   "modelSettings": {
