@@ -4,12 +4,14 @@ import argparse
 import json
 import re
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit
 
 from .cache import cached_call
 from .config import MAX_FETCH_WORKERS, ResearchError
+from .dates import iso_timestamp
 from .network import ClientFactory
-from .output import preview_length
+from .output import MARKDOWN_LINK, preview_length, terms
 from .providers import KEYS, provider_key
 
 # Fallback order for `--backend auto`; Exa also works without a key.
@@ -23,6 +25,13 @@ PAGE_WEIGHT = 3
 CUT_NOTE_CHARS = 40
 # Below this a trimmed passage says too little to be worth its lines.
 MIN_PASSAGE_CHARS = 80
+# Two results repeat each other when this share of one's word runs is in the other.
+REPEAT_SHARE = 0.8
+REPEAT_RUN_WORDS = 4
+# Shorter texts share boilerplate runs by chance.
+MIN_REPEAT_RUNS = 20
+# Line numbers in a passage label differ between copies of the same text.
+PASSAGE_LINES = re.compile(r"(?m)^\[lines \d+-\d+")
 SITE_OPERATOR = re.compile(r"(?<!\S)site:(\S+)")
 
 
@@ -74,7 +83,7 @@ def parse_exa_listing(text: str) -> list[dict]:
             {
                 "title": "" if title == "N/A" else title.strip(),
                 "url": url,
-                "date": "" if published in (None, "N/A") else published[:10],
+                "date": iso_timestamp(published),
                 "text": block[fields.end() :].strip(),
             }
         )
@@ -96,7 +105,7 @@ def parse_exa_json(text: str, *, highlights: bool) -> list[dict] | None:
             {
                 "title": (item.get("title") or "").strip(),
                 "url": item["url"],
-                "date": (item.get("publishedDate") or "")[:10],
+                "date": iso_timestamp(item.get("publishedDate")),
                 "text": (
                     "\n...\n".join(passages) if passages else item.get("text") or ""
                 ).strip(),
@@ -344,7 +353,7 @@ def result_header(rank: int, result: dict, show_providers: bool) -> str:
         lines.append(result["url"])
     if result.get("page"):
         lines.append(
-            f"page saved: {result['page']} ({result['page_chars']:,} chars, "
+            f"page saved: {Path(result['page']).name} ({result['page_chars']:,} chars, "
             f"{result['source']}); line numbers refer to it"
         )
     return "\n".join(lines)
@@ -375,6 +384,30 @@ def trim_passage(text: str, allowed: int, first_line: int) -> str:
     return f"{shown}\n{note}" if shown else note
 
 
+def repeated_results(texts: list[str]) -> dict[int, int]:
+    """Results whose text an earlier result already shows: {index: earlier index}.
+
+    A docs page and its source file, or a mirror, would otherwise be shown twice.
+    """
+    seen: list[tuple[int, set[tuple[str, ...]]]] = []
+    repeats = {}
+    for index, text in enumerate(texts):
+        words = terms(MARKDOWN_LINK.sub(r"\1", PASSAGE_LINES.sub("", text)))
+        runs = {
+            tuple(words[start : start + REPEAT_RUN_WORDS])
+            for start in range(len(words) - REPEAT_RUN_WORDS + 1)
+        }
+        if len(runs) < MIN_REPEAT_RUNS:
+            continue
+        for earlier, known in seen:
+            if len(runs & known) >= REPEAT_SHARE * len(runs):
+                repeats[index] = earlier
+                break
+        else:
+            seen.append((index, runs))
+    return repeats
+
+
 def join_results(headers: list[str], texts: list[str]) -> str:
     return "\n\n".join(
         f"{header}\n{text}".rstrip() for header, text in zip(headers, texts)
@@ -391,16 +424,27 @@ def layout_results(
     ]
     texts = [result["text"] for result in results]
     full = join_results(headers, texts)
-    if not limit or len(full) <= limit:
+    repeats = repeated_results(texts)
+    fits = not limit or len(full) <= limit
+    if fits and not repeats:
         return full, full, texts
-    budget = limit - sum(len(header) + 2 + CUT_NOTE_CHARS for header in headers)
-    weights = [PAGE_WEIGHT if result.get("page") else 1 for result in results]
-    shares = allowances([len(text) for text in texts], weights, budget)
+    lengths = [0 if index in repeats else len(text) for index, text in enumerate(texts)]
+    if fits:
+        shares = lengths
+    else:
+        budget = limit - sum(len(header) + 2 + CUT_NOTE_CHARS for header in headers)
+        weights = [PAGE_WEIGHT if result.get("page") else 1 for result in results]
+        shares = allowances(lengths, weights, budget)
     fitted = []
     line = 1  # line of `full` where the next result starts
-    for header, text, allowed in zip(headers, texts, shares):
+    for index, (header, text, allowed) in enumerate(zip(headers, texts, shares)):
         first_line = line + header.count("\n") + 1
-        fitted.append(trim_passage(text, allowed, first_line))
+        if index in repeats:
+            fitted.append(
+                f"[same text as result {repeats[index] + 1}; saved line {first_line}]"
+            )
+        else:
+            fitted.append(trim_passage(text, allowed, first_line))
         # A result ends with a blank line; one without text has no passage lines.
         line = first_line + (text.count("\n") + 2 if text else 1)
     return full, join_results(headers, fitted), fitted
