@@ -5,7 +5,7 @@ import httpx
 from .config import ResearchError
 from .credentials import api_key
 from .network import open_client, request_timeout
-from .pages import validate_url
+from .pages import redirect_notice, validate_url
 
 
 def scrape_page(
@@ -58,4 +58,5 @@ def scrape_page(
     markdown = data.get("markdown")
     if not isinstance(markdown, str) or not markdown.strip():
         raise ResearchError("Firecrawl: empty markdown", "try another source")
-    return markdown.strip()
+    served = metadata.get("url") if isinstance(metadata, dict) else None
+    return redirect_notice(url, served or url) + markdown.strip()

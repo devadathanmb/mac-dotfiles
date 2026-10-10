@@ -8,13 +8,15 @@ from datetime import date
 
 from . import commands as handlers
 from .cache import remove_expired_files
-from .config import DEFAULT_MAX_CHARS, ResearchError
+from .config import DEFAULT_MAX_CHARS, EXA_PAGE_CHARS, ResearchError
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="research",
         description="Research docs, web pages, repositories, and public code.",
+        epilog="Saved responses and the cache live in $TMPDIR/research-<uid>/ "
+        "for 24 hours; set TMPDIR to move them.",
     )
 
     def common_options(
@@ -51,6 +53,8 @@ def build_parser() -> argparse.ArgumentParser:
         )
 
     common_options(parser)
+    # Only `fetch` offers these selectors; every command's output code reads them.
+    parser.set_defaults(section=None, about=None, lines=None)
     options = argparse.ArgumentParser(add_help=False)
     common_options(options, suppress_defaults=True)
     commands = parser.add_subparsers(dest="command", required=True, metavar="command")
@@ -74,9 +78,31 @@ def build_parser() -> argparse.ArgumentParser:
         "--list", action="store_true", help="list candidate ids instead of fetching"
     )
 
-    web_parser = command("web", "web search (Exa)", handlers.web)
-    web_parser.add_argument("query")
-    web_parser.add_argument("-n", type=int, default=5, help="results (default 5)")
+    web_parser = command(
+        "web", "web search (Exa → Parallel → Brave → Tavily)", handlers.web
+    )
+    web_parser.add_argument(
+        "queries", nargs="+", metavar="query", help="one or more queries, merged"
+    )
+    web_parser.add_argument(
+        "-n",
+        type=int,
+        help="results in total (default 5; 3 per query for several, at most 20)",
+    )
+    web_parser.add_argument(
+        "--backend",
+        default="auto",
+        help="auto (first provider with results), all (fuse every configured "
+        "provider), or a comma list of exa,parallel,brave,tavily",
+    )
+    web_parser.add_argument(
+        "--read",
+        type=int,
+        default=0,
+        metavar="N",
+        help="also fetch the top N pages and show their most relevant passages",
+    )
+    web_parser.add_argument("--json", action="store_true", help="print one JSON object")
     web_parser.add_argument(
         "--objective", help="what you want to learn (improves ranking)"
     )
@@ -104,7 +130,8 @@ def build_parser() -> argparse.ArgumentParser:
     web_parser.add_argument(
         "--chars",
         type=int,
-        help="Exa text chars per result (default 1500 with filters)",
+        help="page text chars per result (default 1500); Exa then returns "
+        "page text instead of highlights",
     )
 
     fetch_parser = command(
@@ -114,10 +141,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     fetch_parser.add_argument("urls", nargs="+")
     fetch_parser.add_argument(
+        "--query",
+        dest="about",
+        metavar="QUESTION",
+        help="show the passages most relevant to a question; save the full response",
+    )
+    fetch_parser.add_argument(
+        "--section",
+        metavar="REGEX",
+        help="show whole sections whose heading matches (case-insensitive)",
+    )
+    fetch_parser.add_argument(
+        "--lines",
+        metavar="A-B",
+        help="show source lines A to B, numbered (as cited in excerpts and outlines)",
+    )
+    fetch_parser.add_argument(
+        "--json", action="store_true", help="print one JSON object per URL"
+    )
+    fetch_parser.add_argument(
         "--chars",
         type=int,
-        default=20000,
-        help="Exa chars per page (default 20000; only with --exa or fallback)",
+        default=EXA_PAGE_CHARS,
+        help="Exa chars per page (default 200000; only with --exa or fallback)",
     )
     mode = fetch_parser.add_mutually_exclusive_group()
     mode.add_argument(
@@ -166,10 +212,79 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def validate_docs(args: argparse.Namespace) -> None:
+    if args.library.startswith("/") and (not args.query.strip() or args.list):
+        raise ResearchError(
+            "docs with a library ID requires a question, without --list",
+            'use docs <name> --list or docs <id> "<question>"',
+        )
+
+
+def validate_web(args: argparse.Namespace) -> None:
+    if not 0 <= args.read <= 5:
+        raise ResearchError("--read must be between 0 and 5")
+    if any(not query.strip() for query in args.queries):
+        raise ResearchError("queries must not be empty")
+    filtered = any((args.domain, args.exclude, args.after, args.before, args.category))
+    if args.objective and (filtered or args.chars is not None):
+        raise ResearchError(
+            "--objective cannot be combined with filters or --chars",
+            "put the objective in the query for filtered searches",
+        )
+    for value in (args.after, args.before):
+        if value:
+            try:
+                date.fromisoformat(value)
+                if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+                    raise ValueError
+            except ValueError as error:
+                raise ResearchError("dates must be valid YYYY-MM-DD values") from error
+    if args.after and args.before and args.after > args.before:
+        raise ResearchError("--after must not be later than --before")
+
+
+def validate_wiki(args: argparse.Namespace) -> None:
+    repositories = [repo.strip() for repo in args.repo.split(",")]
+    if any(not re.fullmatch(r"[\w.-]+/[\w.-]+", repo) for repo in repositories):
+        raise ResearchError("wiki repositories must use owner/repo format")
+    if args.action == "ask":
+        if not args.question or not args.question.strip():
+            raise ResearchError("wiki ask requires a question")
+        if len(repositories) > 10:
+            raise ResearchError("wiki ask supports at most 10 repositories")
+    elif len(repositories) != 1 or args.question is not None:
+        raise ResearchError("wiki outline/read takes one repository and no question")
+    args.repo = ",".join(repositories)
+
+
+def validate_selectors(args: argparse.Namespace) -> None:
+    """Check the excerpt selectors and replace them with their parsed forms."""
+    selectors = (args.match, args.section, args.about, args.lines)
+    if sum(value is not None for value in selectors) > 1:
+        raise ResearchError("use only one of --match, --section, --query, and --lines")
+    if args.lines is not None:
+        span = re.fullmatch(r"(\d+)-(\d+)", args.lines)
+        if not span or not 1 <= int(span.group(1)) <= int(span.group(2)):
+            raise ResearchError("--lines takes a range such as 120-180")
+        args.lines = (int(span.group(1)), int(span.group(2)))
+    try:
+        if args.section is not None:
+            args.section = re.compile(args.section, re.IGNORECASE)
+        if args.match is not None:
+            args.match = re.compile(args.match)
+    except re.error as error:
+        raise ResearchError(
+            f"invalid regex: {error}", "escape punctuation or use a valid regex"
+        ) from error
+
+
+COMMAND_VALIDATORS = {"docs": validate_docs, "web": validate_web, "wiki": validate_wiki}
+
+
 def validate_args(args: argparse.Namespace) -> None:
     if args.max_chars < 0 or args.context < 0:
         raise ResearchError("--max-chars and --context must be nonnegative")
-    if hasattr(args, "n") and not 1 <= args.n <= 100:
+    if getattr(args, "n", None) is not None and not 1 <= args.n <= 100:
         raise ResearchError("-n must be between 1 and 100")
     if (
         getattr(args, "chars", None) is not None
@@ -179,58 +294,9 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ResearchError(
             "--chars must be positive; --max-chars controls inline output"
         )
-    if (
-        args.command == "docs"
-        and args.library.startswith("/")
-        and (not args.query.strip() or args.list)
-    ):
-        raise ResearchError(
-            "docs with a library ID requires a question, without --list",
-            'use docs <name> --list or docs <id> "<question>"',
-        )
-    if args.command == "web":
-        filtered = any(
-            (args.domain, args.exclude, args.after, args.before, args.category)
-        )
-        if args.objective and (filtered or args.chars is not None):
-            raise ResearchError(
-                "--objective cannot be combined with filters or --chars",
-                "put the objective in the query for filtered searches",
-            )
-        for value in (args.after, args.before):
-            if value:
-                try:
-                    date.fromisoformat(value)
-                    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
-                        raise ValueError
-                except ValueError as error:
-                    raise ResearchError(
-                        "dates must be valid YYYY-MM-DD values"
-                    ) from error
-        if args.after and args.before and args.after > args.before:
-            raise ResearchError("--after must not be later than --before")
-    if args.command == "wiki":
-        repositories = [repo.strip() for repo in args.repo.split(",")]
-        if any(not re.fullmatch(r"[\w.-]+/[\w.-]+", repo) for repo in repositories):
-            raise ResearchError("wiki repositories must use owner/repo format")
-        if args.action == "ask":
-            if not args.question or not args.question.strip():
-                raise ResearchError("wiki ask requires a question")
-            if len(repositories) > 10:
-                raise ResearchError("wiki ask supports at most 10 repositories")
-        elif len(repositories) != 1 or args.question is not None:
-            raise ResearchError(
-                "wiki outline/read takes one repository and no question"
-            )
-        args.repo = ",".join(repositories)
-    if args.match is not None:
-        try:
-            args.match = re.compile(args.match)
-        except re.error as error:
-            raise ResearchError(
-                f"invalid --match regex: {error}",
-                "escape punctuation or use a valid regex",
-            ) from error
+    if validate_command := COMMAND_VALIDATORS.get(args.command):
+        validate_command(args)
+    validate_selectors(args)
 
 
 def main() -> int:

@@ -13,6 +13,7 @@ from .firecrawl import scrape_page
 from .mcp import request_tool
 from .network import ClientFactory
 from .pages import fetch_page, fetch_raw
+from .providers import SEARCHERS
 
 DIRECT_FETCHERS = {"raw": fetch_raw, "page": fetch_page}
 
@@ -50,6 +51,8 @@ def cached_call(
     options = {"client": client()} if client is not None else {}
     if service in DIRECT_FETCHERS:
         text = DIRECT_FETCHERS[service](arguments["url"], **options)
+    elif service in SEARCHERS:
+        text = SEARCHERS[service](arguments, **options)
     elif service == "firecrawl":
         text = scrape_page(arguments["url"], fresh=fresh, **options)
     else:

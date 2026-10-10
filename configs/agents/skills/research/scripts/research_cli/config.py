@@ -27,14 +27,37 @@ CACHE_TTL_SECONDS = {
     "raw": 3600,
     "page": 3600,
     "firecrawl": 3600,
+    "parallel": 3600,
+    "brave": 3600,
+    "tavily": 3600,
 }
-REQUEST_TIMEOUT_SECONDS = {"dw": 240, "exa": 90, "c7": 60, "grep": 60, "firecrawl": 75}
+REQUEST_TIMEOUT_SECONDS = {
+    "dw": 240,
+    "exa": 90,
+    "c7": 60,
+    "grep": 60,
+    "firecrawl": 75,
+    "parallel": 30,
+    "brave": 30,
+    "tavily": 30,
+}
 DEFAULT_MAX_CHARS = 4000
+# Exa's page text is saved, not printed, so the cap only has to fit a long PDF.
+EXA_PAGE_CHARS = 200_000
 
 
 class ResearchError(Exception):
-    def __init__(self, message: str, hint: str = "", *, final: bool = False):
+    def __init__(
+        self,
+        message: str,
+        hint: str = "",
+        *,
+        final: bool = False,
+        status: int | None = None,
+    ):
         super().__init__(message)
         self.hint = hint
         # final: retrying with another source cannot help (e.g. HTTP 404).
         self.final = final
+        # status: the HTTP status behind the failure, when a provider reported one.
+        self.status = status

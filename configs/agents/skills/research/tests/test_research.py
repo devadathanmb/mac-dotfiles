@@ -21,6 +21,7 @@ from research_cli import (
     firecrawl,
     mcp,
     pages,
+    search,
 )
 from research_cli import output as out
 
@@ -48,6 +49,15 @@ class ResearchTests(unittest.TestCase):
         args = cli.build_parser().parse_args(tokens)
         cli.validate_args(args)
         return args
+
+    @contextlib.contextmanager
+    def exa_only(self):
+        response = "Title: T\nURL: https://example.com\nHighlights:\ntext"
+        with (
+            patch.object(search, "configured", return_value=["exa"]),
+            patch.object(search, "cached_call", return_value=response) as call,
+        ):
+            yield call
 
     def capture(self, callback, *args, **kwargs):
         output = io.StringIO()
@@ -93,21 +103,21 @@ class ResearchTests(unittest.TestCase):
 
     def test_explicit_chars_selects_advanced_search(self):
         args = self.args("web", "query", "--chars", "321")
-        with patch.object(commands, "cached_call", return_value="result") as call:
+        with self.exa_only() as call:
             self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[1], "web_search_advanced_exa")
         self.assertEqual(call.call_args.args[2]["textMaxCharacters"], 321)
 
     def test_basic_search_preserves_objective(self):
         args = self.args("web", "query", "--objective", "goal")
-        with patch.object(commands, "cached_call", return_value="result") as call:
+        with self.exa_only() as call:
             self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[1], "web_search_exa")
         self.assertEqual(call.call_args.args[2]["objective"], "goal")
 
     def test_filtered_search_default_extraction_limit(self):
         args = self.args("web", "query", "--domain", "example.com")
-        with patch.object(commands, "cached_call", return_value="result") as call:
+        with self.exa_only() as call:
             self.capture(commands.web, args)
         self.assertEqual(call.call_args.args[2]["textMaxCharacters"], 1500)
 
@@ -139,7 +149,7 @@ class ResearchTests(unittest.TestCase):
             "2: b\n3: match\n4: d\n5: match\n6: f\n...\n8: h\n9: match",
         )
 
-    def test_raw_batch_shares_preview_budget_and_preserves_files(self):
+    def test_raw_batch_splits_preview_budget_and_preserves_files(self):
         args = self.args(
             "fetch",
             "--raw",
@@ -154,9 +164,9 @@ class ResearchTests(unittest.TestCase):
 
         with patch.object(commands, "cached_call", side_effect=retrieve):
             _, output = self.capture(commands.fetch, args)
-        self.assertIn("a" * 20, output)
-        self.assertNotIn("b" * 20, output)
-        self.assertIn("preview 0/40", output)
+        self.assertIn("\n" + "a" * 10 + "\n", output)
+        self.assertIn("\n" + "b" * 10 + "\n", output)
+        self.assertEqual(output.count("preview 10/40"), 2)
         self.assertEqual(len(list(config.OUTPUT.iterdir())), 2)
         self.assertEqual(
             {path.read_text() for path in config.OUTPUT.iterdir()},
@@ -259,11 +269,14 @@ class ResearchTests(unittest.TestCase):
 
     def test_fetch_falls_back_to_exa_per_url(self):
         args = self.args("fetch", "https://example.com")
-        with patch.object(
-            commands,
-            "cached_call",
-            side_effect=[config.ResearchError("blocked"), "exa text"],
-        ) as call:
+        with (
+            patch.object(commands, "api_key", return_value=None),
+            patch.object(
+                commands,
+                "cached_call",
+                side_effect=[config.ResearchError("blocked"), "exa text"],
+            ) as call,
+        ):
             _, output = self.capture(commands.fetch, args)
         self.assertEqual(call.call_args.args[:2], ("exa", "web_fetch_exa"))
         self.assertIn("falling back to Exa", output)
