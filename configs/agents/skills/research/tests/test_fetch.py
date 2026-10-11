@@ -1,7 +1,6 @@
 import contextlib
 import gzip
 import io
-import sys
 import tempfile
 import threading
 import unittest
@@ -11,8 +10,6 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import httpx
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from research_cli import cache, cli, commands, config, firecrawl, mcp, network, pages
 

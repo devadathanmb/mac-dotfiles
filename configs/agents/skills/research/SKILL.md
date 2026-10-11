@@ -5,7 +5,7 @@ description: Research current library/SDK docs, API examples, errors, changelogs
 
 # research
 
-Run `uv run ~/.agents/skills/research/scripts/research.py <command>` via the shell. `research` below is shorthand, not an installed command. Use `<command> --help` for uncommon options.
+Run `research <command>` via the shell. Use `<command> --help` for uncommon options.
 
 | Need                                   | Command                                                                |
 | -------------------------------------- | ---------------------------------------------------------------------- |

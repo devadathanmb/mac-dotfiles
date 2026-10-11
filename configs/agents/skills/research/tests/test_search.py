@@ -2,15 +2,12 @@ import contextlib
 import io
 import json
 import re
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 import httpx
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from research_cli import (
     cache,
