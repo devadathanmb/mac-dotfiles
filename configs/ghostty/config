@@ -1,40 +1,69 @@
-# Shell
-command = /opt/homebrew/bin/fish --login --interactive
+# Ghostty configuration
+# Docs: https://ghostty.org/docs/config
 
-font-family = "Maple Mono NF Medium"
-font-size = 16.6
+# Font
+font-family = "Maple Mono NF"
+font-style = Medium
+font-size = 16.3
 font-thicken = true
 adjust-cell-width = "-8%"
-window-padding-x = 10
-window-padding-y = 2
+adjust-cell-height = 15%
 
+# Window
+window-padding-x = 10
+window-padding-y = 2,8
+window-save-state = always
+quit-after-last-window-closed = true
+confirm-close-surface = false
+macos-titlebar-style = transparent
+
+# Rendering / performance
+window-vsync = true
+background-opacity = 1
+background-blur = false
+
+# Cursor
 cursor-style = bar
 cursor-style-blink = true
 adjust-cursor-thickness = 3
+
+# Shell
+command = /Users/devadathan.mb/.homebrew/bin/fish --login
+shell-integration = fish
 shell-integration-features = no-cursor
 
-shell-integration = fish
-confirm-close-surface = false
+# macOS
+macos-option-as-alt = true
 
-window-save-state = always
-quit-after-last-window-closed = true
+# Clipboard
+clipboard-paste-protection = false
 
+# Readability
+theme = GitHub Dark High Contrast
+background = "#000000"
+minimum-contrast = 1.2
+
+# Make selection visible but subtle
+selection-foreground = "#0D1117"
+selection-background = "#A3B0BF"
+
+palette = 0=#000000
+palette = 8=#6F757D
+
+# Keybinds
+keybind = alt+f=toggle_fullscreen
 keybind = cmd+h=previous_tab
 keybind = cmd+l=next_tab
 keybind = cmd+shift+h=move_tab:-1
 keybind = cmd+shift+l=move_tab:+1
 
-macos-option-as-alt = left
-
 keybind = alt+left=unbind
 keybind = alt+right=unbind
 
-theme = GitHub Dark High Contrast
+# Notifications
+notify-on-command-finish = unfocused
+notify-on-command-finish-action = bell,notify
+notify-on-command-finish-after = 10s
 
-palette = 0=#000000
-palette = 8=#6e7681
-
-# keybind = shift+enter=text:\x1b\r
-
-
-clipboard-paste-protection = false
+# QoL
+mouse-hide-while-typing = true
