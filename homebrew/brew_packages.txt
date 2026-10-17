@@ -70,4 +70,5 @@ wget
 yamllint
 yazi
 yq
+yt-dlp
 zoxide

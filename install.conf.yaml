@@ -30,6 +30,8 @@
     ~/.config/htop: configs/htop
     ~/.config/btop: configs/btop
     ~/.config/mpv: configs/mpv
+    ~/.config/yt-x/config: configs/yt-x/config
+    ~/.config/yt-x/extensions/themes/default.theme: configs/yt-x/extensions/themes/default.theme
     ~/.config/mise/config.toml: configs/mise/config.toml
     ~/.config/zed: configs/zed
     ~/.config/opencode/AGENTS.md: configs/opencode/AGENTS.md

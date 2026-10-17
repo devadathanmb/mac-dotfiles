@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+# shellcheck disable=SC2034
+# ==============================================================================
+# yt-x Theme Extension: default.theme (auto-loaded)
+# Matched to Ghostty: GitHub Dark High Contrast (bg #000000, fg #f0f3f6)
+# ==============================================================================
+
+if $CLI_SUPPORTS_TRUE_COLOR && $CONFIG_ENABLE_COLORS; then
+  # GitHub HC: Blue (#71b7ff)
+  THEME_FZF_ICON_COLOR_PRIMARY="$(printf '\033[38;2;113;183;255m')"
+
+  # GitHub HC: Gray (#7a828e)
+  THEME_FZF_ICON_COLOR_SECONDARY="$(printf '\033[38;2;122;130;142m')"
+
+  # GitHub HC: Yellow (#f0b72f)
+  THEME_FZF_ICON_COLOR_ACCENT="$(printf '\033[38;2;240;183;47m')"
+
+  # GitHub HC: Red (#ff9492)
+  THEME_FZF_ICON_COLOR_ERROR="$(printf '\033[38;2;255;148;146m')"
+
+  # GitHub HC: Foreground (#f0f3f6)
+  THEME_FZF_PREVIEW_TITLE="$(printf '\033[38;2;240;243;246m')"
+
+  # GitHub HC: Blue (#71b7ff)
+  THEME_FZF_PREVIEW_KEY="$(printf '\033[38;2;113;183;255m')"
+
+  # GitHub HC: Gray (#7a828e)
+  THEME_FZF_PREVIEW_VALUE="$(printf '\033[38;2;122;130;142m')"
+
+  # GitHub HC: Gray (#7a828e)
+  THEME_FZF_PREVIEW_DIVIDER="$(printf '\033[38;2;122;130;142m')"
+
+  # GitHub HC: Green (#26cd4d)
+  THEME_PLAYER_START="$(printf '\033[38;2;38;205;77m')"
+
+  THEME_BOLD="$(printf '\033[1m')"
+  THEME_RESET="$(printf '\033[0m')"
+fi

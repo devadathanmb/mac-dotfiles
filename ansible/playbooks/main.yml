@@ -30,3 +30,5 @@
       tags: [zsh]
     - role: editors
       tags: [editors, vscode, zed]
+    - role: yt_x
+      tags: [yt_x, yt-x]
