@@ -60,13 +60,8 @@
       "SendFeedback"
     ],
     "ask": [
-      "Bash(rm -rf *)",
-      "Bash(rm -fr *)",
-      "Bash(rm -r *)",
-      "Bash(rm --recursive *)",
       "Bash(nc *)",
-      "Bash(aws*)",
-      "Bash(*rm *)"
+      "Bash(aws*)"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
@@ -74,7 +69,7 @@
       "/tmp/agent-gh"
     ]
   },
-  "model": "haiku",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "disableArtifact": true,

@@ -125,7 +125,7 @@
       "gitDecoration.modifiedResourceForeground": "#E2C08D",
       "gitlens.gutterForegroundColor": "#656D71",
       "gitlens.trailingLineForegroundColor": "#656D71",
-      "editor.background": "#06090d",
+      "editor.background": "#000",
       "statusBar.foreground": "#E1E4E8",
       "editorWhitespace.foreground": "#4e4d4d"
     }

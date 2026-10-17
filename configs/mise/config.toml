@@ -27,6 +27,7 @@ node = "26.9.0"
 # binary; OpenCode's package name is also new enough to trip aube's reputation
 # gate. Codex is the official OpenAI package; it resolves its platform binary
 # through optional dependencies, so it needs no build step or version pin.
+"npm:agent-browser" = "latest"
 "npm:@anthropic-ai/claude-code" = { version = "latest", allow_builds = ["@anthropic-ai/claude-code"] }
 "npm:@earendil-works/pi-coding-agent" = "latest"
 "npm:@openai/codex" = "latest"

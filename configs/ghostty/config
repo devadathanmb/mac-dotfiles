@@ -28,7 +28,7 @@ cursor-style-blink = true
 adjust-cursor-thickness = 3
 
 # Shell
-command = /Users/devadathan.mb/.homebrew/bin/fish --login
+command = /opt/homebrew/bin/fish --login --interactive
 shell-integration = fish
 shell-integration-features = no-cursor
 
