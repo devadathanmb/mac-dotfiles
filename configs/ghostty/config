@@ -7,7 +7,7 @@ font-style = Medium
 font-size = 16.3
 font-thicken = true
 adjust-cell-width = "-8%"
-adjust-cell-height = 15%
+adjust-cell-height = 18%
 
 # Window
 window-padding-x = 10
