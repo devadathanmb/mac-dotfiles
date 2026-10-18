@@ -1,0 +1,10 @@
+{
+  "model": {"display_name": "Opus 5.5"},
+  "effort": {"level": "medium"},
+  "context_window": {"used_percentage": 9, "context_window_size": 1000000},
+  "rate_limits": {
+    "five_hour": {"used_percentage": 35, "resets_at": "+11520"},
+    "seven_day": {"used_percentage": 12, "resets_at": "+380000"}
+  },
+  "cost": {"total_cost_usd": 0, "total_duration_ms": 0, "total_lines_added": 0, "total_lines_removed": 0}
+}

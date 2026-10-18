@@ -1,0 +1,8 @@
+{
+  "context_window": {"used_percentage": 67},
+  "rate_limits": {"five_hour": {"used_percentage": 52, "resets_at": "+10800"}},
+  "prompt_cache": {"caching_observed": true, "warm": false, "hit_ratio": 0.4, "expires_at": "+0",
+                   "last_miss_at": "+0", "last_miss_cause": {"causes": ["tools changed"]}},
+  "cost": {"total_cost_usd": 11.8, "total_duration_ms": 5400000, "total_lines_added": 1204, "total_lines_removed": 380},
+  "pr": {"number": 42, "url": "https://github.com/devadathanmb/revue/pull/42", "review_state": "changes_requested"}
+}

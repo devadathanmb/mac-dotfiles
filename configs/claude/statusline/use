@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Switch the mock shown by sessions started with STATUSLINE_DEV=1.
+# Usage: ./use <scenario> | ./use off | ./use (list scenarios and the active one)
+cd "$(dirname "$0")" || exit 1
+mock=${STATUSLINE_MOCK:-${TMPDIR:-/tmp}/claude-statusline-mock.json}
+case "${1:-}" in
+    "")
+        printf 'scenarios:'
+        for f in scenarios/[!_]*.json; do f=${f##*/}; printf ' %s' "${f%.json}"; done
+        printf '\n'
+        printf 'active:    %s\n' "$(jq -r '._scenario // "?"' "$mock" 2> /dev/null || echo off)"
+        ;;
+    off)
+        rm -f "$mock" && echo "mock off: STATUSLINE_DEV sessions show the real payload"
+        ;;
+    *)
+        [ -f "scenarios/$1.json" ] || { echo "no scenario: $1" >&2; exit 1; }
+        jq -s --arg name "$1" '.[0] * .[1] + {_scenario: $name}' scenarios/_base.json "scenarios/$1.json" > "$mock" &&
+            echo "active: $1"
+        ;;
+esac

@@ -2,7 +2,8 @@
 # shellcheck disable=SC2154 # JSON fields are assigned by name in _parse_input
 
 # Statusline script for Claude Code. Reads a JSON payload from stdin (piped by
-# the harness) and prints a two-line status line:
+# the harness) and prints a two-line status line. Preview and test changes with
+# the tools beside this file; see README.md.
 #
 #   ◆ Opus 5.5 · medium ⏐ ━━━━──────── 34%  340k/1M ⏐ cache 92% 4m      5h ━━━━━─────  35%      3h12m
 #   ~/repos/revue ⏐ 󰘬 main* ↑1 ⏐ +120 −30 ⏐ #42 ✓                     7d ━━━━──────  12% Fri 6:45am
@@ -28,7 +29,19 @@ if ! command -v jq > /dev/null; then
 fi
 
 input=$(cat)
-now=$(date +%s)
+# STATUSLINE_NOW pins the clock so ./preview renders are reproducible
+now=${STATUSLINE_NOW:-$(date +%s)}
+
+# Dev preview (see README.md): sessions started with STATUSLINE_DEV=1 merge the
+# mock written by ./use over the real payload. "+N" strings become now+N, so
+# countdowns stay live.
+STATUSLINE_MOCK=${STATUSLINE_MOCK:-${TMPDIR:-/tmp}/claude-statusline-mock.json}
+if [ -n "${STATUSLINE_DEV:-}" ] && [ -f "$STATUSLINE_MOCK" ]; then
+    input=$(jq -s --argjson now "$now" '
+      .[0] * (.[1] | walk(if type == "string" and test("^\\+[0-9]+$")
+                          then $now + (.[1:] | tonumber) else . end))
+    ' <(printf '%s' "$input") "$STATUSLINE_MOCK" 2> /dev/null || printf '%s' "$input")
+fi
 
 # --- input ---------------------------------------------------------------------
 
