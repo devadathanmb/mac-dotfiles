@@ -77,7 +77,7 @@
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
-    "command": "bash $HOME/.claude/statusline-command.sh",
+    "command": "bash $HOME/.claude/statusline/statusline.sh",
     "refreshInterval": 30
   },
   "enabledPlugins": {

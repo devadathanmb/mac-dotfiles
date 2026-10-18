@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Render scenarios at several widths, framed like the Claude Code footer.
+# Usage: ./preview [scenario...]   (default: all)
+# Env:   WIDTHS="150 90"           columns to render (default: terminal width, 100, 80)
+#        STATUSLINE_BASH=/bin/bash shell that runs the script (check bash 3.2 parity)
+# The git segment comes from the current directory.
+dir=$(cd "$(dirname "$0")" && pwd)
+widths=${WIDTHS:-"$(tput cols 2> /dev/null || echo 120) 100 80"}
+names=("$@")
+# One clock for every render, so runs are comparable (e.g. bash vs /bin/bash)
+export STATUSLINE_NOW=${STATUSLINE_NOW:-$(date +%s)}
+if [ ${#names[@]} -eq 0 ]; then
+    for f in "$dir"/scenarios/[!_]*.json; do names+=("$(basename "$f" .json)"); done
+fi
+rule() { printf '─%.0s' $(seq 1 "$1"); }
+for name in "${names[@]}"; do
+    [ -f "$dir/scenarios/$name.json" ] || { echo "no scenario: $name" >&2; exit 1; }
+    payload=$(jq -s --arg cwd "$PWD" --argjson now "$STATUSLINE_NOW" '
+      .[0] * .[1] * {workspace: {current_dir: $cwd}}
+      | walk(if type == "string" and test("^\\+[0-9]+$") then $now + (.[1:] | tonumber) else . end)
+    ' "$dir/scenarios/_base.json" "$dir/scenarios/$name.json")
+    for w in $widths; do
+        printf '\e[2m── %s · %s cols %s\n❯\n%s\e[0m\n' "$name" "$w" "$(rule $((w - ${#name} - ${#w} - 12)))" "$(rule "$w")"
+        printf '%s' "$payload" | COLUMNS=$w "${STATUSLINE_BASH:-bash}" "$dir/statusline.sh" | sed 's/^/  /'
+        printf '\n\n'
+    done
+done

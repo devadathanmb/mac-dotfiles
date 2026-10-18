@@ -1,0 +1,7 @@
+{
+  "model": {"display_name": "Sonnet 5.5"},
+  "rate_limits": null,
+  "context_window": {"used_percentage": 21, "context_window_size": 200000},
+  "vim": {"mode": "NORMAL"},
+  "cost": {"total_cost_usd": 0.87, "total_duration_ms": 600000}
+}
