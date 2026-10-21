@@ -1,0 +1,18 @@
+---
+- name: Back up application preferences
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - export
+      - "{{ item.domain }}"
+      - "{{ dotfiles_repo }}/{{ item.path }}"
+  loop:
+    - domain: com.lwouis.alt-tab-macos
+      path: exports/alt-tab/com.lwouis.alt-tab-macos.plist
+    - domain: eu.exelban.Stats
+      path: exports/stats/Stats.plist
+    - domain: com.googlecode.iterm2
+      path: exports/iterm2/com.googlecode.iterm2.plist
+  loop_control:
+    label: "{{ item.domain }}"
+  changed_when: true

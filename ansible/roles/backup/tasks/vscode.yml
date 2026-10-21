@@ -1,0 +1,28 @@
+---
+- name: Check if VSCode is installed
+  ansible.builtin.command:
+    argv: [code, --version]
+  register: code_check
+  failed_when: false
+  changed_when: false
+  check_mode: false
+
+- name: Get installed VSCode extensions
+  ansible.builtin.command:
+    cmd: code --list-extensions
+  register: vscode_extensions
+  changed_when: false
+  check_mode: false
+  when: code_check.rc == 0
+
+- name: Write VSCode extensions to file
+  ansible.builtin.copy:
+    content: "{{ vscode_extensions.stdout_lines | sort | join('\n') }}{{ '\n' if vscode_extensions.stdout_lines | length > 0 else '' }}"
+    dest: "{{ vscode_extensions_file }}"
+    mode: "0644"
+  when: code_check.rc == 0
+
+- name: Display VSCode extensions backup result
+  ansible.builtin.debug:
+    msg: "Backed up {{ vscode_extensions.stdout_lines | length }} VSCode extensions to {{ vscode_extensions_file | basename }}"
+  when: code_check.rc == 0

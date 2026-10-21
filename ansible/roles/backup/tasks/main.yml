@@ -1,0 +1,39 @@
+---
+- name: Back up Homebrew formulae
+  ansible.builtin.import_tasks: formulae.yml
+  tags: formulae
+
+- name: Back up Homebrew casks
+  ansible.builtin.import_tasks: casks.yml
+  tags: casks
+
+- name: Back up VSCode extensions
+  ansible.builtin.import_tasks: vscode.yml
+  tags: vscode
+
+- name: Back up Zed extensions
+  ansible.builtin.import_tasks: zed.yml
+  tags: zed
+
+- name: Back up application preferences
+  ansible.builtin.import_tasks: apps.yml
+  tags: apps
+
+- name: Back up macOS defaults
+  ansible.builtin.import_tasks: macos.yml
+  tags: macos
+
+- name: Display backup summary
+  ansible.builtin.debug:
+    msg: |
+      ========================================
+      Backup Complete!
+      ========================================
+      Homebrew formulae (on request): {{ installed_formulae.stdout_lines | default([]) | length }}
+      Homebrew casks: {{ installed_casks | default([]) | length }}
+      VSCode extensions: {{ vscode_extensions.stdout_lines | default([]) | length }}
+      Zed extensions: {{ installed_zed_extensions | default([]) | length }}
+      Application preferences: AltTab, Stats, iTerm2
+      macOS defaults backup: {{ macos_defaults_backup.stdout | default('not run') }}
+      ========================================
+      Run `git diff` to see changes, then `git add` and `git commit` to save.

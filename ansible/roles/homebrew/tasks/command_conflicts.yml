@@ -5,6 +5,7 @@
   register: mole_prefix
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Check for Markdown mo installation
   ansible.builtin.command:
@@ -12,22 +13,25 @@
   register: markdown_mo_prefix
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Unlink Mole's conflicting mo command
   ansible.builtin.command:
     cmd: brew unlink mole
   when: mole_prefix.rc == 0
-  changed_when: false
+  register: mole_unlink
+  changed_when: "mole_unlink.stdout is search('[1-9][0-9]* symlinks? removed')"
 
 - name: Link the Markdown mo command
   ansible.builtin.command:
     cmd: brew link --overwrite mo
   when: markdown_mo_prefix.rc == 0
-  changed_when: false
+  register: markdown_mo_link
+  changed_when: "markdown_mo_link.stdout is search('[1-9][0-9]* symlinks? created')"
 
 - name: Ensure user-local executable directory exists
   ansible.builtin.file:
-    path: "{{ lookup('env', 'HOME') }}/.local/bin"
+    path: "{{ local_bin_dir }}"
     state: directory
     mode: "0755"
   when: mole_prefix.rc == 0
@@ -35,7 +39,7 @@
 - name: Expose Mole under its unambiguous command name
   ansible.builtin.file:
     src: "{{ mole_prefix.stdout | trim }}/bin/mole"
-    dest: "{{ lookup('env', 'HOME') }}/.local/bin/mole"
+    dest: "{{ local_bin_dir }}/mole"
     state: link
     force: true
   when:

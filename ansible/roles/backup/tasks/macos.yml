@@ -1,0 +1,16 @@
+---
+- name: Refresh latest managed macOS defaults backup
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python }}"
+      - "{{ dotfiles_repo }}/ansible/scripts/backup_macos_defaults.py"
+      - --source-dir
+      - "{{ dotfiles_repo }}/ansible/roles/macos/tasks/mac"
+      - --output-dir
+      - "{{ dotfiles_repo }}/configs/macos/backups"
+  register: macos_defaults_backup
+  changed_when: true
+
+- name: Display macOS defaults backup result
+  ansible.builtin.debug:
+    msg: "{{ macos_defaults_backup.stdout }}"

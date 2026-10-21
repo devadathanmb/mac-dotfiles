@@ -1,25 +1,16 @@
 ---
-- name: Ensure Homebrew is installed (Apple Silicon)
+- name: Check Homebrew is available
   ansible.builtin.command:
-    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    creates: /opt/homebrew/bin/brew
-  when:
-    - ansible_facts['os_family'] == "Darwin"
-    - ansible_facts['architecture'] == "arm64"
-  become: false
-  environment:
-    NONINTERACTIVE: "1"
+    cmd: brew --version
+  register: homebrew_check
+  check_mode: false
+  changed_when: false
+  failed_when: false
 
-- name: Ensure Homebrew is installed (Intel)
-  ansible.builtin.command:
-    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    creates: /usr/local/bin/brew
-  when:
-    - ansible_facts['os_family'] == "Darwin"
-    - ansible_facts['architecture'] != "arm64"
-  become: false
-  environment:
-    NONINTERACTIVE: "1"
+- name: Require Homebrew before installing packages
+  ansible.builtin.assert:
+    that: homebrew_check.rc == 0
+    fail_msg: Run make bootstrap to install Homebrew and Ansible first.
 
 - name: Update Homebrew
   community.general.homebrew:
@@ -28,38 +19,29 @@
 
 - name: Read Homebrew formulae from file
   ansible.builtin.set_fact:
-    brew_formulae: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_packages.txt').splitlines() | reject('==', '') | list }}"
+    brew_formulae: "{{ lookup('file', brew_formulae_file).splitlines() | reject('==', '') | list }}"
 
 - name: Read Homebrew casks from file
   ansible.builtin.set_fact:
-    brew_casks: "{{ lookup('file', dotfiles_repo + '/homebrew/brew_casks.txt').splitlines() | reject('==', '') | list }}"
+    brew_casks: "{{ lookup('file', brew_casks_file).splitlines() | reject('==', '') | list }}"
 
 - name: Install Homebrew formulae
   community.general.homebrew:
-    name: "{{ item }}"
+    name: "{{ brew_formulae }}"
     state: present
-  loop: "{{ brew_formulae }}"
   become: false
-
-- name: Validate sudo before installing privileged casks
-  ansible.builtin.command: /usr/bin/true
-  become: true
-  changed_when: false
 
 - name: Install Homebrew casks
   community.general.homebrew_cask:
-    name: "{{ item }}"
+    name: "{{ brew_casks }}"
     state: present
-    sudo_password: "{{ bootstrap_sudo_password }}"
-  loop: "{{ brew_casks }}"
+    # Homebrew runs as the user; only privileged installers use sudo.
+    # -K is not exposed as ansible_become_password to this module.
+    sudo_password: "{{ ansible_become_password | default(lookup('ansible.builtin.env', 'ANSIBLE_BECOME_PASS'), true) | default(omit, true) }}"
   become: false
 
 - name: Resolve Homebrew command conflicts
   ansible.builtin.import_tasks: command_conflicts.yml
 
 - name: Configure default applications
-  ansible.builtin.command:
-    argv:
-      - duti
-      - "{{ dotfiles_repo }}/configs/duti/defaults.duti"
-  changed_when: false
+  ansible.builtin.import_tasks: default_applications.yml
