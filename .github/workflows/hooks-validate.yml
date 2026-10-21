@@ -1,0 +1,56 @@
+name: Hook Validation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - ".github/workflows/hooks-validate.yml"
+      - ".pre-commit-config.yaml"
+      - "**/*.yaml"
+      - "**/*.yml"
+      - "**/*.sh"
+      - "**/*.bash"
+      - "**/*.fish"
+      - "**/*.zsh"
+      - ".zshrc"
+  pull_request:
+    paths:
+      - ".github/workflows/hooks-validate.yml"
+      - ".pre-commit-config.yaml"
+      - "**/*.yaml"
+      - "**/*.yml"
+      - "**/*.sh"
+      - "**/*.bash"
+      - "**/*.fish"
+      - "**/*.zsh"
+      - ".zshrc"
+  workflow_dispatch:
+
+jobs:
+  hooks:
+    name: YAML, shell, fish, and zsh checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install hook dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes fish shellcheck yamllint zsh
+          python -m pip install --upgrade pre-commit
+
+      - name: Run non-mutating hooks across all files
+        run: |
+          pre-commit run lint-yaml --all-files
+          pre-commit run lint-shell --all-files
+          pre-commit run check-fish-syntax --all-files
+          pre-commit run check-zsh-syntax --all-files

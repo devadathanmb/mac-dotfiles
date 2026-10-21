@@ -8,6 +8,7 @@ untracked/*
 **/log/
 **/history
 *.log
+.ruff_cache/
 .cursor/*
 .claude/*
 .commandcode/
