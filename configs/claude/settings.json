@@ -17,7 +17,6 @@
     "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
     "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL": "1",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "DISABLE_TELEMETRY": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_FEEDBACK_COMMAND": "1",
@@ -44,7 +43,6 @@
       "Edit(~/.ssh/**)",
       "Edit(/.ssh/**)",
       "DesignSync",
-      "RemoteTrigger",
       "PushNotification",
       "ScheduleWakeup",
       "ReportFindings",
@@ -69,7 +67,6 @@
       "/tmp/agent-gh"
     ]
   },
-  "model": "opus",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "disableArtifact": true,
@@ -82,7 +79,17 @@
   },
   "enabledPlugins": {
     "cc-plugin-plugin-authoring@builtin": false,
-    "cc-plugin-telemetry@builtin": false
+    "cc-plugin-telemetry@builtin": false,
+    "frontend-design@claude-plugins-official": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
@@ -91,7 +98,6 @@
       "effortLevel": "medium"
     }
   },
-  "fastMode": false,
   "fastModePerSessionOptIn": true,
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,

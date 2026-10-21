@@ -32,5 +32,8 @@
         "thinking": "high"
       }
     }
-  }
+  },
+  "extensions": [
+    "-builtin:mcp"
+  ]
 }

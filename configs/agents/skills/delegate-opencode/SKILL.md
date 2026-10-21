@@ -89,6 +89,9 @@ python3 $D interrupt --session ses_...
 
 - Follow up only with the session ID the script printed for this task; never continue the "last"
   session. `--rule` applies only to new sessions and accepts `deny` or `ask`; never grant `allow`.
+- `--auto` (new sessions only) is OpenCode's auto mode: every permission request not explicitly denied by a `--rule` is approved, so
+  piped/chained shell commands and `rm` stop blocking. Use it only when the user has said so; explicit `--rule deny` still wins (tested).
+  The brief's hygiene rules still apply: auto mode removes the prompts, not the instructions.
 - Watching exits as soon as the session needs attention. Unless the status says it was interrupted,
   the session is still running.
 
