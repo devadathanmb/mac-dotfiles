@@ -1,37 +1,56 @@
 ---
-- name: Check if VSCode is installed
-  ansible.builtin.command:
-    argv: [code, --version]
-  register: code_check
-  failed_when: false
-  changed_when: false
-
 - name: Read VSCode extensions from file
   ansible.builtin.set_fact:
-    vscode_extensions: "{{ lookup('file', dotfiles_repo + '/configs/vscode/extensions.txt').splitlines() | reject('==', '') | list }}"
+    vscode_extensions: "{{ lookup('file', vscode_extensions_file).splitlines() | reject('==', '') | list }}"
+
+- name: Check if VSCode is installed
+  ansible.builtin.command:
+    argv: [which, code]
+  register: code_check
+  failed_when: code_check.rc not in [0, 1]
+  changed_when: false
+  check_mode: false
+
+- name: Read installed VSCode extensions
+  ansible.builtin.command:
+    argv: [code, --list-extensions]
+  register: vscode_installed_result
+  changed_when: false
+  check_mode: false
   when: code_check.rc == 0
 
-- name: Install VSCode extensions
+- name: Normalize installed VSCode extension identifiers
+  ansible.builtin.set_fact:
+    vscode_installed_extensions: "{{ vscode_installed_result.stdout_lines | map('lower') | list }}"
+  when: code_check.rc == 0
+
+- name: Install missing VSCode extensions
   ansible.builtin.command:
     argv: [code, --install-extension, "{{ item }}"]
-  loop: "{{ vscode_extensions | default([]) }}"
-  when: code_check.rc == 0
-  failed_when: false
-  changed_when: false
+  loop: "{{ vscode_extensions }}"
+  changed_when: true
+  when:
+    - code_check.rc == 0
+    - item | lower not in vscode_installed_extensions
 
 - name: Read Zed extensions from file
   ansible.builtin.set_fact:
-    zed_extensions: "{{ lookup('file', dotfiles_repo + '/configs/zed/extensions.txt').splitlines() | reject('==', '') | list }}"
+    zed_extensions: "{{ lookup('file', zed_extensions_file).splitlines() | reject('==', '') | list }}"
 
-- name: Configure Zed extension auto-install
-  ansible.builtin.blockinfile:
-    path: "{{ dotfiles_repo }}/configs/zed/settings.json"
-    marker: "    // {mark} ANSIBLE MANAGED ZED EXTENSIONS"
-    insertafter: "^{"
-    block: |2
-          "auto_install_extensions": {{ dict(zed_extensions | zip([true] * (zed_extensions | length))) | to_nice_json(indent=4) | indent(4, false) }},
-  when: zed_extensions | length > 0
+- name: Parse tracked Zed auto-install extensions
+  ansible.builtin.set_fact:
+    zed_auto_install_extensions: >-
+      {{ lookup('file', dotfiles_repo + '/configs/zed/settings.json')
+         | regex_findall('(?s)"auto_install_extensions" *: *({[^}]*})')
+         | first
+         | from_json }}
+
+- name: Verify Zed extension settings match the extension manifest
+  ansible.builtin.assert:
+    that:
+      - zed_auto_install_extensions == dict(zed_extensions | zip([true] * (zed_extensions | length)))
+    fail_msg: "The auto_install_extensions setting must exactly match configs/zed/extensions.txt."
 
 - name: Display extension installation summary
   ansible.builtin.debug:
-    msg: "VSCode extensions installed; Zed extensions configured for auto-install on startup. Some may have failed (deprecated extensions)."
+    msg: "Checked the VSCode extension manifest and verified {{ zed_extensions | length }} Zed extension settings."

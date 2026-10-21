@@ -7,7 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-    // BEGIN ANSIBLE MANAGED ZED EXTENSIONS
+    // Keep this map in sync with configs/zed/extensions.txt.
     "auto_install_extensions": {
         "astro": true,
         "dockerfile": true,
@@ -17,7 +17,6 @@
         "material-icon-theme": true,
         "mdx": true
     },
-    // END ANSIBLE MANAGED ZED EXTENSIONS
     // ─── Font ────────────────────────────────────────────────────────────────────
     "icon_theme": "Material Icon Theme",
     "cli_default_open_behavior": "existing_window",
