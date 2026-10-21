@@ -236,11 +236,16 @@ def create_session(api, a):
         if not mid:
             die("--model must look like provider/model#variant")
         body["model"] = {"providerID": prov, "id": mid, **({"variant": variant} if variant else {})}
+    # --auto is OpenCode's auto mode: approve everything not explicitly denied. The allow-all rule goes first so
+    # any --rule deny/ask after it still applies (later rules win).
+    perms = [{"action": "*", "resource": "*", "effect": "allow"}] if a.auto else []
     if a.rule:
         rules = [r.partition("=") for r in a.rule]
         if any(e not in ("deny", "ask") for _, _, e in rules):
             die("--rule must look like action=deny|ask")
-        body["permissions"] = [{"action": x, "resource": "*", "effect": e} for x, _, e in rules]
+        perms += [{"action": x, "resource": "*", "effect": e} for x, _, e in rules]
+    if perms:
+        body["permissions"] = perms
     return api.call("POST", "/api/session", body)["data"]["id"]
 
 
@@ -262,6 +267,7 @@ def main():
     r.add_argument("--model", help="provider/model#variant (new session)")
     r.add_argument("--agent")
     r.add_argument("--title", default="Delegated task")
+    r.add_argument("--auto", action="store_true", help="auto mode for a new session: approve all permission requests not explicitly denied by --rule (like OpenCode --auto)")
     r.add_argument("--rule", action="append", default=[], metavar="ACTION=EFFECT", help="new-session rule, e.g. edit=deny")
     watched(r)
 
