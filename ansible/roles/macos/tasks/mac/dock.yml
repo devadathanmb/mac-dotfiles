@@ -2,7 +2,6 @@
 # DOCK SETTINGS
 
 - name: Dock | Read pinned applications
-  tags: [macos]
   ansible.builtin.command:
     argv: [dockutil, --list]
   register: dock_items
@@ -10,13 +9,11 @@
   check_mode: false
 
 - name: Dock | Record pinned application names
-  tags: [macos]
   ansible.builtin.set_fact:
     current_dock_apps: "{{ dock_items.stdout_lines | map('regex_replace', '\t.*$', '') | list }}"
     expected_dock_apps: "{{ macos_dock_applications | map(attribute='name') | list }}"
 
 - name: Dock | Remove unexpected pinned applications
-  tags: [macos]
   ansible.builtin.command:
     argv: [dockutil, --remove, all, --no-restart]
   when: current_dock_apps != expected_dock_apps
@@ -24,7 +21,6 @@
   notify: Restart Dock
 
 - name: Dock | Add pinned applications in order
-  tags: [macos]
   ansible.builtin.command:
     argv: [dockutil, --add, "{{ item.path }}", --no-restart]
   loop: "{{ macos_dock_applications }}"
@@ -35,7 +31,6 @@
   notify: Restart Dock
 
 - name: Dock | Auto-hide Dock
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: autohide
@@ -44,7 +39,6 @@
   notify: Restart Dock
 
 - name: Dock | Set auto-hide animation speed
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: autohide-time-modifier
@@ -53,7 +47,6 @@
   notify: Restart Dock
 
 - name: Dock | Change minimize/maximize window effect to genie
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: mineffect
@@ -62,7 +55,6 @@
   notify: Restart Dock
 
 - name: Dock | Minimize windows into their application icon
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: minimize-to-application
@@ -71,7 +63,6 @@
   notify: Restart Dock
 
 - name: Dock | Show indicator lights for open applications
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: show-process-indicators
@@ -80,7 +71,6 @@
   notify: Restart Dock
 
 - name: Dock | Show pinned and open applications
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: static-only
@@ -89,7 +79,6 @@
   notify: Restart Dock
 
 - name: Dock | Don't animate opening applications
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: launchanim
@@ -98,7 +87,6 @@
   notify: Restart Dock
 
 - name: Dock | Don't show recently used applications
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: show-recents
@@ -107,7 +95,6 @@
   notify: Restart Dock
 
 - name: Dock | Speed up Mission Control animations
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: expose-animation-duration
@@ -116,7 +103,6 @@
   notify: Restart Dock
 
 - name: Dock | Don't automatically rearrange Spaces
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: mru-spaces
@@ -125,7 +111,6 @@
   notify: Restart Dock
 
 - name: Dock | Set icon size
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: tilesize
@@ -134,7 +119,6 @@
   notify: Restart Dock
 
 - name: Dock | Disable magnification
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: magnification
@@ -143,7 +127,6 @@
   notify: Restart Dock
 
 - name: Dock | Don't group windows by app in Mission Control
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: expose-group-apps
@@ -152,106 +135,9 @@
   notify: Restart Dock
 
 - name: Dock | Enable Mission Control by dragging window to top
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.dock
     key: enterMissionControlByTopWindowDrag
     type: bool
     value: true
-  notify: Restart Dock
-
-# WINDOW MANAGER SETTINGS
-
-- name: Window Manager | Disable click wallpaper to show desktop (Sonoma+)
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: EnableStandardClickToShowDesktop
-    type: bool
-    value: false
-
-- name: Window Manager | Disable margins between tiled windows
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: EnableTiledWindowMargins
-    type: bool
-    value: false
-
-- name: Window Manager | Hide widgets on desktop
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: StandardHideWidgets
-    type: bool
-    value: true
-
-- name: Window Manager | Hide widgets in Stage Manager
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: StageManagerHideWidgets
-    type: bool
-    value: true
-
-- name: Window Manager | Hide desktop items
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: HideDesktop
-    type: bool
-    value: true
-
-- name: Window Manager | Hide standard desktop icons
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: StandardHideDesktopIcons
-    type: bool
-    value: true
-
-- name: Window Manager | Group windows by app in Stage Manager
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.WindowManager
-    key: AppWindowGroupingBehavior
-    type: int
-    value: 1
-
-# HOT CORNERS
-
-- name: Hot Corners | Top left screen corner - Disabled
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.dock
-    key: wvous-tl-corner
-    type: int
-    value: 0
-  notify: Restart Dock
-
-- name: Hot Corners | Top right screen corner - Disabled
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.dock
-    key: wvous-tr-corner
-    type: int
-    value: 0
-  notify: Restart Dock
-
-- name: Hot Corners | Bottom left screen corner - Disabled
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.dock
-    key: wvous-bl-corner
-    type: int
-    value: 0
-  notify: Restart Dock
-
-- name: Hot Corners | Bottom right screen corner - Disabled
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.dock
-    key: wvous-br-corner
-    type: int
-    value: 0
   notify: Restart Dock

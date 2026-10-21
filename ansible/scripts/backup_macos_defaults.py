@@ -143,7 +143,7 @@ def portable_value(value: Any) -> Any:
 
     home = str(Path.home())
     if value == home or value.startswith(f"{home}/"):
-        return "{{ ansible_facts['env']['HOME'] }}" + value[len(home) :]
+        return "{{ home_dir }}" + value[len(home) :]
     return value
 
 

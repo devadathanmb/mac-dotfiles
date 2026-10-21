@@ -1,0 +1,36 @@
+---
+# SCREENSHOT SETTINGS
+
+- name: Screenshots | Create Screenshots directory
+  ansible.builtin.file:
+    path: "{{ home_dir }}/Pictures/Screenshots"
+    state: directory
+    mode: "0755"
+
+- name: Screenshots | Save screenshots to Screenshots folder
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: location
+    type: string
+    value: "{{ home_dir }}/Pictures/Screenshots"
+
+- name: Screenshots | Save screenshots in PNG format
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: type
+    type: string
+    value: png
+
+- name: Screenshots | Disable HDR screenshots
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: captureHDR
+    type: bool
+    value: false
+
+- name: Screenshots | Disable shadow in screenshots
+  community.general.osx_defaults:
+    domain: com.apple.screencapture
+    key: disable-shadow
+    type: bool
+    value: true

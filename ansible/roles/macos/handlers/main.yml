@@ -4,14 +4,14 @@
 - name: Restart Finder
   ansible.builtin.command:
     cmd: killall Finder
-  changed_when: false
+  changed_when: true
 
 - name: Restart Dock
   ansible.builtin.command:
     cmd: killall Dock
-  changed_when: false
+  changed_when: true
 
 - name: Restart SystemUIServer
   ansible.builtin.command:
     cmd: killall SystemUIServer
-  changed_when: false
+  changed_when: true

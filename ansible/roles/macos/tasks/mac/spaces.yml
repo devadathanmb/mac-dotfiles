@@ -2,7 +2,6 @@
 # SPACES SETTINGS
 
 - name: Spaces | Use separate spaces per display
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.spaces
     key: spans-displays
@@ -10,7 +9,6 @@
     value: false
 
 - name: Spaces | Switch to app's Space when activated
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleSpacesSwitchOnActivate

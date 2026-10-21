@@ -4,38 +4,50 @@
 # Each topic is split into a dedicated file under mac/
 
 - name: Apply macOS defaults from backup file
-  ansible.builtin.include_tasks: apply_backup.yml
+  ansible.builtin.import_tasks: apply_backup.yml
   when: macos_defaults_file is defined
 
 - name: Apply managed macOS defaults
   when: macos_defaults_file is not defined
   block:
     - name: Include trackpad settings
-      ansible.builtin.include_tasks: mac/trackpad.yml
+      ansible.builtin.import_tasks: mac/trackpad.yml
 
     - name: Include finder settings
-      ansible.builtin.include_tasks: mac/finder.yml
+      ansible.builtin.import_tasks: mac/finder.yml
 
     - name: Include keyboard settings
-      ansible.builtin.include_tasks: mac/keyboard.yml
+      ansible.builtin.import_tasks: mac/keyboard.yml
 
     - name: Include appearance settings
-      ansible.builtin.include_tasks: mac/appearance.yml
+      ansible.builtin.import_tasks: mac/appearance.yml
 
     - name: Include dock settings
-      ansible.builtin.include_tasks: mac/dock.yml
+      ansible.builtin.import_tasks: mac/dock.yml
+
+    - name: Include window manager settings
+      ansible.builtin.import_tasks: mac/window_manager.yml
+
+    - name: Include hot corner settings
+      ansible.builtin.import_tasks: mac/hot_corners.yml
 
     - name: Include login item settings
-      ansible.builtin.include_tasks: mac/login_items.yml
+      ansible.builtin.import_tasks: mac/login_items.yml
 
     - name: Include system UI settings
-      ansible.builtin.include_tasks: mac/system_ui.yml
+      ansible.builtin.import_tasks: mac/system_ui.yml
+
+    - name: Include terminal settings
+      ansible.builtin.import_tasks: mac/terminal.yml
+
+    - name: Include screenshot settings
+      ansible.builtin.import_tasks: mac/screenshots.yml
 
     - name: Include security settings
-      ansible.builtin.include_tasks: mac/security.yml
+      ansible.builtin.import_tasks: mac/security.yml
 
     - name: Include spaces settings
-      ansible.builtin.include_tasks: mac/spaces.yml
+      ansible.builtin.import_tasks: mac/spaces.yml
 
     - name: Include app settings
-      ansible.builtin.include_tasks: mac/apps.yml
+      ansible.builtin.import_tasks: mac/apps.yml
