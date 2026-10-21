@@ -12,7 +12,7 @@
 
 - name: Check the tracked mise config is linked
   ansible.builtin.stat:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.config/mise/config.toml"
+    path: "{{ home_dir }}/.config/mise/config.toml"
   register: mise_global_config
 
 - name: Fail when the tracked mise config is missing
@@ -25,7 +25,7 @@
 - name: Install globally configured mise tools
   ansible.builtin.command:
     cmd: mise install
-    chdir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
+    chdir: "{{ home_dir }}"
   register: mise_install_result
   changed_when: "'installed 0 tools' not in (mise_install_result.stdout + mise_install_result.stderr)"
 

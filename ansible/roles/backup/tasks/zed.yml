@@ -1,0 +1,30 @@
+---
+- name: Check if Zed extensions directory exists
+  ansible.builtin.stat:
+    path: "{{ zed_extensions_installed_dir }}"
+  register: zed_extensions_dir
+
+- name: Get installed Zed extensions
+  ansible.builtin.find:
+    paths: "{{ zed_extensions_installed_dir }}"
+    file_type: directory
+    recurse: false
+  register: zed_extensions
+  when: zed_extensions_dir.stat.exists
+
+- name: Collect installed Zed extension names
+  ansible.builtin.set_fact:
+    installed_zed_extensions: "{{ zed_extensions.files | map(attribute='path') | map('basename') | sort | list }}"
+  when: zed_extensions_dir.stat.exists
+
+- name: Write Zed extensions to file
+  ansible.builtin.copy:
+    content: "{{ installed_zed_extensions | join('\n') }}{{ '\n' if installed_zed_extensions | length > 0 else '' }}"
+    dest: "{{ zed_extensions_file }}"
+    mode: "0644"
+  when: zed_extensions_dir.stat.exists
+
+- name: Display Zed extensions backup result
+  ansible.builtin.debug:
+    msg: "Backed up {{ installed_zed_extensions | length }} Zed extensions to {{ zed_extensions_file | basename }}"
+  when: zed_extensions_dir.stat.exists

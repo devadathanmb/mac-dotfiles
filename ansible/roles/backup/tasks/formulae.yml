@@ -1,0 +1,19 @@
+---
+# Keep formulae installed on request, including formulae that are also another
+# package's dependency and would be omitted by `brew leaves`.
+- name: Get directly-installed (on request) Homebrew formulae
+  ansible.builtin.command:
+    cmd: brew list --formula --installed-on-request
+  register: installed_formulae
+  changed_when: false
+  check_mode: false
+
+- name: Write directly-installed formulae to file
+  ansible.builtin.copy:
+    content: "{{ installed_formulae.stdout_lines | sort | join('\n') }}{{ '\n' if installed_formulae.stdout_lines | length > 0 else '' }}"
+    dest: "{{ brew_formulae_file }}"
+    mode: "0644"
+
+- name: Display formulae backup result
+  ansible.builtin.debug:
+    msg: "Backed up {{ installed_formulae.stdout_lines | length }} directly-installed Homebrew formulae to {{ brew_formulae_file | basename }}"

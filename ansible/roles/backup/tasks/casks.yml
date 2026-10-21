@@ -1,0 +1,21 @@
+---
+- name: Get installed Homebrew casks with versions
+  ansible.builtin.command:
+    cmd: brew list --cask --versions
+  register: discovered_casks
+  changed_when: false
+  check_mode: false
+
+- name: Collect installed Homebrew casks
+  ansible.builtin.set_fact:
+    installed_casks: "{{ discovered_casks.stdout_lines | select('search', '\\S+\\s+\\S+') | map('regex_replace', '^\\s*(\\S+)\\s+.*$', '\\1') | sort | list }}"
+
+- name: Write installed casks to file
+  ansible.builtin.copy:
+    content: "{{ installed_casks | join('\n') }}{{ '\n' if installed_casks | length > 0 else '' }}"
+    dest: "{{ brew_casks_file }}"
+    mode: "0644"
+
+- name: Display casks backup result
+  ansible.builtin.debug:
+    msg: "Backed up {{ installed_casks | length }} Homebrew casks to {{ brew_casks_file | basename }}"

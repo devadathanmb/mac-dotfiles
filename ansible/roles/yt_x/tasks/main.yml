@@ -6,13 +6,13 @@
 
 - name: Ensure user-local executable directory exists
   ansible.builtin.file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    path: "{{ local_bin_dir }}"
     state: directory
     mode: "0755"
 
 - name: Check installed yt-x version
   ansible.builtin.command:
-    cmd: "{{ ansible_facts['env']['HOME'] }}/.local/bin/yt-x --version"
+    cmd: "{{ local_bin_dir }}/yt-x --version"
   register: yt_x_installed
   changed_when: false
   failed_when: false
@@ -20,6 +20,6 @@
 - name: Install pinned yt-x release
   ansible.builtin.get_url:
     url: "https://github.com/Benexl/yt-x/releases/download/v{{ yt_x_version }}/yt-x"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/yt-x"
+    dest: "{{ local_bin_dir }}/yt-x"
     mode: "0755"
   when: "'v' + yt_x_version not in (yt_x_installed.stdout | default(''))"

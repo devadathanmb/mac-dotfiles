@@ -1,4 +1,11 @@
 ---
 # Path to the dotfiles repository. Keep this inventory-wide because multiple
 # independent roles and playbooks consume tracked files from the repository.
-dotfiles_repo: "{{ lookup('env', 'DOTFILES_REPO') | default(lookup('env', 'HOME') ~ '/.mac-dots', true) }}"
+home_dir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
+dotfiles_repo: "{{ lookup('ansible.builtin.env', 'DOTFILES_REPO') | default(home_dir ~ '/.mac-dots', true) }}"
+local_bin_dir: "{{ home_dir }}/.local/bin"
+brew_formulae_file: "{{ dotfiles_repo }}/homebrew/brew_packages.txt"
+brew_casks_file: "{{ dotfiles_repo }}/homebrew/brew_casks.txt"
+vscode_extensions_file: "{{ dotfiles_repo }}/configs/vscode/extensions.txt"
+zed_extensions_file: "{{ dotfiles_repo }}/configs/zed/extensions.txt"
+zed_extensions_installed_dir: "{{ home_dir }}/Library/Application Support/Zed/extensions/installed"

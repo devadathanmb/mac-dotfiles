@@ -31,36 +31,25 @@ if ! command -v brew &> /dev/null; then
     setup_homebrew_shellenv
 fi
 
-# Check for Homebrew
-if ! command -v brew &> /dev/null; then
-    # The installer runs NONINTERACTIVE, so it calls sudo with -n and can never
-    # prompt for a password itself. Cache credentials first so creating
-    # /opt/homebrew succeeds instead of failing with insufficient permissions.
-    if ! sudo -n true 2> /dev/null; then
-        if [ ! -t 0 ]; then
-            echo "❌ sudo credentials are required to install Homebrew, but this shell is not interactive." >&2
-            exit 1
-        fi
-        echo "🔑 Administrator password required to install Homebrew to /opt/homebrew..."
-        sudo -v || {
-            echo "❌ sudo authentication failed." >&2
-            exit 1
-        }
+# Privileged cask installers and macOS defaults also need sudo. Keep one
+# timestamp alive throughout provisioning, including when Homebrew exists.
+if ! sudo -n true 2> /dev/null; then
+    if [ ! -t 0 ]; then
+        echo "❌ sudo credentials are required; run sudo -v in an interactive shell first." >&2
+        exit 1
     fi
+    echo "🔑 Administrator password required for provisioning..."
+    sudo -v
+fi
+sudo_keepalive() { while sudo -n true 2> /dev/null; do sleep 30; done; }
+sudo_keepalive &
+sudo_keepalive_pid=$!
+trap 'kill "$sudo_keepalive_pid" 2> /dev/null || true' EXIT
 
-    # Refresh the cached sudo ticket while the installer runs. On a slow
-    # network the download outlives the default 5-minute sudo timestamp, and
-    # the installer's later `sudo -n` calls would fail halfway through.
-    sudo_keepalive() { while sudo -n true 2> /dev/null; do sleep 30; done; }
-    sudo_keepalive &
-    sudo_keepalive_pid=$!
-    trap 'kill "$sudo_keepalive_pid" 2> /dev/null || true' EXIT
-
+# Bootstrap owns Homebrew installation because Ansible itself comes from brew.
+if ! command -v brew &> /dev/null; then
     echo "📦 Installing Homebrew..."
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    kill "$sudo_keepalive_pid" 2> /dev/null || true
-    trap - EXIT
 
     # Initialize Homebrew environment for this shell session
     setup_homebrew_shellenv
@@ -76,14 +65,6 @@ fi
 echo "📦 Installing Ansible collections..."
 cd "$(dirname "$0")"
 ansible-galaxy collection install -r requirements.yml
-
-# ansible-lint ships its own ansible-core and cannot see the collections that
-# Homebrew's ansible bundles. Mirror them into the user collection path so
-# `.ansible-lint` can resolve modules without fetching from Galaxy at lint time.
-if [ ! -d "${HOME}/.ansible/collections/ansible_collections/community/general" ]; then
-    echo "📦 Installing Ansible collections for ansible-lint (user path)..."
-    ansible-galaxy collection install -r requirements.yml -p "${HOME}/.ansible/collections" --force
-fi
 
 # Run the main playbook
 echo "🚀 Running Ansible playbook..."

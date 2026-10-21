@@ -1,0 +1,7 @@
+---
+- name: Apply default application associations
+  ansible.builtin.command:
+    argv:
+      - duti
+      - "{{ dotfiles_repo }}/configs/duti/defaults.duti"
+  changed_when: true
