@@ -46,19 +46,19 @@ repos:
 
       - id: check-fish-syntax
         name: Check fish syntax
-        entry: scripts/git-hooks/check-fish-syntax.sh
+        entry: tools/git-hooks/check-fish-syntax.sh
         language: script
         files: \.fish$
 
       - id: check-zsh-syntax
         name: Check zsh syntax
-        entry: scripts/git-hooks/check-zsh-syntax.sh
+        entry: tools/git-hooks/check-zsh-syntax.sh
         language: script
         files: (^|/)(\.zshrc|.*\.zsh)$
 
       - id: ansible-validation
         name: Validate Ansible changes
-        entry: scripts/git-hooks/validate-ansible.sh
+        entry: tools/git-hooks/validate-ansible.sh
         language: script
         pass_filenames: false
         files: ^ansible/
