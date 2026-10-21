@@ -1,19 +1,7 @@
 ---
-# TERMINAL SETTINGS
-
-- name: Terminal | Use UTF-8 encoding
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.terminal
-    key: StringEncodings
-    type: array
-    value:
-      - 4
-
 # SYSTEM UI SETTINGS
 
 - name: System UI | Show Wi-Fi in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC WiFi
@@ -22,7 +10,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show battery percentage in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: BatteryShowPercentage
@@ -32,7 +19,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show Battery in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC Battery
@@ -41,7 +27,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show volume icon in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: Sound
@@ -51,7 +36,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show Sound in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC Sound
@@ -60,7 +44,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show Bluetooth as active-only in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: Bluetooth
@@ -70,7 +53,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show Bluetooth in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NSStatusItem VisibleCC Bluetooth
@@ -79,7 +61,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Display in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: Display
@@ -89,7 +70,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Now Playing in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NowPlaying
@@ -99,7 +79,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Now Playing status item
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.controlcenter
     key: NSStatusItem Visible NowPlaying
@@ -108,7 +87,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Spotlight in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.Spotlight
     key: MenuItemHidden
@@ -118,7 +96,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Text Input in menu bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextInputMenu
     key: visible
@@ -127,7 +104,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Hide Text Input status item
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextInputMenuAgent
     key: NSStatusItem Visible Item-0
@@ -136,7 +112,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Beep on moving the slider
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: com.apple.sound.beep.feedback
@@ -144,7 +119,6 @@
     value: 1
 
 - name: System UI | Use 24-hour time format
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleICUForce24HourTime
@@ -153,7 +127,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Use 24-hour time format on login and lock screen
-  tags: [macos]
   community.general.osx_defaults:
     domain: /Library/Preferences/.GlobalPreferences
     key: AppleICUForce24HourTime
@@ -162,7 +135,6 @@
   become: true
 
 - name: System UI | Use 24-hour menu bar clock
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.menuextra.clock
     key: Show24Hour
@@ -171,7 +143,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show date in menu bar clock when space allows
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.menuextra.clock
     key: ShowDate
@@ -180,7 +151,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Show day of week in menu bar clock
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.menuextra.clock
     key: ShowDayOfWeek
@@ -189,7 +159,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Disable menu bar clock time announcements
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.menuextra.clock
     key: TimeAnnouncementsEnabled
@@ -198,7 +167,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Reduce status item spacing
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSStatusItemSpacing
@@ -208,7 +176,6 @@
   notify: Restart SystemUIServer
 
 - name: System UI | Reduce status item selection padding
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSStatusItemSelectionPadding
@@ -216,44 +183,3 @@
     value: 12
     host: currentHost
   notify: Restart SystemUIServer
-
-# SCREENSHOT SETTINGS
-
-- name: Screenshots | Create Screenshots directory
-  tags: [macos]
-  ansible.builtin.file:
-    path: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
-    state: directory
-    mode: "0755"
-
-- name: Screenshots | Save screenshots to Screenshots folder
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screencapture
-    key: location
-    type: string
-    value: "{{ ansible_facts['env']['HOME'] }}/Pictures/Screenshots"
-
-- name: Screenshots | Save screenshots in PNG format
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screencapture
-    key: type
-    type: string
-    value: png
-
-- name: Screenshots | Disable HDR screenshots
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screencapture
-    key: captureHDR
-    type: bool
-    value: false
-
-- name: Screenshots | Disable shadow in screenshots
-  tags: [macos]
-  community.general.osx_defaults:
-    domain: com.apple.screencapture
-    key: disable-shadow
-    type: bool
-    value: true

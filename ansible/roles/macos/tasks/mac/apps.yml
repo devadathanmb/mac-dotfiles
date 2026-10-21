@@ -2,7 +2,6 @@
 # TEXTEDIT SETTINGS
 
 - name: TextEdit | Use plain text mode for new documents
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: RichText
@@ -10,7 +9,6 @@
     value: false
 
 - name: TextEdit | Use UTF-8 encoding
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: PlainTextEncoding
@@ -18,7 +16,6 @@
     value: 4
 
 - name: TextEdit | Use UTF-8 encoding for write
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.TextEdit
     key: PlainTextEncodingForWrite
@@ -28,7 +25,6 @@
 # ACTIVITY MONITOR SETTINGS
 
 - name: Activity Monitor | Show all processes
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: ShowCategory
@@ -36,7 +32,6 @@
     value: 100
 
 - name: Activity Monitor | Sort by CPU usage
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: SortColumn
@@ -44,7 +39,6 @@
     value: CPUUsage
 
 - name: Activity Monitor | Set sort direction
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.ActivityMonitor
     key: SortDirection
@@ -54,7 +48,6 @@
 # APP STORE SETTINGS
 
 - name: App Store | Disable automatic downloads
-  tags: [macos]
   community.general.osx_defaults:
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticDownload
@@ -65,7 +58,6 @@
 # ITERM2 SETTINGS
 
 - name: iTerm2 | Specify custom preferences folder
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.googlecode.iterm2
     key: PrefsCustomFolder
@@ -73,7 +65,6 @@
     value: "{{ dotfiles_repo }}/exports/iterm2"
 
 - name: iTerm2 | Load preferences from custom folder
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.googlecode.iterm2
     key: LoadPrefsFromCustomFolder

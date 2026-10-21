@@ -1,0 +1,10 @@
+---
+# TERMINAL SETTINGS
+
+- name: Terminal | Use UTF-8 encoding
+  community.general.osx_defaults:
+    domain: com.apple.terminal
+    key: StringEncodings
+    type: array
+    value:
+      - 4

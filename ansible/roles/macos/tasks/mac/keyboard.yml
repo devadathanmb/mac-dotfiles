@@ -2,7 +2,6 @@
 # KEYBOARD AND TEXT INPUT SETTINGS
 
 - name: Keyboard | Disable automatic spelling correction
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticSpellingCorrectionEnabled
@@ -10,7 +9,6 @@
     value: false
 
 - name: Keyboard | Set fast key repeat rate
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: KeyRepeat
@@ -18,7 +16,6 @@
     value: 1
 
 - name: Keyboard | Set fast initial key repeat
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: InitialKeyRepeat
@@ -26,7 +23,6 @@
     value: 10
 
 - name: Keyboard | Disable press and hold for key repeat
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: ApplePressAndHoldEnabled
@@ -34,7 +30,6 @@
     value: false
 
 - name: Keyboard | Enable automatic capitalization
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticCapitalizationEnabled
@@ -42,7 +37,6 @@
     value: true
 
 - name: Keyboard | Enable automatic period substitution
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticPeriodSubstitutionEnabled
@@ -50,7 +44,6 @@
     value: true
 
 - name: Keyboard | Disable smart quotes
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticQuoteSubstitutionEnabled
@@ -58,7 +51,6 @@
     value: false
 
 - name: Keyboard | Disable smart dashes
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSAutomaticDashSubstitutionEnabled
@@ -66,7 +58,6 @@
     value: false
 
 - name: Keyboard | Enable full keyboard access for all controls
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleKeyboardUIMode
@@ -76,7 +67,6 @@
 # SAVE DIALOGS
 
 - name: Save Dialogs | Always expand save panel by default
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSNavPanelExpandedStateForSaveMode
@@ -84,7 +74,6 @@
     value: true
 
 - name: Save Dialogs | Always expand save panel (variant 2)
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSNavPanelExpandedStateForSaveMode2

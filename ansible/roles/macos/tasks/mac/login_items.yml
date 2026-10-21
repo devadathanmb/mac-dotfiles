@@ -1,6 +1,5 @@
 ---
 - name: Login Items | Read configured applications
-  tags: [macos]
   ansible.builtin.command:
     argv:
       - osascript
@@ -11,7 +10,6 @@
   check_mode: false
 
 - name: Login Items | Remove stale Raycast Beta entry
-  tags: [macos]
   ansible.builtin.command:
     argv:
       - osascript
@@ -21,7 +19,6 @@
   changed_when: true
 
 - name: Login Items | Add applications
-  tags: [macos]
   ansible.builtin.command:
     argv:
       - osascript

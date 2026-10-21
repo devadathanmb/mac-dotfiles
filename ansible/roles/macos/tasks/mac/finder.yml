@@ -2,7 +2,6 @@
 # FINDER SETTINGS
 
 - name: Finder | Show all filename extensions
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleShowAllExtensions
@@ -10,7 +9,6 @@
     value: true
 
 - name: Finder | Show full POSIX path in window title
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: _FXShowPosixPathInTitle
@@ -18,7 +16,6 @@
     value: true
 
 - name: Finder | Hide all desktop icons
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: CreateDesktop
@@ -26,7 +23,6 @@
     value: false
 
 - name: Finder | Disable warning before changing file extension
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXEnableExtensionChangeWarning
@@ -34,7 +30,6 @@
     value: false
 
 - name: Finder | Set default search scope to current folder
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXDefaultSearchScope
@@ -42,7 +37,6 @@
     value: SCcf
 
 - name: Finder | Show status bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowStatusBar
@@ -50,7 +44,6 @@
     value: false
 
 - name: Finder | Show path bar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowPathbar
@@ -58,7 +51,6 @@
     value: true
 
 - name: Finder | Use list view as default
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXPreferredViewStyle
@@ -66,7 +58,6 @@
     value: Nlsv
 
 - name: Finder | Disable warning before emptying Trash
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: WarnOnEmptyTrash
@@ -74,7 +65,6 @@
     value: false
 
 - name: Finder | Open new windows to Home folder
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: NewWindowTarget
@@ -82,7 +72,6 @@
     value: PfHm
 
 - name: Finder | Don't sync Desktop to iCloud Drive
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXICloudDriveDesktop
@@ -90,7 +79,6 @@
     value: false
 
 - name: Finder | Don't sync Documents to iCloud Drive
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXICloudDriveDocuments
@@ -98,7 +86,6 @@
     value: false
 
 - name: Finder | Show external drives on Desktop
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowExternalHardDrivesOnDesktop
@@ -106,7 +93,6 @@
     value: true
 
 - name: Finder | Hide internal hard drives on Desktop
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowHardDrivesOnDesktop
@@ -114,7 +100,6 @@
     value: false
 
 - name: Finder | Show removable media on Desktop
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowRemovableMediaOnDesktop
@@ -122,7 +107,6 @@
     value: true
 
 - name: Finder | Show sidebar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowSidebar
@@ -130,7 +114,6 @@
     value: true
 
 - name: Finder | Set sidebar width
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: SidebarWidth
@@ -138,7 +121,6 @@
     value: 139.0
 
 - name: Finder | Set secondary sidebar width
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: SidebarWidth2
@@ -146,7 +128,6 @@
     value: 164.0
 
 - name: Finder | Group icon view by name
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXArrangeGroupViewBy
@@ -154,7 +135,6 @@
     value: Name
 
 - name: Finder | Auto-remove trash items after 30 days
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: FXRemoveOldTrashItems
@@ -162,7 +142,6 @@
     value: true
 
 - name: Finder | Hide recent tags in sidebar
-  tags: [macos]
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowRecentTags
@@ -170,23 +149,20 @@
     value: false
 
 - name: Finder | Show ~/Library folder
-  tags: [macos]
   ansible.builtin.file:
-    path: "{{ ansible_facts['env']['HOME'] }}/Library"
+    path: "{{ home_dir }}/Library"
     state: directory
     mode: "0755"
   register: library_folder
 
 - name: Finder | Check if ~/Library folder is hidden
-  tags: [macos]
   ansible.builtin.command:
-    cmd: "ls -ldO {{ ansible_facts['env']['HOME'] }}/Library"
+    cmd: "ls -ldO {{ home_dir }}/Library"
   register: library_chflags
   changed_when: false
 
 - name: Finder | Remove hidden flag from ~/Library
-  tags: [macos]
   ansible.builtin.command:
-    cmd: "chflags nohidden {{ ansible_facts['env']['HOME'] }}/Library"
+    cmd: "chflags nohidden {{ home_dir }}/Library"
   changed_when: true
   when: "'hidden' in library_chflags.stdout"

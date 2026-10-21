@@ -1,0 +1,51 @@
+---
+# WINDOW MANAGER SETTINGS
+
+- name: Window Manager | Disable click wallpaper to show desktop (Sonoma+)
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: EnableStandardClickToShowDesktop
+    type: bool
+    value: false
+
+- name: Window Manager | Disable margins between tiled windows
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: EnableTiledWindowMargins
+    type: bool
+    value: false
+
+- name: Window Manager | Hide widgets on desktop
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: StandardHideWidgets
+    type: bool
+    value: true
+
+- name: Window Manager | Hide widgets in Stage Manager
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: StageManagerHideWidgets
+    type: bool
+    value: true
+
+- name: Window Manager | Hide desktop items
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: HideDesktop
+    type: bool
+    value: true
+
+- name: Window Manager | Hide standard desktop icons
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: StandardHideDesktopIcons
+    type: bool
+    value: true
+
+- name: Window Manager | Group windows by app in Stage Manager
+  community.general.osx_defaults:
+    domain: com.apple.WindowManager
+    key: AppWindowGroupingBehavior
+    type: int
+    value: 1

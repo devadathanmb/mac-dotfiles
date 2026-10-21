@@ -1,0 +1,34 @@
+---
+# HOT CORNERS
+
+- name: Hot Corners | Top left screen corner - Disabled
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tl-corner
+    type: int
+    value: 0
+  notify: Restart Dock
+
+- name: Hot Corners | Top right screen corner - Disabled
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-tr-corner
+    type: int
+    value: 0
+  notify: Restart Dock
+
+- name: Hot Corners | Bottom left screen corner - Disabled
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-bl-corner
+    type: int
+    value: 0
+  notify: Restart Dock
+
+- name: Hot Corners | Bottom right screen corner - Disabled
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: wvous-br-corner
+    type: int
+    value: 0
+  notify: Restart Dock

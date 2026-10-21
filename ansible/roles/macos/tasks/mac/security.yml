@@ -6,7 +6,6 @@
 # framework. Use sysadminctl or an MDM profile instead:
 #   sudo sysadminctl -screenLock immediate -adminUser <user> -adminPassword <pass>
 - name: Security | Require auth immediately after sleep
-  tags: [macos]
   ansible.builtin.command:
     cmd: sysadminctl -screenLock immediate
   become: true
@@ -16,7 +15,6 @@
 # PERFORMANCE SETTINGS
 
 - name: Performance | Disable automatic termination of inactive apps
-  tags: [macos]
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: NSDisableAutomaticTermination
