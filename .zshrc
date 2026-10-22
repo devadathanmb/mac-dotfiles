@@ -51,7 +51,6 @@ if [[ $- != *i* ]]; then
 fi
 
 eval "$(atuin init zsh --disable-up-arrow)"
-[[ -f "$HOME/.deno/env" ]] && source "$HOME/.deno/env"
 
 export PATH="$PATH:$HOME/.spicetify"
 

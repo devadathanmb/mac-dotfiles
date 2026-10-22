@@ -17,7 +17,6 @@ minimum_release_age_excludes = [
 [tools]
 agy = "latest"
 bun = "latest"
-deno = "latest"
 go = "latest"
 node = "26.9.0"
 
