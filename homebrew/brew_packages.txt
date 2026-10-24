@@ -30,6 +30,7 @@ hyperfine
 imagemagick
 iperf3
 jq
+just
 k6
 k9s
 kustomize
@@ -70,5 +71,4 @@ wget
 yamllint
 yazi
 yq
-yt-dlp
 zoxide

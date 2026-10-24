@@ -1,6 +1,6 @@
-company.thebrowser.Browser public.html all
-company.thebrowser.Browser http
-company.thebrowser.Browser https
+net.imput.helium public.html all
+net.imput.helium http
+net.imput.helium https
 com.microsoft.VSCode public.c-source all
 com.microsoft.VSCode public.c-plus-plus-source all
 com.microsoft.VSCode public.data all

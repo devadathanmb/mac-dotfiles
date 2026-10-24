@@ -1,9 +1,8 @@
 alt-tab
+android-platform-tools
 antigravity
-arc
 balenaetcher
 bruno
-burp-suite
 calibre
 chatgpt
 claude
@@ -18,6 +17,7 @@ font-maple-mono-nf
 ghostty
 gimp
 google-chrome
+helium-browser
 iterm2
 localsend
 mitmproxy
