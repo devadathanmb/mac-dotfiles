@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project="${XDG_CONFIG_HOME:-$HOME/.config}/agent-python"
+export UV_PROJECT_ENVIRONMENT="${XDG_DATA_HOME:-$HOME/.local/share}/agent-python/venv"
+
+if [[ ! -f "$project/uv.lock" ]]; then
+    printf 'agent-python: missing %s/uv.lock; link the dotfiles first.\n' "$project" >&2
+    exit 1
+fi
+
+# Keep scratch dependencies and the interpreter independent of mise and the cwd.
+exec uv run --project "$project" --locked --managed-python --python 3.15.1 python "$@"

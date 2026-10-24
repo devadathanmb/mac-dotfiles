@@ -4,8 +4,8 @@ macos_dock_applications:
     path: /Applications/Visual Studio Code.app
   - name: Ghostty
     path: /Applications/Ghostty.app
-  - name: Arc
-    path: /Applications/Arc.app
+  - name: Helium
+    path: /Applications/Helium.app
   - name: Google Chrome
     path: /Applications/Google Chrome.app
 

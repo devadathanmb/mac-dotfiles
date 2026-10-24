@@ -33,6 +33,7 @@
     ~/.config/yt-x/config: configs/yt-x/config
     ~/.config/yt-x/extensions/themes/default.theme: configs/yt-x/extensions/themes/default.theme
     ~/.config/mise/config.toml: configs/mise/config.toml
+    ~/.config/agent-python: configs/agent-python
     ~/.config/zed: configs/zed
     ~/.config/opencode/AGENTS.md: configs/opencode/AGENTS.md
     ~/.config/opencode/cli.json: configs/opencode/cli.json
