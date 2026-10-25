@@ -21,6 +21,7 @@ STOPWORDS = frozenset(
 # Without an inline limit, ranked passages still need a bound to be a selection.
 DEFAULT_PASSAGE_CHARS = 12000
 NO_PASSAGES = "No passages contain the question's words; use terms the page uses."
+NO_MATCHES = "No matching lines in this response."
 # A passage this short is usually a signature or term; its explanation follows.
 SHORT_PASSAGE_CHARS = 160
 # Room reserved for each passage's `[lines A-B | heading]` label.
@@ -128,7 +129,7 @@ def matching_lines(
     excerpt = under_headings(lines, entries)
     if limit and sum(map(len, excerpt)) + len(excerpt) > limit:
         return rarest_matches(lines, hits, pattern, limit)
-    return "\n".join(excerpt) or "No matching lines in this response."
+    return "\n".join(excerpt) or NO_MATCHES
 
 
 def numbered_lines(text: str, first: int, last: int) -> str:
@@ -407,6 +408,12 @@ def render_response(
     rendered.notice = saved_notice(
         rendered.path, text, "excerpt" if excerpt else "preview", cut, len(display)
     )
+    if args.match and display == NO_MATCHES:
+        rendered.notice = (
+            f"[saved: {rendered.path} | {len(text):,} chars, "
+            f"{len(text.splitlines())} lines | --match: 0 matching lines; "
+            "full response saved, try a different pattern or read the saved file]"
+        )
     return rendered
 
 

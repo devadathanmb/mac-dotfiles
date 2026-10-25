@@ -9,7 +9,6 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import httpx2
-
 from research_cli import (
     cache,
     cli,
@@ -138,6 +137,10 @@ class ResearchTests(unittest.TestCase):
         args = self.args("web", "query", "--match", "missing")
         _, output = self.capture(out.emit_response, "full response", args, "test")
         self.assertIn("No matching lines", output)
+        self.assertIn("13 chars, 1 lines | --match: 0 matching lines", output)
+        self.assertIn("full response saved, try a different pattern", output)
+        self.assertNotIn("excerpt", output)
+        self.assertNotIn("35/35", output)
         self.assertEqual(next(config.OUTPUT.iterdir()).read_text(), "full response\n")
 
     def test_matching_lines_merge_context_and_keep_source_numbers(self):

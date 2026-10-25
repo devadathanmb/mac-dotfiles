@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import httpx2
-
 from research_cli import (
     cache,
     cli,
@@ -158,6 +157,71 @@ class SearchTests(unittest.TestCase):
         self.assertIn("[brave (query 2) failed: brave: HTTP 429]", output)
         self.assertIn("one0 [parallel, brave]", output)
         self.assertIn("two0 [parallel]", output)
+        self.assertIn('Queries:\nQ1: "one"\nQ2: "two"', output)
+        self.assertIn("one0 [parallel, brave] [queries: Q1]", output)
+        self.assertIn("two0 [parallel] [queries: Q2]", output)
+
+    def test_shared_results_keep_all_query_ids_in_text_saved_file_and_json(self):
+        def respond(service, tool, arguments, fresh, **options):
+            query = arguments["queries"][0]
+            return json.dumps(
+                [
+                    hit("https://shared.test", "shared passage " * 100, "Shared"),
+                    hit(f"https://{query}.test", title=query),
+                ]
+            )
+
+        for mode in ((), ("--json",)):
+            with self.subTest(mode=mode):
+                output, call = self.run_web(
+                    "one",
+                    "one",
+                    "two",
+                    "--backend",
+                    "brave",
+                    "--max-chars",
+                    "500",
+                    *mode,
+                    respond=respond,
+                )
+                self.assertEqual(call.call_count, 2)
+                if mode:
+                    record = json.loads(output)
+                    self.assertEqual(record["queries"], ["one", "two"])
+                    self.assertEqual(
+                        [result["query_ids"] for result in record["results"]],
+                        [[1, 2], [1], [2]],
+                    )
+                    saved = record["saved"]
+                else:
+                    self.assertIn('Q1: "one"\nQ2: "two"', output)
+                    self.assertIn("Shared [queries: Q1, Q2]", output)
+                    saved = re.search(r"\[saved: ([^|]+) \|", output).group(1)
+                full = Path(saved).read_text()
+                self.assertTrue(full.startswith('Queries:\nQ1: "one"\nQ2: "two"'))
+                self.assertIn("Shared [queries: Q1, Q2]", full)
+
+    def test_empty_query_keeps_its_id_in_the_query_map(self):
+        def respond(service, tool, arguments, fresh, **options):
+            return json.dumps(
+                [] if arguments["queries"] == ["one"] else [hit("https://two.test")]
+            )
+
+        output, _ = self.run_web("one", "two", "--backend", "brave", respond=respond)
+        self.assertIn('Q1: "one"\nQ2: "two"', output)
+        self.assertIn("[queries: Q2]", output)
+        self.assertIn("[brave (query 1): no results]", output)
+
+    def test_multi_query_map_preserves_saved_line_references(self):
+        doc = " ".join(f"word{number}" for number in range(60))
+        results = [
+            {**hit("https://docs.test/a", doc), "query_ids": [1]},
+            {**hit("https://docs.test/b", doc), "query_ids": [2]},
+        ]
+        full, compact, fitted = search.layout_results(results, 0, False, ["one", "two"])
+        line = int(re.search(r"saved line (\d+)", fitted[1]).group(1))
+        self.assertEqual(full.splitlines()[line - 1], doc)
+        self.assertIn("[queries: Q2]", compact)
 
     def test_site_operators_become_domain_filters_except_for_brave(self):
         seen = {}
@@ -564,7 +628,9 @@ class SearchTests(unittest.TestCase):
             httpx2.Response(429, json={}),
             httpx2.Response(200, json={"web": {}}),
         ]
-        client = httpx2.Client(transport=httpx2.MockTransport(lambda r: responses.pop(0)))
+        client = httpx2.Client(
+            transport=httpx2.MockTransport(lambda r: responses.pop(0))
+        )
         with (
             patch.object(providers, "provider_key", return_value="secret"),
             patch.object(providers, "BRAVE_INTERVAL_SECONDS", 0),
@@ -626,7 +692,9 @@ class SearchTests(unittest.TestCase):
                 )
                 with (
                     patch.object(pages, "download", return_value=(html, "text/html")),
-                    self.assertRaisesRegex(config.ResearchError, "bot challenge") as raised,
+                    self.assertRaisesRegex(
+                        config.ResearchError, "bot challenge"
+                    ) as raised,
                 ):
                     pages.fetch_page("https://challenge.test")
                 self.assertFalse(raised.exception.final)
