@@ -9,7 +9,19 @@ from . import __version__
 USER_AGENT = f"research-cli/{__version__}"
 
 SECRETS = Path.home() / ".secrets"
-WORK = Path(tempfile.gettempdir()) / f"research-{os.getuid()}"
+
+
+def work_directory() -> Path:
+    """Where saved responses and the cache live.
+
+    `tempfile.gettempdir()` silently skips a `TMPDIR` that does not exist yet;
+    a requested location is honoured and created on first use instead.
+    """
+    base = os.environ.get("TMPDIR") or tempfile.gettempdir()
+    return Path(base) / f"research-{os.getuid()}"
+
+
+WORK = work_directory()
 CACHE = WORK / "cache"
 OUTPUT = WORK / "out"
 RETENTION_SECONDS = 24 * 3600

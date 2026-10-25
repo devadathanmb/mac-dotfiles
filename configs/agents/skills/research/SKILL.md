@@ -59,7 +59,7 @@ Check local evidence first, then pick one command for the missing fact; these ar
 
 - Errors print `error: <what> | hint: <next step>` and exit 1. Follow the hint or switch source; never repeat a call unchanged.
 - `web`: `no results` means rephrase or loosen filters; `every provider failed` means keys, quotas, or outages, so follow each provider's hint or pick another `--backend`.
-- Other sources: `gh` (issues, releases, repo files), PyPI/npm metadata, or a shallow clone in a temp directory searched with `rg`.
+- Other sources: `gh` (issues, releases, repo files), PyPI/npm metadata, or a shallow clone in a temp directory searched with `rg`. For one PyPI release's files and date, fetch `https://pypi.org/pypi/<package>/<version>/json`; the unversioned endpoint lists every release.
 
 ## Evidence and answer
 
