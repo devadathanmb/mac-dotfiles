@@ -154,7 +154,7 @@ def web_record(
     notices: list[str],
     saved: str | None,
 ) -> dict:
-    fields = ("title", "url", "date", "providers", "page", "source")
+    fields = ("title", "url", "date", "providers", "query_ids", "page", "source")
     return {
         "queries": args.queries,
         "providers": providers,
@@ -173,13 +173,17 @@ def web_record(
 
 
 def web(args: argparse.Namespace) -> None:
+    args.queries = list(dict.fromkeys(args.queries))
     with shared_client() as client:
         results, providers, notices = search(args, client)
         if args.read:
             notices += read_pages(args, results, client)
     label = f"web-{args.queries[0]}"
     full, compact, fitted = layout_results(
-        results, args.max_chars, show_providers=len(providers) > 1
+        results,
+        args.max_chars,
+        show_providers=len(providers) > 1,
+        queries=args.queries,
     )
     if args.json:
         saved = str(save_text(full, label)) if compact != full else None

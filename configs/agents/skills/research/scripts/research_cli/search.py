@@ -94,7 +94,7 @@ def parse_exa_json(text: str, *, highlights: bool) -> list[dict] | None:
     """Results from Exa's advanced search; None when the response is not its JSON."""
     try:
         items = json.loads(text).get("results") or []
-    except (ValueError, AttributeError):
+    except ValueError, AttributeError:
         return None
     results = []
     for item in items if isinstance(items, list) else []:
@@ -289,6 +289,9 @@ def interleave(rankings: list[list[dict]], count: int) -> list[dict]:
             if key in merged:
                 known = merged[key]["providers"]
                 known.extend(p for p in result["providers"] if p not in known)
+                queries = merged[key]["query_ids"]
+                queries.extend(q for q in result["query_ids"] if q not in queries)
+                queries.sort()
             else:
                 merged[key] = result
     return list(merged.values())[:count]
@@ -330,6 +333,9 @@ def search(
         fuse([(name, results) for name, results, _ in answers if results], count)
         for answers in outcomes
     ]
+    for number, results in enumerate(per_query, 1):
+        for result in results:
+            result["query_ids"] = [number]
     if not any(per_query):
         raise ResearchError(
             "no results: " + " ".join(notices),
@@ -341,13 +347,17 @@ def search(
     return interleave(per_query, count), used, notices
 
 
-def result_header(rank: int, result: dict, show_providers: bool) -> str:
+def result_header(
+    rank: int, result: dict, show_providers: bool, show_queries: bool = False
+) -> str:
     title = result["title"] or result["url"] or "(untitled)"
     line = f"{rank}. {title}"
     if result["date"]:
         line += f" ({result['date']})"
     if show_providers:
         line += f" [{', '.join(result['providers'])}]"
+    if show_queries:
+        line += f" [queries: {', '.join(f'Q{q}' for q in sorted(result['query_ids']))}]"
     lines = [line]
     if result["title"] and result["url"]:
         lines.append(result["url"])
@@ -415,15 +425,29 @@ def join_results(headers: list[str], texts: list[str]) -> str:
 
 
 def layout_results(
-    results: list[dict], limit: int, show_providers: bool
+    results: list[dict],
+    limit: int,
+    show_providers: bool,
+    queries: list[str] | None = None,
 ) -> tuple[str, str, list[str]]:
     """(complete text, text fitted to `limit`, fitted passage per result)."""
+    multiple = bool(queries and len(queries) > 1)
+    prefix = (
+        "Queries:\n"
+        + "\n".join(
+            f"Q{number}: {json.dumps(query, ensure_ascii=False)}"
+            for number, query in enumerate(queries, 1)
+        )
+        + "\n\n"
+        if multiple
+        else ""
+    )
     headers = [
-        result_header(rank, result, show_providers)
+        result_header(rank, result, show_providers, multiple)
         for rank, result in enumerate(results, 1)
     ]
     texts = [result["text"] for result in results]
-    full = join_results(headers, texts)
+    full = prefix + join_results(headers, texts)
     repeats = repeated_results(texts)
     fits = not limit or len(full) <= limit
     if fits and not repeats:
@@ -432,11 +456,15 @@ def layout_results(
     if fits:
         shares = lengths
     else:
-        budget = limit - sum(len(header) + 2 + CUT_NOTE_CHARS for header in headers)
+        budget = (
+            limit
+            - len(prefix)
+            - sum(len(header) + 2 + CUT_NOTE_CHARS for header in headers)
+        )
         weights = [PAGE_WEIGHT if result.get("page") else 1 for result in results]
         shares = allowances(lengths, weights, budget)
     fitted = []
-    line = 1  # line of `full` where the next result starts
+    line = 1 + prefix.count("\n")  # line of `full` where the next result starts
     for index, (header, text, allowed) in enumerate(zip(headers, texts, shares)):
         first_line = line + header.count("\n") + 1
         if index in repeats:
@@ -447,4 +475,4 @@ def layout_results(
             fitted.append(trim_passage(text, allowed, first_line))
         # A result ends with a blank line; one without text has no passage lines.
         line = first_line + (text.count("\n") + 2 if text else 1)
-    return full, join_results(headers, fitted), fitted
+    return full, prefix + join_results(headers, fitted), fitted
