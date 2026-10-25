@@ -42,6 +42,11 @@ DATE_SOURCES = (
 # A short page that asks for JavaScript has not rendered its real content.
 JS_NOTICE = re.compile(r"(?i)(requires?|enable|turn on|without) javascript")
 JS_NOTICE_PAGE_CHARS = 5000
+CHALLENGE_HEADING = re.compile(
+    r"(?i)^#\s+(?:just a moment(?:\.{3}|…)?|"
+    r"attention required!?\s*[|·]\s*cloudflare|client challenge|"
+    r"(?:reddit\s*[-–—]\s*)?prove your humanity)\s*$"
+)
 
 
 def validate_url(url: str) -> None:
@@ -65,7 +70,6 @@ def download(
     accept: str = "*/*",
     *,
     client: httpx2.Client | None = None,
-    compress: bool = False,
     final_urls: list[str] | None = None,
 ) -> tuple[str, str]:
     """Return (text, lowercase mime) for an HTTP(S) URL, enforcing size/text limits.
@@ -75,7 +79,7 @@ def download(
     validate_url(url)
     try:
         with open_client(client) as http:
-            return download_response(http, url, accept, compress, final_urls)
+            return download_response(http, url, accept, final_urls)
     except httpx2.HTTPStatusError as error:
         status = error.response.status_code
         if github.is_api_rate_limit(url, status):
@@ -123,7 +127,6 @@ def download_response(
     client: httpx2.Client,
     url: str,
     accept: str,
-    compress: bool,
     final_urls: list[str] | None = None,
 ) -> tuple[str, str]:
     with client.stream(
@@ -133,7 +136,6 @@ def download_response(
             "User-Agent": "research-cli/2.0",
             "Accept": accept,
             **github.api_headers(url),
-            "Accept-Encoding": "gzip, deflate" if compress else "identity",
         },
         timeout=request_timeout("exa"),
         follow_redirects=True,
@@ -245,6 +247,11 @@ def html_to_markdown(html: str, base_url: str) -> str:
 
 def require_rendered(markdown: str) -> None:
     """Raise, so the caller falls back to a scraper, if the page did not render."""
+    first_line = markdown.lstrip().split("\n", 1)[0].strip()
+    if CHALLENGE_HEADING.fullmatch(first_line):
+        raise ResearchError(
+            "page returned a bot challenge", "try a scraping fallback"
+        )
     if len(markdown) < 1000 and "a required part of this site couldn't load" in (
         markdown.lower().replace("’", "'")
     ):
@@ -262,11 +269,11 @@ def require_rendered(markdown: str) -> None:
 
 def fetch_thread(api: str, client: httpx2.Client | None) -> str:
     """A GitHub issue or pull request, with its comments, read through the API."""
-    issue = json.loads(download(api, client=client, compress=True)[0])
+    issue = json.loads(download(api, client=client)[0])
     comments: list[dict] = []
     for page in range(1, github.COMMENT_PAGES + 1):
         url = github.comments_api_url(api, page)
-        batch = json.loads(download(url, client=client, compress=True)[0])
+        batch = json.loads(download(url, client=client)[0])
         comments.extend(batch)
         if len(batch) < github.COMMENTS_PER_PAGE:
             break
@@ -277,7 +284,7 @@ def fetch_page(url: str, *, client: httpx2.Client | None = None) -> str:
     """Fetch a URL; markdown/plain text passes through, HTML is converted."""
     if raw := github.raw_file_url(url):
         try:
-            return download(raw, client=client, compress=True)[0]
+            return download(raw, client=client)[0]
         except ResearchError:
             pass  # e.g. a ref containing "/"; the page itself may still work
     if api := github.thread_api_url(url):
@@ -287,7 +294,7 @@ def fetch_page(url: str, *, client: httpx2.Client | None = None) -> str:
             pass  # rate-limited or an unexpected shape; the page still has the text
     final_urls: list[str] = []
     text, mime = download(
-        url, PAGE_ACCEPT, client=client, compress=True, final_urls=final_urls
+        url, PAGE_ACCEPT, client=client, final_urls=final_urls
     )
     if mime == "application/json" or mime.endswith("+json"):
         # Minified JSON is one line, which defeats --match and line-based reads.
@@ -297,6 +304,7 @@ def fetch_page(url: str, *, client: httpx2.Client | None = None) -> str:
             return text
     if mime not in HTML_MIMES:
         return text
-    markdown = html_to_markdown(text, url)
+    final_url = final_urls[0] if final_urls else url
+    markdown = html_to_markdown(text, final_url)
     require_rendered(markdown)
-    return redirect_notice(url, final_urls[0] if final_urls else url) + markdown
+    return redirect_notice(url, final_url) + markdown

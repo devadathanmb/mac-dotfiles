@@ -4,8 +4,10 @@ import io
 import tempfile
 import threading
 import unittest
+import zlib
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from compression import zstd
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -371,7 +373,7 @@ class FetchTests(unittest.TestCase):
                             service, "fetch", {"url": "https://one.test"}, client=client
                         )
 
-    def test_compressed_page_and_raw_identity_preserve_text_and_client(self):
+    def test_compressed_page_and_raw_preserve_text_and_client(self):
         text = b"  # Doc\r\nFull text\r\n"
         seen = []
 
@@ -395,8 +397,9 @@ class FetchTests(unittest.TestCase):
                 pages.fetch_raw("https://one.test", client=client), text.decode()
             )
             self.assertFalse(client.is_closed)
-        self.assertEqual(seen[0].headers["Accept-Encoding"], "gzip, deflate")
-        self.assertEqual(seen[1].headers["Accept-Encoding"], "identity")
+        for request in seen:
+            encodings = set(request.headers["Accept-Encoding"].split(", "))
+            self.assertTrue({"gzip", "deflate", "zstd"} <= encodings)
         self.assertEqual(seen[0].extensions["timeout"]["connect"], 5)
         self.assertEqual(seen[0].extensions["timeout"]["read"], 90)
 
@@ -414,6 +417,53 @@ class FetchTests(unittest.TestCase):
             self.assertRaisesRegex(config.ResearchError, "exceeds"),
         ):
             pages.fetch_page("https://one.test", client=client)
+
+    def test_compression_formats_preserve_text_and_enforce_decoded_limits(self):
+        text = b"  # Doc\r\n" + b"Content with spacing.  \r\n" * 100
+        for encoding, encode in (
+            ("gzip", gzip.compress),
+            ("deflate", zlib.compress),
+            ("zstd", zstd.compress),
+        ):
+            for fetch in (pages.fetch_page, pages.fetch_raw):
+                with self.subTest(encoding=encoding, fetch=fetch.__name__):
+
+                    def handler(request):
+                        return httpx2.Response(
+                            200,
+                            headers={
+                                "Content-Type": "text/markdown; charset=utf-8",
+                                "Content-Encoding": encoding,
+                            },
+                            stream=httpx2.ByteStream(encode(text)),
+                        )
+
+                    with httpx2.Client(
+                        transport=httpx2.MockTransport(handler)
+                    ) as client:
+                        self.assertEqual(
+                            fetch("https://one.test", client=client), text.decode()
+                        )
+                        with (
+                            patch.object(config, "MAX_RAW_BYTES", 1024),
+                            self.assertRaises(config.ResearchError) as raised,
+                        ):
+                            fetch("https://one.test", client=client)
+                        self.assertTrue(raised.exception.final)
+
+    def test_invalid_compressed_body_is_a_recoverable_fetch_error(self):
+        with httpx2.Client(
+            transport=httpx2.MockTransport(
+                lambda request: httpx2.Response(
+                    200,
+                    headers={"Content-Type": "text/html", "Content-Encoding": "gzip"},
+                    stream=httpx2.ByteStream(b"invalid gzip bytes"),
+                )
+            )
+        ) as client:
+            with self.assertRaises(config.ResearchError) as raised:
+                pages.fetch_page("https://one.test", client=client)
+            self.assertFalse(raised.exception.final)
 
     def test_backend_timeouts_keep_service_read_budgets(self):
         for service, read in config.REQUEST_TIMEOUT_SECONDS.items():
