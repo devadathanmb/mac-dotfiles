@@ -4,13 +4,13 @@
 # Font
 font-family = "Maple Mono NF"
 font-style = Medium
-font-size = 16.4
-font-thicken = true
+font-size = 16.8
+font-thicken = false
 font-feature = cv01
 font-feature = zero
 font-feature = cv61
 adjust-cell-width = "-8%"
-adjust-cell-height = 18%
+adjust-cell-height = 14%
 
 # Window
 window-padding-x = 10
