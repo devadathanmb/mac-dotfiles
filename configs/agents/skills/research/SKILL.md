@@ -44,7 +44,7 @@ Check local evidence first, then pick one command for the missing fact; these ar
     - `--match "<regex>"` (any command): source-numbered lines with `--context N` lines around each (default 2); `(?i)` ignores case. Keep it narrow: when matches exceed the preview, lines matching the rarest alternative are shown first.
     - An empty selection is not evidence of absence; check the outline or the saved file.
   - A 404/410 is reported per URL (the rest of a batch still runs); don't guess repository paths, follow the hint to list the directory. A blocked, JS-rendered, or PDF page falls back to Exa, then Firecrawl if Exa fails or returns almost nothing and a Firecrawl key is configured.
-  - `--exa` forces Exa; `--firecrawl` forces Firecrawl, which uses credits. `--raw` returns the unmodified HTTP body; never use it just to read an HTML page.
+  - `--exa` forces Exa; `--firecrawl` forces Firecrawl, which uses credits. `--raw` returns decoded HTTP text without conversion, preserving whitespace and line endings; transport compression is removed automatically. Never use it just to read an HTML page.
 - `code`: literal text (`useOptimistic(`), not a description. Supports `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; there is no `-n`.
   - Output starts with an `Index` of every hit (repo, path:lines); pick candidates from it, not another `rg` listing. For "find N examples", one search plus its Index is enough: read 2–3 candidate files with `fetch --match`, then answer.
   - On "no matches", loosen the snippet or filters; don't probe repos one by one. After two misses, switch to `examples`/`web`.

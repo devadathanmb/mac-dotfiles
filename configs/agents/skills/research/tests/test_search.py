@@ -611,6 +611,53 @@ class SearchTests(unittest.TestCase):
             "matching lines,", out.matching_lines(text, re.compile("io_uring"), 0, 300)
         )
 
+    def test_bot_challenge_headings_trigger_extraction_fallback(self):
+        for heading in (
+            "Just a moment...",
+            "Attention Required! | Cloudflare",
+            "Client Challenge",
+            "Reddit - Prove your humanity",
+        ):
+            with self.subTest(heading=heading):
+                html = (
+                    f"<main><h1>{heading}</h1><p>"
+                    + "Checking access. " * 100
+                    + "</p></main>"
+                )
+                with (
+                    patch.object(pages, "download", return_value=(html, "text/html")),
+                    self.assertRaisesRegex(config.ResearchError, "bot challenge") as raised,
+                ):
+                    pages.fetch_page("https://challenge.test")
+                self.assertFalse(raised.exception.final)
+        article = "# Handling bot challenges\n\n" + "A guide. " * 100
+        article += "\n\n## Client Challenge\n\nJust a moment..."
+        pages.require_rendered(article)
+
+    def test_challenge_response_uses_exa_instead_of_returning_the_challenge(self):
+        html = (
+            "<main><h1>Client Challenge</h1><p>"
+            + "Checking access. " * 100
+            + "</p></main>"
+        )
+        url = "https://challenge.test"
+        with (
+            httpx2.Client(
+                transport=httpx2.MockTransport(
+                    lambda request: httpx2.Response(200, html=html)
+                )
+            ) as client,
+            patch.object(commands, "exa_fetch", return_value=PAGE) as extract,
+            patch.object(commands, "api_key", return_value=None),
+        ):
+            result = commands.fetch_result(
+                self.args("fetch", url, "--fresh"), url, lambda: client
+            )
+        self.assertIsNone(result.error)
+        self.assertEqual((result.source, result.text), ("Exa", PAGE))
+        self.assertIn("bot challenge", " ".join(result.notices))
+        extract.assert_called_once()
+
     def test_lines_selector_prints_the_cited_range(self):
         pages_ = {"https://a.test": PAGE}
         output = self.fetch("https://a.test", "--lines", "14-16", pages=pages_)
@@ -662,6 +709,30 @@ class SearchTests(unittest.TestCase):
             "Published: 2026-10-07T05:09:04Z (first of 2 timestamps on the page)",
             pages.html_to_markdown(feed, "https://a.test"),
         )
+
+    def test_relative_links_use_the_redirect_destination(self):
+        def handler(request):
+            if request.url.host == "old.test":
+                return httpx2.Response(
+                    302, headers={"Location": "https://docs.test/v2/guide/"}
+                )
+            return httpx2.Response(
+                200,
+                html=(
+                    "<main><h1>Guide</h1><p>"
+                    + "Content. " * 100
+                    + '</p><a href="../reference/">API</a> '
+                    + '<a href="examples/">Examples</a> '
+                    + '<a href="#section">Section</a></main>'
+                ),
+            )
+
+        with httpx2.Client(transport=httpx2.MockTransport(handler)) as client:
+            text = pages.fetch_page("https://old.test/start", client=client)
+        self.assertTrue(text.startswith("[redirected to https://docs.test/v2/guide/;"))
+        self.assertIn("[API](https://docs.test/v2/reference/)", text)
+        self.assertIn("[Examples](https://docs.test/v2/guide/examples/)", text)
+        self.assertIn("[Section](#section)", text)
 
     def test_redirected_pages_say_where_they_came_from(self):
         def handler(request):
