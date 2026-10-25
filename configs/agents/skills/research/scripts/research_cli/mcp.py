@@ -3,7 +3,7 @@
 import json
 import time
 
-import httpx
+import httpx2
 
 from .config import ENDPOINTS, ResearchError
 from .credentials import api_key
@@ -61,15 +61,15 @@ def parse_tool_response(body: str, tool: str) -> str:
 
 
 def request_tool(
-    service: str, tool: str, arguments: dict, *, client: httpx.Client | None = None
+    service: str, tool: str, arguments: dict, *, client: httpx2.Client | None = None
 ) -> str:
     with open_client(client) as http:
         return call_tool(http, service, tool, arguments)
 
 
 def same_origin_response(
-    client: httpx.Client, response: httpx.Response, tool: str
-) -> httpx.Response:
+    client: httpx2.Client, response: httpx2.Response, tool: str
+) -> httpx2.Response:
     origin = response.request.url
     for _ in range(client.max_redirects):
         request = response.next_request
@@ -87,11 +87,11 @@ def same_origin_response(
             )
         response = client.send(request, follow_redirects=False)
     if response.next_request is not None:
-        raise httpx.TooManyRedirects("too many MCP redirects", request=response.request)
+        raise httpx2.TooManyRedirects("too many MCP redirects", request=response.request)
     return response
 
 
-def call_tool(client: httpx.Client, service: str, tool: str, arguments: dict) -> str:
+def call_tool(client: httpx2.Client, service: str, tool: str, arguments: dict) -> str:
     payload = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -116,7 +116,7 @@ def call_tool(client: httpx.Client, service: str, tool: str, arguments: dict) ->
             response = same_origin_response(client, response, tool)
             response.raise_for_status()
             return parse_tool_response(response.text, tool)
-        except httpx.HTTPStatusError as error:
+        except httpx2.HTTPStatusError as error:
             status = error.response.status_code
             detail = error.response.text[:200].replace("\n", " ")
             if status in (429, 500, 502, 503, 504) and attempt < 2:
@@ -139,11 +139,11 @@ def call_tool(client: httpx.Client, service: str, tool: str, arguments: dict) ->
             raise ResearchError(
                 f"{tool}: HTTP {status} {detail}", hints.get(status, "")
             ) from error
-        except httpx.TimeoutException as error:
+        except httpx2.TimeoutException as error:
             raise ResearchError(
                 f"{tool}: timeout", "try a narrower query or another source"
             ) from error
-        except (httpx.RequestError, httpx.InvalidURL, OSError) as error:
+        except (httpx2.RequestError, httpx2.InvalidURL, OSError) as error:
             if attempt < 2:
                 time.sleep(1.5)
                 continue

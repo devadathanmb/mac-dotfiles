@@ -7,9 +7,9 @@ name = "agent-research-cli"
 version = "0.1.0"
 description = "Research docs, web pages, repositories, and public code."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 dependencies = [
-    "httpx>=0.28,<1",
+    "httpx2>=2.16,<3",
     "html-to-markdown>=3,<4",
     "selectolax>=0.4,<1",
 ]

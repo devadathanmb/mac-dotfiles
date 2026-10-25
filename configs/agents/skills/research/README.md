@@ -4,6 +4,8 @@ A research skill and CLI for finding documentation, searching the web and public
 
 ## Setup
 
+Requires Python 3.14 or newer. HTTP requests use [HTTPX2](https://pydantic.dev/docs/httpx2/), which verifies TLS with the system trust store and honors `SSL_CERT_FILE` and `SSL_CERT_DIR`.
+
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run from this directory:
 
 ```sh
@@ -19,7 +21,7 @@ Search providers may need API keys. Set the relevant environment variables: `EXA
 ```sh
 research fetch https://example.com
 research web "Python asyncio documentation"
-research docs httpx "How do timeouts work?"
+research docs httpx2 "How do timeouts work?"
 research --help
 ```
 

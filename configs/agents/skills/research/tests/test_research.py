@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import httpx
+import httpx2
 
 from research_cli import (
     cache,
@@ -29,7 +29,7 @@ class ResearchTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         transport = patch.object(
-            httpx.HTTPTransport,
+            httpx2.HTTPTransport,
             "handle_request",
             side_effect=AssertionError("unit tests must not make live HTTP requests"),
         )
@@ -370,17 +370,17 @@ class ResearchTests(unittest.TestCase):
         self.assertIn("# Second page", output)
 
     def test_firecrawl_request_returns_markdown_and_bypasses_provider_cache(self):
-        response = httpx.Response(
+        response = httpx2.Response(
             200,
             json={
                 "success": True,
                 "data": {"markdown": " # Page\n", "metadata": {"statusCode": 200}},
             },
-            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+            request=httpx2.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
         )
         with (
             patch.object(firecrawl, "api_key", return_value="test-key"),
-            patch.object(httpx.Client, "post", return_value=response) as post,
+            patch.object(httpx2.Client, "post", return_value=response) as post,
         ):
             self.assertEqual(
                 firecrawl.scrape_page("https://example.com", True), "# Page"
@@ -392,14 +392,14 @@ class ResearchTests(unittest.TestCase):
         )
 
     def test_firecrawl_default_request_allows_provider_cache(self):
-        response = httpx.Response(
+        response = httpx2.Response(
             200,
             json={"success": True, "data": {"markdown": "# Page"}},
-            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+            request=httpx2.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
         )
         with (
             patch.object(firecrawl, "api_key", return_value="test-key"),
-            patch.object(httpx.Client, "post", return_value=response) as post,
+            patch.object(httpx2.Client, "post", return_value=response) as post,
         ):
             firecrawl.scrape_page("https://example.com")
         self.assertNotIn("maxAge", post.call_args.kwargs["json"])
@@ -417,15 +417,15 @@ class ResearchTests(unittest.TestCase):
             },
         ]
         for result in results:
-            response = httpx.Response(
+            response = httpx2.Response(
                 200,
                 json=result,
-                request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+                request=httpx2.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
             )
             with (
                 self.subTest(result=result),
                 patch.object(firecrawl, "api_key", return_value="test-key"),
-                patch.object(httpx.Client, "post", return_value=response),
+                patch.object(httpx2.Client, "post", return_value=response),
                 self.assertRaises(config.ResearchError),
             ):
                 firecrawl.scrape_page("https://example.com")
@@ -433,7 +433,7 @@ class ResearchTests(unittest.TestCase):
     def test_firecrawl_missing_key_and_timeout_do_not_retry(self):
         with (
             patch.object(firecrawl, "api_key", return_value=None),
-            patch.object(httpx.Client, "post") as post,
+            patch.object(httpx2.Client, "post") as post,
             self.assertRaisesRegex(config.ResearchError, "key not configured"),
         ):
             firecrawl.scrape_page("https://example.com")
@@ -441,7 +441,7 @@ class ResearchTests(unittest.TestCase):
         with (
             patch.object(firecrawl, "api_key", return_value="test-key"),
             patch.object(
-                httpx.Client, "post", side_effect=httpx.ReadTimeout("timeout")
+                httpx2.Client, "post", side_effect=httpx2.ReadTimeout("timeout")
             ) as post,
             self.assertRaisesRegex(config.ResearchError, "timeout"),
         ):
@@ -465,15 +465,15 @@ class ResearchTests(unittest.TestCase):
             500: "another source",
         }
         for status, hint in cases.items():
-            response = httpx.Response(
+            response = httpx2.Response(
                 status,
                 text="provider echoed secret-key",
-                request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+                request=httpx2.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
             )
             with (
                 self.subTest(status=status),
                 patch.object(firecrawl, "api_key", return_value="secret-key"),
-                patch.object(httpx.Client, "post", return_value=response) as post,
+                patch.object(httpx2.Client, "post", return_value=response) as post,
                 self.assertRaises(config.ResearchError) as caught,
             ):
                 firecrawl.scrape_page("https://example.com")
@@ -483,17 +483,17 @@ class ResearchTests(unittest.TestCase):
             self.assertEqual(post.call_count, 1)
 
     def test_firecrawl_bad_json_and_network_error_are_concise(self):
-        response = httpx.Response(
+        response = httpx2.Response(
             200,
             text="not JSON",
-            request=httpx.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
+            request=httpx2.Request("POST", "https://api.firecrawl.dev/v2/scrape"),
         )
-        for failure in (None, httpx.ConnectError("network unavailable")):
+        for failure in (None, httpx2.ConnectError("network unavailable")):
             with (
                 self.subTest(failure=failure),
                 patch.object(firecrawl, "api_key", return_value="test-key"),
                 patch.object(
-                    httpx.Client, "post", return_value=response, side_effect=failure
+                    httpx2.Client, "post", return_value=response, side_effect=failure
                 ),
                 self.assertRaisesRegex(
                     config.ResearchError, "request or response failed"
@@ -625,7 +625,7 @@ class ResearchTests(unittest.TestCase):
     def test_timeout_does_not_repeat_expensive_call(self):
         with (
             patch.object(
-                httpx.Client, "post", side_effect=httpx.ReadTimeout("timeout")
+                httpx2.Client, "post", side_effect=httpx2.ReadTimeout("timeout")
             ) as post,
             self.assertRaisesRegex(config.ResearchError, "timeout"),
         ):
@@ -641,14 +641,14 @@ class ResearchTests(unittest.TestCase):
         self.args("fetch", "--raw", "https://example.com", "--chars", "0")
 
     def test_raw_fetch_preserves_text_exactly(self):
-        response = httpx.Response(
+        response = httpx2.Response(
             200,
             content=b"  first\r\nlast\n\n",
             headers={"Content-Type": "text/plain"},
-            request=httpx.Request("GET", "https://example.com"),
+            request=httpx2.Request("GET", "https://example.com"),
         )
         with patch.object(
-            httpx.Client, "stream", return_value=contextlib.nullcontext(response)
+            httpx2.Client, "stream", return_value=contextlib.nullcontext(response)
         ):
             self.assertEqual(
                 pages.fetch_raw("https://example.com"), "  first\r\nlast\n\n"
@@ -661,16 +661,16 @@ class ResearchTests(unittest.TestCase):
             (b"too long", "text/plain", 4),
         ]
         for body, mime, limit in cases:
-            response = httpx.Response(
+            response = httpx2.Response(
                 200,
                 content=body,
                 headers={"Content-Type": mime},
-                request=httpx.Request("GET", "https://example.com"),
+                request=httpx2.Request("GET", "https://example.com"),
             )
             with (
                 self.subTest(mime=mime, limit=limit),
                 patch.object(
-                    httpx.Client,
+                    httpx2.Client,
                     "stream",
                     return_value=contextlib.nullcontext(response),
                 ),

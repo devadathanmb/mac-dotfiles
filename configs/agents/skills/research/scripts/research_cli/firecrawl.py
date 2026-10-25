@@ -1,6 +1,6 @@
 """Firecrawl's scrape API supplies markdown when ordinary fetches are blocked."""
 
-import httpx
+import httpx2
 
 from .config import ResearchError
 from .credentials import api_key
@@ -9,7 +9,7 @@ from .pages import redirect_notice, validate_url
 
 
 def scrape_page(
-    url: str, fresh: bool = False, *, client: httpx.Client | None = None
+    url: str, fresh: bool = False, *, client: httpx2.Client | None = None
 ) -> str:
     validate_url(url)
     key = api_key("FIRECRAWL_API_KEY", "firecrawl-api-key")
@@ -32,7 +32,7 @@ def scrape_page(
             )
         response.raise_for_status()
         result = response.json()
-    except httpx.HTTPStatusError as error:
+    except httpx2.HTTPStatusError as error:
         hints = {
             401: "check $FIRECRAWL_API_KEY or ~/.secrets/firecrawl-api-key",
             402: "Firecrawl credits exhausted",
@@ -42,9 +42,9 @@ def scrape_page(
         raise ResearchError(
             f"Firecrawl: HTTP {status}", hints.get(status, "try another source")
         ) from error
-    except httpx.TimeoutException as error:
+    except httpx2.TimeoutException as error:
         raise ResearchError("Firecrawl: timeout", "try another source") from error
-    except (httpx.RequestError, ValueError) as error:
+    except (httpx2.RequestError, ValueError) as error:
         raise ResearchError("Firecrawl: request or response failed") from error
     if not isinstance(result, dict) or result.get("success") is not True:
         raise ResearchError("Firecrawl: scrape failed", "try another source")
