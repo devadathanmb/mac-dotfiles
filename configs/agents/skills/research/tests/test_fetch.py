@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import httpx
+import httpx2
 
 from research_cli import cache, cli, commands, config, firecrawl, mcp, network, pages
 
@@ -19,7 +19,7 @@ class FetchTests(unittest.TestCase):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         transport = patch.object(
-            httpx.HTTPTransport,
+            httpx2.HTTPTransport,
             "handle_request",
             side_effect=AssertionError("unit tests must not make live HTTP requests"),
         )
@@ -124,7 +124,7 @@ class FetchTests(unittest.TestCase):
 
         with (
             patch.object(commands, "ThreadPoolExecutor", TrackingExecutor),
-            httpx.Client() as client,
+            httpx2.Client() as client,
         ):
             results = list(commands.fetch_results(args, lambda: client))
         self.assertEqual([url for url, result in results], args.urls)
@@ -175,8 +175,8 @@ class FetchTests(unittest.TestCase):
         second_started = threading.Event()
         failure_seen = threading.Event()
         release_second = threading.Event()
-        client = httpx.Client(
-            transport=httpx.MockTransport(lambda request: httpx.Response(200))
+        client = httpx2.Client(
+            transport=httpx2.MockTransport(lambda request: httpx2.Response(200))
         )
 
         def retrieve(args, url, get_client):
@@ -285,7 +285,7 @@ class FetchTests(unittest.TestCase):
         args = self.args("fetch", "https://one.test", "https://two.test")
         output = io.StringIO()
         with (
-            patch.object(httpx, "Client", side_effect=OSError("no such CA bundle")),
+            patch.object(httpx2, "Client", side_effect=OSError("no such CA bundle")),
             contextlib.redirect_stdout(output),
             self.assertRaisesRegex(config.ResearchError, "no URL could be fetched"),
         ):
@@ -328,7 +328,7 @@ class FetchTests(unittest.TestCase):
                 self.assertEqual(output.getvalue().count("[error: failed"), 3)
 
     def test_shared_client_propagates_through_each_cache_backend(self):
-        with httpx.Client() as client:
+        with httpx2.Client() as client:
             for service in ("raw", "page", "firecrawl", "exa"):
                 with self.subTest(service=service):
                     if service in cache.DIRECT_FETCHERS:
@@ -381,13 +381,13 @@ class FetchTests(unittest.TestCase):
             headers = {"Content-Type": "text/markdown"}
             if compressed:
                 headers["Content-Encoding"] = "gzip"
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 headers=headers,
-                stream=httpx.ByteStream(gzip.compress(text) if compressed else text),
+                stream=httpx2.ByteStream(gzip.compress(text) if compressed else text),
             )
 
-        with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with httpx2.Client(transport=httpx2.MockTransport(handler)) as client:
             self.assertEqual(
                 pages.fetch_page("https://one.test", client=client), text.decode()
             )
@@ -402,14 +402,14 @@ class FetchTests(unittest.TestCase):
 
     def test_size_limit_applies_to_decompressed_page(self):
         def handler(request):
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 headers={"Content-Type": "text/markdown", "Content-Encoding": "gzip"},
-                stream=httpx.ByteStream(gzip.compress(b"a" * 2048)),
+                stream=httpx2.ByteStream(gzip.compress(b"a" * 2048)),
             )
 
         with (
-            httpx.Client(transport=httpx.MockTransport(handler)) as client,
+            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
             patch.object(config, "MAX_RAW_BYTES", 1024),
             self.assertRaisesRegex(config.ResearchError, "exceeds"),
         ):
@@ -428,10 +428,10 @@ class FetchTests(unittest.TestCase):
         def handler(request):
             calls.append(request)
             if request.url.host == "api.firecrawl.dev":
-                return httpx.Response(
+                return httpx2.Response(
                     200, json={"success": True, "data": {"markdown": "page"}}
                 )
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "id": 1,
@@ -440,7 +440,7 @@ class FetchTests(unittest.TestCase):
             )
 
         with (
-            httpx.Client(transport=httpx.MockTransport(handler)) as client,
+            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
             patch.object(firecrawl, "api_key", return_value="test-key"),
         ):
             self.assertEqual(mcp.request_tool("dw", "tool", {}, client=client), "docs")
@@ -458,16 +458,16 @@ class FetchTests(unittest.TestCase):
         def handler(request):
             requests.append(request)
             if request.url.host == "api.firecrawl.dev":
-                return httpx.Response(
+                return httpx2.Response(
                     302, headers={"Location": "https://other.test/scrape"}
                 )
-            return httpx.Response(
+            return httpx2.Response(
                 200, json={"success": True, "data": {"markdown": "page"}}
             )
 
         with (
-            httpx.Client(
-                transport=httpx.MockTransport(handler), follow_redirects=True
+            httpx2.Client(
+                transport=httpx2.MockTransport(handler), follow_redirects=True
             ) as client,
             patch.object(firecrawl, "api_key", return_value="test-key"),
             self.assertRaisesRegex(config.ResearchError, "HTTP 302"),
@@ -487,11 +487,11 @@ class FetchTests(unittest.TestCase):
 
                     def handler(request, requests=requests, target=target):
                         requests.append(request)
-                        return httpx.Response(307, headers={"Location": target})
+                        return httpx2.Response(307, headers={"Location": target})
 
                     with (
-                        httpx.Client(
-                            transport=httpx.MockTransport(handler),
+                        httpx2.Client(
+                            transport=httpx2.MockTransport(handler),
                             follow_redirects=True,
                         ) as client,
                         patch.dict(
@@ -513,8 +513,8 @@ class FetchTests(unittest.TestCase):
         def handler(request):
             requests.append(request)
             if request.url.path == "/mcp":
-                return httpx.Response(307, headers={"Location": "/canonical"})
-            return httpx.Response(
+                return httpx2.Response(307, headers={"Location": "/canonical"})
+            return httpx2.Response(
                 200,
                 json={
                     "id": 1,
@@ -523,7 +523,7 @@ class FetchTests(unittest.TestCase):
             )
 
         with (
-            httpx.Client(transport=httpx.MockTransport(handler)) as client,
+            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
             patch.dict(config.ENDPOINTS, {"exa": "https://same.test/mcp"}),
             patch.object(mcp, "api_key", return_value="test-key"),
         ):

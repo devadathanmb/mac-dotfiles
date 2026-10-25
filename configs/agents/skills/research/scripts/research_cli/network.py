@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterator
 from contextlib import ExitStack, contextmanager
 from threading import Lock
 
-import httpx
+import httpx2
 
 from .config import (
     CONNECT_TIMEOUT_SECONDS,
@@ -13,20 +13,20 @@ from .config import (
     ResearchError,
 )
 
-ClientFactory = Callable[[], httpx.Client]
+ClientFactory = Callable[[], httpx2.Client]
 
 
-def request_timeout(service: str) -> httpx.Timeout:
-    return httpx.Timeout(
+def request_timeout(service: str) -> httpx2.Timeout:
+    return httpx2.Timeout(
         REQUEST_TIMEOUT_SECONDS[service], connect=CONNECT_TIMEOUT_SECONDS
     )
 
 
-def create_client() -> httpx.Client:
+def create_client() -> httpx2.Client:
     try:
-        return httpx.Client(
+        return httpx2.Client(
             timeout=request_timeout("exa"),
-            limits=httpx.Limits(
+            limits=httpx2.Limits(
                 max_connections=MAX_FETCH_WORKERS,
                 max_keepalive_connections=MAX_FETCH_WORKERS,
             ),
@@ -42,7 +42,7 @@ def create_client() -> httpx.Client:
 
 
 @contextmanager
-def open_client(client: httpx.Client | None = None) -> Iterator[httpx.Client]:
+def open_client(client: httpx2.Client | None = None) -> Iterator[httpx2.Client]:
     """Yield the caller's pooled client, or a private one closed on exit."""
     if client is not None:
         yield client
@@ -58,7 +58,7 @@ def shared_client() -> Iterator[ClientFactory]:
         client = None
         lock = Lock()
 
-        def get_client() -> httpx.Client:
+        def get_client() -> httpx2.Client:
             nonlocal client
             with lock:
                 if client is None:

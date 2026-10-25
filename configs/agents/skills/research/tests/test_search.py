@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import httpx
+import httpx2
 
 from research_cli import (
     cache,
@@ -61,7 +61,7 @@ class SearchTests(unittest.TestCase):
         self.addCleanup(temp.cleanup)
         patches = [
             patch.object(
-                httpx.HTTPTransport,
+                httpx2.HTTPTransport,
                 "handle_request",
                 side_effect=AssertionError("unit tests must not make live requests"),
             ),
@@ -359,9 +359,9 @@ class SearchTests(unittest.TestCase):
 
         def handler(request):
             requests.append(request)
-            return httpx.Response(status, json=body)
+            return httpx2.Response(status, json=body)
 
-        return httpx.Client(transport=httpx.MockTransport(handler)), requests
+        return httpx2.Client(transport=httpx2.MockTransport(handler)), requests
 
     def test_brave_builds_operators_and_unescapes_entities(self):
         body = {
@@ -561,10 +561,10 @@ class SearchTests(unittest.TestCase):
 
     def test_brave_retries_when_rate_limited_then_gives_up(self):
         responses = [
-            httpx.Response(429, json={}),
-            httpx.Response(200, json={"web": {}}),
+            httpx2.Response(429, json={}),
+            httpx2.Response(200, json={"web": {}}),
         ]
-        client = httpx.Client(transport=httpx.MockTransport(lambda r: responses.pop(0)))
+        client = httpx2.Client(transport=httpx2.MockTransport(lambda r: responses.pop(0)))
         with (
             patch.object(providers, "provider_key", return_value="secret"),
             patch.object(providers, "BRAVE_INTERVAL_SECONDS", 0),
@@ -573,15 +573,15 @@ class SearchTests(unittest.TestCase):
                 providers.search_brave({"queries": ["q"], "n": 1}, client=client), "[]"
             )
             with self.assertRaises(config.ResearchError) as raised:
-                responses.extend([httpx.Response(429, json={})] * 3)
+                responses.extend([httpx2.Response(429, json={})] * 3)
                 providers.search_brave({"queries": ["q"], "n": 1}, client=client)
         self.assertEqual(raised.exception.status, 429)
 
     def test_oversized_and_javascript_pages_fail_in_the_right_direction(self):
         with patch.object(config, "MAX_RAW_BYTES", 10):
-            client = httpx.Client(
-                transport=httpx.MockTransport(
-                    lambda request: httpx.Response(200, text="x" * 50)
+            client = httpx2.Client(
+                transport=httpx2.MockTransport(
+                    lambda request: httpx2.Response(200, text="x" * 50)
                 )
             )
             with self.assertRaises(config.ResearchError) as raised:
@@ -666,14 +666,14 @@ class SearchTests(unittest.TestCase):
     def test_redirected_pages_say_where_they_came_from(self):
         def handler(request):
             if request.url.path == "/old":
-                return httpx.Response(
+                return httpx2.Response(
                     302, headers={"Location": "https://docs.test/landing"}
                 )
-            return httpx.Response(
+            return httpx2.Response(
                 200, html="<main><h1>Landing</h1><p>" + "x " * 150 + "</p></main>"
             )
 
-        client = httpx.Client(transport=httpx.MockTransport(handler))
+        client = httpx2.Client(transport=httpx2.MockTransport(handler))
         page = pages.fetch_page("https://docs.test/old", client=client)
         self.assertTrue(page.startswith("[redirected to https://docs.test/landing;"))
         self.assertNotIn(
@@ -687,8 +687,8 @@ class SearchTests(unittest.TestCase):
                 "metadata": {"url": "https://docs.test/home", "statusCode": 200},
             },
         }
-        client = httpx.Client(
-            transport=httpx.MockTransport(lambda r: httpx.Response(200, json=body))
+        client = httpx2.Client(
+            transport=httpx2.MockTransport(lambda r: httpx2.Response(200, json=body))
         )
         with patch.object(firecrawl, "api_key", return_value="k"):
             self.assertTrue(
@@ -698,8 +698,8 @@ class SearchTests(unittest.TestCase):
             )
 
     def test_missing_github_path_hint_names_the_directory_listing(self):
-        client = httpx.Client(
-            transport=httpx.MockTransport(lambda r: httpx.Response(404))
+        client = httpx2.Client(
+            transport=httpx2.MockTransport(lambda r: httpx2.Response(404))
         )
         for url in (
             "https://raw.githubusercontent.com/tikv/pd/v8.5.0/pkg/tso/timestamp.go",
@@ -771,11 +771,11 @@ class SearchTests(unittest.TestCase):
 
         def handler(request):
             requests.append(request)
-            return httpx.Response(
+            return httpx2.Response(
                 200, json=comments if request.url.path.endswith("/comments") else issue
             )
 
-        client = httpx.Client(transport=httpx.MockTransport(handler))
+        client = httpx2.Client(transport=httpx2.MockTransport(handler))
         with patch.object(github, "github_token", return_value="tok"):
             page = pages.fetch_page(
                 "https://github.com/kubernetes/kubernetes/pull/136160", client=client
@@ -800,8 +800,8 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(
                 github.api_headers("https://raw.githubusercontent.com/o/r/m/f"), {}
             )
-            client = httpx.Client(
-                transport=httpx.MockTransport(lambda r: httpx.Response(403))
+            client = httpx2.Client(
+                transport=httpx2.MockTransport(lambda r: httpx2.Response(403))
             )
             with self.assertRaises(config.ResearchError) as raised:
                 pages.download(
@@ -813,10 +813,10 @@ class SearchTests(unittest.TestCase):
 
             def handler(request):
                 if request.url.host == "api.github.com":
-                    return httpx.Response(403)
-                return httpx.Response(200, html=html)
+                    return httpx2.Response(403)
+                return httpx2.Response(200, html=html)
 
-            client = httpx.Client(transport=httpx.MockTransport(handler))
+            client = httpx2.Client(transport=httpx2.MockTransport(handler))
             self.assertIn(
                 "Issue page",
                 pages.fetch_page("https://github.com/o/r/issues/5", client=client),

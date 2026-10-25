@@ -5,7 +5,7 @@ description = "Shared libraries for coding-agent scratch scripts"
 requires-python = ">=3.15,<3.16"
 dependencies = [
   "beautifulsoup4",
-  "httpx",
+  "httpx2>=2.16,<3",
   "lxml",
   "matplotlib",
   "numpy",

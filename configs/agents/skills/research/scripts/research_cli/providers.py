@@ -6,7 +6,7 @@ import threading
 import time
 from datetime import date
 
-import httpx
+import httpx2
 
 from .config import ResearchError
 from .credentials import api_key
@@ -47,7 +47,7 @@ def provider_key(name: str) -> str | None:
 
 
 def request_json(
-    name: str, method: str, url: str, *, client: httpx.Client | None = None, **options
+    name: str, method: str, url: str, *, client: httpx2.Client | None = None, **options
 ) -> dict:
     variable, filename = KEYS[name]
     key_hint = f"check ${variable} or ~/.secrets/{filename}"
@@ -62,7 +62,7 @@ def request_json(
             )
         response.raise_for_status()
         result = response.json()
-    except httpx.HTTPStatusError as error:
+    except httpx2.HTTPStatusError as error:
         status = error.response.status_code
         hints = {
             401: key_hint,
@@ -78,9 +78,9 @@ def request_json(
             hints.get(status, "use another --backend"),
             status=status,
         ) from error
-    except httpx.TimeoutException as error:
+    except httpx2.TimeoutException as error:
         raise ResearchError(f"{name}: timeout", "use another --backend") from error
-    except (httpx.RequestError, ValueError) as error:
+    except (httpx2.RequestError, ValueError) as error:
         raise ResearchError(f"{name}: request or response failed: {error}") from error
     if not isinstance(result, dict):
         raise ResearchError(f"{name}: invalid response")
@@ -96,7 +96,7 @@ def result(title: object, url: object, published: object, text: object) -> dict:
     }
 
 
-def search_parallel(arguments: dict, *, client: httpx.Client | None = None) -> str:
+def search_parallel(arguments: dict, *, client: httpx2.Client | None = None) -> str:
     settings: dict = {
         "max_results": arguments["n"],
         "excerpt_settings": {"max_chars_per_result": arguments["chars"]},
@@ -139,7 +139,7 @@ def search_parallel(arguments: dict, *, client: httpx.Client | None = None) -> s
     )
 
 
-def search_brave(arguments: dict, *, client: httpx.Client | None = None) -> str:
+def search_brave(arguments: dict, *, client: httpx2.Client | None = None) -> str:
     query = arguments["queries"][0]
     if domains := arguments.get("domains"):
         sites = " OR ".join(f"site:{domain}" for domain in domains)
@@ -199,7 +199,7 @@ def search_brave(arguments: dict, *, client: httpx.Client | None = None) -> str:
     )
 
 
-def search_tavily(arguments: dict, *, client: httpx.Client | None = None) -> str:
+def search_tavily(arguments: dict, *, client: httpx2.Client | None = None) -> str:
     payload = {
         "query": arguments["queries"][0],
         "max_results": min(arguments["n"], 20),

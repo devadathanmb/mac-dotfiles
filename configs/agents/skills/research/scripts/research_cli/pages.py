@@ -4,7 +4,7 @@ import json
 import re
 from urllib.parse import urljoin, urlsplit
 
-import httpx
+import httpx2
 from html_to_markdown import convert
 from selectolax.lexbor import LexborHTMLParser
 
@@ -64,7 +64,7 @@ def download(
     url: str,
     accept: str = "*/*",
     *,
-    client: httpx.Client | None = None,
+    client: httpx2.Client | None = None,
     compress: bool = False,
     final_urls: list[str] | None = None,
 ) -> tuple[str, str]:
@@ -76,7 +76,7 @@ def download(
     try:
         with open_client(client) as http:
             return download_response(http, url, accept, compress, final_urls)
-    except httpx.HTTPStatusError as error:
+    except httpx2.HTTPStatusError as error:
         status = error.response.status_code
         if github.is_api_rate_limit(url, status):
             # A scraper cannot stand in for an API; its copy would not be the JSON.
@@ -101,7 +101,7 @@ def download(
         raise ResearchError(
             "raw response could not be decoded as text", "use fetch --exa"
         ) from error
-    except (httpx.RequestError, httpx.InvalidURL, OSError, ValueError) as error:
+    except (httpx2.RequestError, httpx2.InvalidURL, OSError, ValueError) as error:
         raise ResearchError(
             f"raw fetch: {error}", "check the URL and network, then retry"
         ) from error
@@ -120,7 +120,7 @@ def redirect_notice(requested: str, final: str) -> str:
 
 
 def download_response(
-    client: httpx.Client,
+    client: httpx2.Client,
     url: str,
     accept: str,
     compress: bool,
@@ -177,7 +177,7 @@ def download_response(
         return text, mime
 
 
-def fetch_raw(url: str, *, client: httpx.Client | None = None) -> str:
+def fetch_raw(url: str, *, client: httpx2.Client | None = None) -> str:
     return download(url, client=client)[0]
 
 
@@ -260,7 +260,7 @@ def require_rendered(markdown: str) -> None:
         )
 
 
-def fetch_thread(api: str, client: httpx.Client | None) -> str:
+def fetch_thread(api: str, client: httpx2.Client | None) -> str:
     """A GitHub issue or pull request, with its comments, read through the API."""
     issue = json.loads(download(api, client=client, compress=True)[0])
     comments: list[dict] = []
@@ -273,7 +273,7 @@ def fetch_thread(api: str, client: httpx.Client | None) -> str:
     return github.render_thread(issue, comments)
 
 
-def fetch_page(url: str, *, client: httpx.Client | None = None) -> str:
+def fetch_page(url: str, *, client: httpx2.Client | None = None) -> str:
     """Fetch a URL; markdown/plain text passes through, HTML is converted."""
     if raw := github.raw_file_url(url):
         try:
