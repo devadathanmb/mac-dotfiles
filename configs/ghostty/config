@@ -4,7 +4,8 @@
 # Font
 font-family = "Maple Mono NF"
 font-style = Medium
-font-size = 16.3
+font-size = 16.4
+font-thicken = true
 font-feature = cv01
 font-feature = zero
 font-feature = cv61
