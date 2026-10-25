@@ -7,11 +7,16 @@ with source line numbers so the agent can read on in the saved file.
 import math
 import re
 from collections import Counter
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
 FENCE = re.compile(r"^\s*(```|~~~)")
-WORD = re.compile(r"[a-z0-9_]{2,}")
+TOKEN = re.compile(r"[A-Za-z0-9_]+")
+# Parts of an identifier: `use_thread_local`, `maxRetries`, `HTTPClient2`.
+IDENTIFIER_PART = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+")
+# A setext or reStructuredText underline, which makes the line above a heading.
+UNDERLINE = re.compile(r"""^([=\-~^"'*+#:.`])\1{2,}\s*$""")
 STOPWORDS = frozenset(
     {"a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for"}
     | {"from", "how", "in", "is", "it", "of", "on", "or", "that", "the", "this"}
@@ -33,23 +38,52 @@ BM25_B = 0.75
 MARKDOWN_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 
 
-def headings(lines: list[str], *, markdown: bool = True) -> list[tuple[int, int, str]]:
-    """(line index, level, title) for ATX headings outside code fences.
+def headings(
+    lines: Sequence[str], *, markdown: bool = True
+) -> list[tuple[int, int, str]]:
+    """(line index, level, title) for headings outside code fences.
 
-    Source files where `#` starts a comment (`markdown=False`) have none.
+    Both `# Title` and an underlined title (setext markdown, reStructuredText)
+    count. Underline styles take levels in order of first use, as in rST. Source
+    files where `#` starts a comment (`markdown=False`) have none.
     """
     if not markdown:
         return []
     found = []
+    styles: list[str] = []
     fenced = False
     for index, line in enumerate(lines):
         if FENCE.match(line):
             fenced = not fenced
-        elif not fenced and (match := HEADING.match(line)):
-            # Permalink anchors and link targets are noise in a label.
-            title = MARKDOWN_LINK.sub(r"\1", match.group(2)).replace("¶", "").strip()
-            found.append((index, len(match.group(1)), title))
+            continue
+        if fenced:
+            continue
+        if match := HEADING.match(line):
+            level, title = len(match.group(1)), match.group(2)
+        elif underlined(lines, index):
+            style = lines[index + 1].strip()[0]
+            if style not in styles:
+                styles.append(style)
+            level, title = min(styles.index(style) + 1, 6), line.strip()
+        else:
+            continue
+        # Permalink anchors and link targets are noise in a label.
+        title = MARKDOWN_LINK.sub(r"\1", title).replace("¶", "").strip()
+        found.append((index, level, title))
     return found
+
+
+def underlined(lines: Sequence[str], index: int) -> bool:
+    """Whether the next line underlines this one, at least as long as its text.
+
+    The length rule (rST's) keeps a YAML front-matter fence or a horizontal rule
+    under a paragraph from turning a long line into a heading.
+    """
+    title = lines[index].strip()
+    if not title or index + 1 >= len(lines) or UNDERLINE.match(lines[index]):
+        return False
+    underline = lines[index + 1].strip()
+    return bool(UNDERLINE.match(underline)) and len(underline) >= len(title)
 
 
 def demote_headings(text: str, levels: int) -> str:
@@ -236,7 +270,18 @@ def matching_sections(
 
 
 def terms(text: str) -> list[str]:
-    return [word for word in WORD.findall(text.lower()) if word not in STOPWORDS]
+    """Lowercase words, with each identifier also split into its parts.
+
+    `use_thread_local_curl` then matches a question about threads.
+    """
+    found = []
+    for token in TOKEN.findall(text):
+        words = [token.lower()]
+        parts = [part.lower() for part in IDENTIFIER_PART.findall(token)]
+        if parts != words:
+            words += parts
+        found += [word for word in words if len(word) > 1 and word not in STOPWORDS]
+    return found
 
 
 def text_blocks(lines: list[str]) -> list[tuple[int, int]]:
@@ -276,7 +321,8 @@ def passage_blocks(
     blocks = []
     heading = ""
     for start, end in text_blocks(lines):
-        if start in section and end == start + 1:
+        underline = end == start + 2 and UNDERLINE.match(lines[start + 1])
+        if start in section and (end == start + 1 or underline):
             heading = section[start]
             continue
         body = "\n".join(lines[start:end])

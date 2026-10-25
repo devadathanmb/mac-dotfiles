@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from research_cli import config
+from research_cli.config import work_directory
 from research_cli.dates import iso_timestamp
 from research_cli.excerpts import (
     NO_PASSAGES,
@@ -16,6 +17,7 @@ from research_cli.excerpts import (
     matching_sections,
     page_outline,
     ranked_passages,
+    terms,
 )
 from research_cli.extract import require_rendered
 from research_cli.output import Selection, render, save_text
@@ -117,6 +119,49 @@ class ExcerptTests(unittest.TestCase):
         ]
         self.assertEqual([name for *_, name in headings(lines)], ["Queue", "Docs"])
 
+    def test_identifiers_are_also_split_into_their_words(self):
+        self.assertEqual(
+            terms("use_thread_local maxRetries HTTPClient2"),
+            [
+                "use_thread_local",
+                "use",
+                "thread",
+                "local",
+                "maxretries",
+                "max",
+                "retries",
+                "httpclient2",
+                "http",
+                "client",
+            ],
+        )
+
+    def test_query_reaches_code_through_identifier_parts(self):
+        text = "Intro words.\n\n    self.use_thread_local_curl = True\n\nOther words."
+        self.assertIn(
+            "use_thread_local_curl", ranked_passages(text, "thread local", 400)
+        )
+
+    def test_underlined_headings_count_in_outline_and_sections(self):
+        text = (
+            "=====\nGuide\n=====\n\nIntro text here.\n\nInstall\n-------\n\n"
+            "Run it.\n\nThreads\n-------\n\nOne handle per thread.\n"
+        )
+        outline = page_outline(text, 1000)
+        self.assertIn("2: # Guide", outline)
+        self.assertIn("12: ## Threads", outline)
+        section = matching_sections(text, re.compile("install", re.IGNORECASE))
+        self.assertEqual(section, "[lines 7-11]\nInstall\n-------\n\nRun it.")
+        passages = ranked_passages(text, "handle thread", 400)
+        self.assertEqual(passages, "[lines 15-15 | Threads]\nOne handle per thread.")
+
+    def test_front_matter_and_rules_under_long_lines_are_not_headings(self):
+        text = (
+            "---\ndescription: Build serverless apps on the edge\n---\n\n"
+            "Body\n\nA long paragraph line\n---\n"
+        )
+        self.assertEqual(headings(text.splitlines()), [])
+
     def test_demoted_headings_nest_below_their_container_but_not_in_code(self):
         text = "# Title\n\n```\n# comment\n```\n\n##### Deep"
         self.assertEqual(
@@ -174,6 +219,14 @@ class RenderTests(unittest.TestCase):
         first = save_text("same", "fetch-https://github.com/o/r/blob/v1/a.rs")
         second = save_text("same", "fetch-https://github.com/o/r/blob/v2/a.rs")
         self.assertNotEqual(first, second)
+
+
+class WorkDirectoryTests(unittest.TestCase):
+    def test_a_requested_tmpdir_is_used_even_before_it_exists(self):
+        with tempfile.TemporaryDirectory() as root:
+            missing = Path(root, "not-yet")
+            with patch.dict("os.environ", {"TMPDIR": str(missing)}):
+                self.assertEqual(work_directory().parent, missing)
 
 
 class DateTests(unittest.TestCase):
