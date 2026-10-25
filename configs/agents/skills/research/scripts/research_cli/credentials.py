@@ -1,17 +1,41 @@
-"""Load API keys from the environment or untracked local secret files."""
+"""API keys from the environment or untracked files in ~/.secrets."""
 
 import os
 import subprocess
+from dataclasses import dataclass
 from functools import cache
 
-from .config import SECRETS
+from . import config
 
 
-def api_key(environment_variable: str, filename: str) -> str | None:
-    if value := os.environ.get(environment_variable, "").strip():
+@dataclass(frozen=True)
+class Key:
+    variable: str
+    filename: str
+
+    @property
+    def locations(self) -> str:
+        return f"${self.variable} or ~/.secrets/{self.filename}"
+
+
+KEYS = {
+    "exa": Key("EXA_API_KEY", "exa-api-key"),
+    "context7": Key("CONTEXT7_API_KEY", "context7-api-key"),
+    "parallel": Key("PARALLEL_API_KEY", "parallel-api-key"),
+    "brave": Key("BRAVE_API_KEY", "brave-api-key"),
+    "tavily": Key("TAVILY_API_KEY", "tavily-api-key"),
+    "firecrawl": Key("FIRECRAWL_API_KEY", "firecrawl-api-key"),
+    # Optional: raises the Stack Exchange quota from 300 to 10,000 requests a day.
+    "stackexchange": Key("STACKEXCHANGE_KEY", "stackexchange-key"),
+}
+
+
+def api_key(service: str) -> str | None:
+    key = KEYS[service]
+    if value := os.environ.get(key.variable, "").strip():
         return value
     try:
-        return (SECRETS / filename).read_text().strip() or None
+        return (config.SECRETS / key.filename).read_text().strip() or None
     except OSError:
         return None
 
@@ -30,6 +54,6 @@ def github_token() -> str | None:
             text=True,
             timeout=5,
         )
-    except (OSError, subprocess.SubprocessError):
+    except OSError, subprocess.SubprocessError:
         return None
     return result.stdout.strip() or None

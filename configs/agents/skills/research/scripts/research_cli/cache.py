@@ -1,25 +1,18 @@
-"""On-disk response cache and cleanup of expired cache/output files."""
+"""On-disk response cache, and cleanup of expired cache and output files."""
 
 import hashlib
 import json
 import os
 import tempfile
 import time
+from collections.abc import Callable
 from pathlib import Path
 
 from . import config
-from .config import CACHE_TTL_SECONDS, RETENTION_SECONDS
-from .firecrawl import scrape_page
-from .mcp import request_tool
-from .network import ClientFactory
-from .pages import fetch_page, fetch_raw
-from .providers import SEARCHERS
-
-DIRECT_FETCHERS = {"raw": fetch_raw, "page": fetch_page}
 
 
 def remove_expired_files() -> None:
-    cutoff = time.time() - RETENTION_SECONDS
+    cutoff = time.time() - config.RETENTION_SECONDS
     for directory in (config.CACHE, config.OUTPUT):
         directory.mkdir(parents=True, exist_ok=True, mode=0o700)
         for path in directory.iterdir():
@@ -27,36 +20,30 @@ def remove_expired_files() -> None:
                 if path.stat().st_mtime < cutoff:
                     path.unlink()
             except OSError:
-                pass
+                pass  # removed concurrently by another research process
 
 
-def cached_call(
-    service: str,
-    tool: str,
-    arguments: dict,
-    fresh: bool = False,
+def cached(
+    namespace: str,
+    key: object,
+    compute: Callable[[], str],
     *,
-    client: ClientFactory | None = None,
+    fresh: bool = False,
 ) -> str:
-    key = hashlib.sha1(
-        json.dumps([service, tool, arguments], sort_keys=True).encode()
+    """`compute()`, reused for `config.CACHE_TTL_SECONDS[namespace]` seconds.
+
+    `key` must be JSON-serialisable; failures raise and are never cached.
+    """
+    digest = hashlib.sha256(
+        json.dumps([namespace, key], sort_keys=True).encode()
     ).hexdigest()
-    path = config.CACHE / key
-    if (
-        not fresh
-        and path.exists()
-        and time.time() - path.stat().st_mtime < CACHE_TTL_SECONDS[service]
-    ):
+    path = config.CACHE / digest
+    ttl = config.CACHE_TTL_SECONDS[namespace]
+    if not fresh and path.exists() and time.time() - path.stat().st_mtime < ttl:
         return path.read_bytes().decode("utf-8")
-    options = {"client": client()} if client is not None else {}
-    if service in DIRECT_FETCHERS:
-        text = DIRECT_FETCHERS[service](arguments["url"], **options)
-    elif service in SEARCHERS:
-        text = SEARCHERS[service](arguments, **options)
-    elif service == "firecrawl":
-        text = scrape_page(arguments["url"], fresh=fresh, **options)
-    else:
-        text = request_tool(service, tool, arguments, **options)
+    text = compute()
+    config.CACHE.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Write then rename, so a concurrent reader never sees a partial file.
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", newline="", dir=config.CACHE, delete=False
     ) as pending:

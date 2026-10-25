@@ -25,7 +25,7 @@ def iso_timestamp(value: object) -> str:
         return f"{day}T{clock}{zone or ''}"
     try:
         parsed = parsedate_to_datetime(text)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return ""
     if not any((parsed.hour, parsed.minute, parsed.second)):
         return parsed.date().isoformat()

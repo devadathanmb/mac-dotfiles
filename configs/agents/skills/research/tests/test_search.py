@@ -1,501 +1,183 @@
-import contextlib
-import io
+"""`web`: provider requests, fallback, fusion, query interleaving, and layout."""
+
 import json
 import re
-import tempfile
 import unittest
+from collections.abc import Callable
 from pathlib import Path
-from unittest.mock import patch
+from typing import Any
+from urllib.parse import parse_qs
 
 import httpx2
-from research_cli import (
-    cache,
-    cli,
-    commands,
-    config,
-    dates,
-    firecrawl,
-    github,
-    pages,
-    providers,
-    search,
-)
-from research_cli import output as out
+
+from research_cli.layout import layout_results
+from research_cli.models import SearchResult
+from research_cli.search import fuse
+from support import ResearchTestCase, mcp_text, tool_call
 
 LISTING = (
     "Title: First\nURL: https://one.test/a\nPublished: 2026-01-02T00:00:00.000Z\n"
     "Author: N/A\nHighlights:\nalpha passage\n...\nTitle: not a result\n\n"
     "Title: N/A\nURL: https://two.test/b\nPublished: N/A\nHighlights:\nbeta passage"
 )
-PAGE = """# Guide
-
-Intro paragraph about nothing in particular.
-
-## Install
-
-Run the installer and wait.
-
-```sh
-# not a heading
-make install
-```
-
-## Proxies
-
-Set trust_env to False to ignore proxy variables.
-
-### Details
-
-Unrelated closing words.
-"""
+PAGE = "# Guide\n\n## Proxies\n\nSet trust_env to False to ignore proxy variables.\n"
+Hits = Callable[[str, str], list[dict[str, Any]]]
 
 
-def hit(url, text="text", title="T"):
-    return {"title": title, "url": url, "date": "", "text": text}
+def hit(url: str, text: str = "text", title: str = "T") -> dict[str, Any]:
+    return {"title": title, "url": url, "text": text}
 
 
-class SearchTests(unittest.TestCase):
-    def setUp(self):
-        temp = tempfile.TemporaryDirectory()
-        self.addCleanup(temp.cleanup)
-        patches = [
-            patch.object(
-                httpx2.HTTPTransport,
-                "handle_request",
-                side_effect=AssertionError("unit tests must not make live requests"),
-            ),
-            patch.object(search, "configured", return_value=list(search.PROVIDERS)),
-        ]
-        for name in ("CACHE", "OUTPUT"):
-            directory = Path(temp.name) / name.lower()
-            directory.mkdir()
-            patches.append(patch.object(config, name, directory))
-        for patcher in patches:
-            patcher.start()
-            self.addCleanup(patcher.stop)
+class SearchTestCase(ResearchTestCase):
+    """Every REST provider configured; each answers with `hits(provider, query)`."""
 
-    def args(self, *tokens):
-        args = cli.build_parser().parse_args(tokens)
-        cli.validate_args(args)
-        return args
+    def setUp(self) -> None:
+        super().setUp()
+        for name in ("parallel", "brave", "tavily"):
+            self.set_key(name)
+        self.requests: dict[str, list[dict[str, Any]]] = {}
 
-    def run_web(self, *tokens, respond):
-        output = io.StringIO()
-        with (
-            patch.object(search, "cached_call", side_effect=respond) as call,
-            contextlib.redirect_stdout(output),
-        ):
-            commands.web(self.args("web", *tokens))
-        return output.getvalue(), call
+    def providers(
+        self, hits: Hits, *, exa: Callable[[str, dict], str] | None = None
+    ) -> None:
+        def record(name: str, payload: dict[str, Any]) -> None:
+            self.requests.setdefault(name, []).append(payload)
 
-    def test_exa_listing_parses_results_without_splitting_on_passage_text(self):
-        first, second = search.parse_exa_listing(LISTING)
-        self.assertEqual(
-            (first["title"], first["url"], first["date"]),
-            ("First", "https://one.test/a", "2026-01-02"),
-        )
-        self.assertIn("Title: not a result", first["text"])
-        self.assertEqual((second["title"], second["text"]), ("", "beta passage"))
+        def parallel(request, transport):
+            payload = json.loads(request.content)
+            record("parallel", payload)
+            items = [
+                {"title": h["title"], "url": h["url"], "excerpts": [h["text"]]}
+                for h in hits("parallel", payload["search_queries"][0])
+            ]
+            return httpx2.Response(200, json={"results": items})
 
-    def test_auto_falls_back_to_the_next_provider_and_reports_the_failure(self):
-        def respond(service, tool, arguments, fresh, **options):
-            if service == "exa":
-                raise config.ResearchError("web_search_exa: HTTP 429")
-            return json.dumps([hit("https://docs.test/page", "from parallel")])
+        def brave(request, transport):
+            params = {
+                key: values[0]
+                for key, values in parse_qs(request.url.query.decode()).items()
+            }
+            record("brave", params)
+            items = [
+                {"title": h["title"], "url": h["url"], "description": h["text"]}
+                for h in hits("brave", params["q"])
+            ]
+            return httpx2.Response(200, json={"web": {"results": items}})
 
-        output, call = self.run_web("query", respond=respond)
-        self.assertEqual([c.args[0] for c in call.call_args_list], ["exa", "parallel"])
-        self.assertIn("[exa failed: web_search_exa: HTTP 429]", output)
-        self.assertIn("[web: 1 results via parallel]", output)
-        self.assertIn("from parallel", output)
+        def tavily(request, transport):
+            payload = json.loads(request.content)
+            record("tavily", payload)
+            items = [
+                {"title": h["title"], "url": h["url"], "content": h["text"]}
+                for h in hits("tavily", payload["query"])
+            ]
+            return httpx2.Response(200, json={"results": items})
 
-    def test_every_provider_failing_raises_with_each_reason(self):
-        def respond(service, tool, arguments, fresh, **options):
-            raise config.ResearchError(f"{service}: down")
-
-        with self.assertRaisesRegex(config.ResearchError, "exa: down.*tavily: down"):
-            self.run_web("query", respond=respond)
-
-    def test_fusion_merges_one_page_across_providers_and_ranks_agreement_first(self):
-        def respond(service, tool, arguments, fresh, **options):
-            if service == "exa":
-                return "Title: Only Exa\nURL: https://solo.test\nHighlights:\nx\n\n" + (
-                    "Title: Shared\nURL: https://www.shared.test/doc/?utm_source=a\n"
-                    "Highlights:\nexa text"
-                )
-            return json.dumps([hit("https://shared.test/doc", "brave text", "Shared")])
-
-        output, _ = self.run_web("query", "--backend", "exa,brave", respond=respond)
-        self.assertIn("[web: 2 results via exa, brave]", output)
-        self.assertLess(output.index("Shared [exa, brave]"), output.index("Only Exa"))
-        self.assertIn("exa text", output)
-        self.assertNotIn("brave text", output)
-
-    def test_several_queries_alternate_so_each_is_represented(self):
-        def respond(service, tool, arguments, fresh, **options):
-            query = arguments["queries"][0]
-            if query == "two" and service == "brave":
-                raise config.ResearchError("brave: HTTP 429")
-            shared = [hit("https://shared.test")] if query == "two" else []
-            return json.dumps(
-                [
-                    hit(f"https://{query}.test/{n}", title=f"{query}{n}")
-                    for n in range(3)
-                ]
-                + shared
-            )
-
-        output, call = self.run_web(
-            "one", "two", "--backend", "parallel,brave", "-n", "4", respond=respond
-        )
-        self.assertEqual(call.call_count, 4)
-        self.assertEqual(len(call.call_args.args[2]["queries"]), 1)
-        self.assertEqual(
-            re.findall(r"^\d\. (\w+)", output, re.MULTILINE),
-            ["one0", "two0", "one1", "two1"],
-        )
-        self.assertIn("[brave (query 2) failed: brave: HTTP 429]", output)
-        self.assertIn("one0 [parallel, brave]", output)
-        self.assertIn("two0 [parallel]", output)
-        self.assertIn('Queries:\nQ1: "one"\nQ2: "two"', output)
-        self.assertIn("one0 [parallel, brave] [queries: Q1]", output)
-        self.assertIn("two0 [parallel] [queries: Q2]", output)
-
-    def test_shared_results_keep_all_query_ids_in_text_saved_file_and_json(self):
-        def respond(service, tool, arguments, fresh, **options):
-            query = arguments["queries"][0]
-            return json.dumps(
-                [
-                    hit("https://shared.test", "shared passage " * 100, "Shared"),
-                    hit(f"https://{query}.test", title=query),
-                ]
-            )
-
-        for mode in ((), ("--json",)):
-            with self.subTest(mode=mode):
-                output, call = self.run_web(
-                    "one",
-                    "one",
-                    "two",
-                    "--backend",
-                    "brave",
-                    "--max-chars",
-                    "500",
-                    *mode,
-                    respond=respond,
-                )
-                self.assertEqual(call.call_count, 2)
-                if mode:
-                    record = json.loads(output)
-                    self.assertEqual(record["queries"], ["one", "two"])
-                    self.assertEqual(
-                        [result["query_ids"] for result in record["results"]],
-                        [[1, 2], [1], [2]],
+        def exa_handler(request, transport):
+            tool, arguments = tool_call(request)
+            record("exa", {"tool": tool, **arguments})
+            if exa is not None:
+                return mcp_text(exa(tool, arguments))
+            if tool == "web_search_exa":  # the basic search answers in a text listing
+                return mcp_text(
+                    "\n\n".join(
+                        f"Title: {h['title']}\nURL: {h['url']}\n"
+                        f"Highlights:\n{h['text']}"
+                        for h in hits("exa", arguments["query"])
                     )
-                    saved = record["saved"]
-                else:
-                    self.assertIn('Q1: "one"\nQ2: "two"', output)
-                    self.assertIn("Shared [queries: Q1, Q2]", output)
-                    saved = re.search(r"\[saved: ([^|]+) \|", output).group(1)
-                full = Path(saved).read_text()
-                self.assertTrue(full.startswith('Queries:\nQ1: "one"\nQ2: "two"'))
-                self.assertIn("Shared [queries: Q1, Q2]", full)
-
-    def test_empty_query_keeps_its_id_in_the_query_map(self):
-        def respond(service, tool, arguments, fresh, **options):
-            return json.dumps(
-                [] if arguments["queries"] == ["one"] else [hit("https://two.test")]
-            )
-
-        output, _ = self.run_web("one", "two", "--backend", "brave", respond=respond)
-        self.assertIn('Q1: "one"\nQ2: "two"', output)
-        self.assertIn("[queries: Q2]", output)
-        self.assertIn("[brave (query 1): no results]", output)
-
-    def test_multi_query_map_preserves_saved_line_references(self):
-        doc = " ".join(f"word{number}" for number in range(60))
-        results = [
-            {**hit("https://docs.test/a", doc), "query_ids": [1]},
-            {**hit("https://docs.test/b", doc), "query_ids": [2]},
-        ]
-        full, compact, fitted = search.layout_results(results, 0, False, ["one", "two"])
-        line = int(re.search(r"saved line (\d+)", fitted[1]).group(1))
-        self.assertEqual(full.splitlines()[line - 1], doc)
-        self.assertIn("[queries: Q2]", compact)
-
-    def test_site_operators_become_domain_filters_except_for_brave(self):
-        seen = {}
-
-        def respond(service, tool, arguments, fresh, **options):
-            seen[service] = arguments
-            if service == "exa":
-                return json.dumps(
-                    {"results": [{"url": "https://x.test", "title": "X"}]}
                 )
-            return json.dumps([hit("https://x.test")])
+            items = [
+                {"title": h["title"], "url": h["url"], "highlights": [h["text"]]}
+                for h in hits("exa", arguments["query"])
+            ]
+            return mcp_text(json.dumps({"results": items}))
 
-        self.run_web(
-            "site:github.com/ijl/orjson free threading",
-            "--backend",
-            "all",
-            respond=respond,
-        )
-        self.assertEqual(seen["exa"]["includeDomains"], ["github.com"])
-        self.assertEqual(seen["exa"]["query"], "free threading ijl orjson")
-        self.assertEqual(seen["parallel"]["domains"], ["github.com/ijl/orjson"])
-        self.assertEqual(seen["parallel"]["queries"], ["free threading"])
-        self.assertEqual(seen["tavily"]["domains"], ["github.com"])
-        self.assertNotIn("domains", seen["brave"])
-        self.assertEqual(
-            seen["brave"]["queries"], ["site:github.com/ijl/orjson free threading"]
-        )
-        self.assertEqual(
-            search.split_sites("site:a.test/x/1", paths=False), ("x 1", ["a.test"])
-        )
+        self.web.route("api.parallel.ai", parallel)
+        self.web.route("api.search.brave.com", brave)
+        self.web.route("api.tavily.com", tavily)
+        self.web.route("mcp.exa.ai", exa_handler)
 
-    def test_unsupported_and_unconfigured_backends_are_actionable(self):
-        with (
-            patch.object(search, "configured", return_value=["exa"]),
-            self.assertRaisesRegex(config.ResearchError, "brave key not"),
-        ):
-            search.select_providers(self.args("web", "q", "--backend", "brave"))
-        with self.assertRaisesRegex(config.ResearchError, "unknown backend"):
-            search.select_providers(self.args("web", "q", "--backend", "bing"))
-        with self.assertRaisesRegex(config.ResearchError, "Exa-only"):
-            search.select_providers(
-                self.args("web", "q", "--backend", "all", "--category", "news")
-            )
 
-    def test_tight_preview_keeps_every_result_and_points_into_the_saved_file(self):
-        results = [
-            {**hit(f"https://{n}.test", f"{n} " + "word " * 300), "providers": ["exa"]}
-            for n in ("one", "two", "three")
-        ]
-        results[1]["text"] = "short"
-        full, compact, fitted = search.layout_results(results, 900, False)
-        self.assertLessEqual(len(compact), 900)
-        for name in ("one", "two", "three"):
-            self.assertIn(f"https://{name}.test", compact)
-        self.assertEqual(fitted[1], "short")
-        line = int(re.findall(r"saved line (\d+)", compact)[-1])
-        self.assertTrue(full.splitlines()[line - 2].startswith("three word"))
-
-    def test_json_output_reports_fitted_text_and_the_saved_path(self):
-        def respond(service, tool, arguments, fresh, **options):
-            return json.dumps([hit("https://a.test", "x" * 900), hit("https://b.test")])
-
-        output, _ = self.run_web(
-            "q", "--backend", "tavily", "--json", "--max-chars", "400", respond=respond
-        )
-        data = json.loads(output)
-        self.assertEqual(data["providers"], ["tavily"])
-        self.assertEqual(
-            [r["url"] for r in data["results"]], ["https://a.test", "https://b.test"]
-        )
-        self.assertEqual(data["results"][0]["chars"], 900)
-        self.assertLess(len(data["results"][0]["text"]), 400)
-        self.assertIn("x" * 900, Path(data["saved"]).read_text())
-
-    def test_read_replaces_the_snippet_with_passages_from_the_saved_page(self):
-        def respond(service, tool, arguments, fresh, **options):
-            return json.dumps([hit("https://a.test", "snippet"), hit("https://b.test")])
-
-        page = commands.FetchResult(text=PAGE, source="direct HTTP, markdown")
-        with patch.object(commands, "fetch_result", return_value=page) as fetched:
-            output, _ = self.run_web(
-                "trust_env proxy", "--backend", "brave", "--read", "1", respond=respond
-            )
-        self.assertEqual(fetched.call_count, 1)
-        self.assertIn("[lines 16-16 | Proxies]\nSet trust_env to False", output)
-        self.assertNotIn("snippet", output)
-        folder = re.search(r"pages saved in (\S+)\]", output).group(1)
-        saved = re.search(r"page saved: (\S+)", output).group(1)
-        self.assertEqual(Path(folder, saved).read_text(), PAGE)
-
-    def test_a_result_repeating_an_earlier_one_is_collapsed_in_the_preview(self):
-        doc = " ".join(f"word{number}" for number in range(60))
-        results = [
-            hit("https://docs.test/a", doc),
-            hit(
-                "https://github.test/a.md",
-                f"[lines 30-41 | H]\n[a](https://x.test) {doc}",
-            ),
-            hit("https://other.test", doc[::-1]),
-        ]
-        full, compact, fitted = search.layout_results(results, 0, False)
-        self.assertEqual(full.count("word59"), 2)
-        self.assertEqual(fitted[1], "[same text as result 1; saved line 7]")
-        self.assertEqual(full.splitlines()[6], "[lines 30-41 | H]")
-        self.assertEqual((fitted[0], fitted[2]), (doc, doc[::-1]))
-        self.assertIn(fitted[1], compact)
-
-    def test_outline_lists_numbered_headings_outside_code_fences(self):
-        outline = out.page_outline(PAGE, 1000)
-        self.assertIn("5: ## Install", outline)
-        self.assertIn("18: ### Details", outline)
-        self.assertNotIn("not a heading", outline)
-        shallow = out.page_outline(PAGE, 110)
-        self.assertNotIn("Details", shallow)
-        self.assertIn("more headings", shallow)
-
-    def test_section_returns_the_whole_section_or_lists_the_headings(self):
-        section = out.matching_sections(PAGE, re.compile("prox", re.IGNORECASE))
-        self.assertTrue(section.startswith("[lines 14-20]\n## Proxies"))
-        self.assertIn("Unrelated closing words.", section)
-        missing = out.matching_sections(PAGE, re.compile("absent"))
-        self.assertIn("No heading matches", missing)
-        self.assertIn("14: ## Proxies", missing)
-
-    def test_ranked_passages_choose_relevant_paragraphs_in_document_order(self):
-        passages = out.ranked_passages(PAGE, "how to install", 400)
-        self.assertLess(
-            passages.index("Run the installer"), passages.index("make install")
-        )
-        self.assertNotIn("trust_env", passages)
-        self.assertEqual(out.ranked_passages(PAGE, "kubernetes", 400), out.NO_PASSAGES)
-
-    def fetch(self, *tokens, pages):
-        output = io.StringIO()
-        with (
-            patch.object(
-                commands,
-                "cached_call",
-                side_effect=lambda s, t, a, f, **o: pages[a["url"]],
-            ),
-            contextlib.redirect_stdout(output),
-        ):
-            commands.fetch(self.args("fetch", *tokens))
-        return output.getvalue()
-
-    def test_long_page_preview_starts_with_its_outline(self):
-        pages = {"https://a.test": PAGE + "filler line\n" * 200}
-        output = self.fetch("https://a.test", "--max-chars", "600", pages=pages)
-        self.assertIn("Outline (line: heading)", output)
-        self.assertIn("14: ## Proxies", output)
-
-    def test_fetch_query_and_section_select_from_the_page(self):
-        pages = {"https://a.test": PAGE}
+class ProviderTests(SearchTestCase):
+    def test_exa_basic_listing_parses_without_splitting_on_passage_text(self):
+        self.providers(lambda name, query: [], exa=lambda tool, arguments: LISTING)
+        output = self.ok("web", "query", "--backend", "exa").stdout
         self.assertIn(
-            "[lines 16-16 | Proxies]",
-            self.fetch(
-                "https://a.test", "--query", "ignore proxy variables", pages=pages
-            ),
+            "1. First (2026-01-02)\nhttps://one.test/a\nalpha passage", output
         )
-        section = self.fetch("https://a.test", "--section", "install", pages=pages)
-        self.assertIn("[lines 5-13]", section)
-        self.assertNotIn("trust_env", section)
-        with self.assertRaisesRegex(config.ResearchError, "only one of"):
-            self.args("fetch", "https://a.test", "--match", "x", "--section", "y")
+        self.assertIn("Title: not a result", output)
+        self.assertIn("2. https://two.test/b\nbeta passage", output)
+        self.assertEqual(self.requests["exa"][0]["tool"], "web_search_exa")
 
-    def test_fetch_json_emits_one_record_per_url_including_failures(self):
-        def retrieve(args, url, client):
-            if url.endswith("b.test"):
-                return commands.FetchResult(
-                    error=config.ResearchError("raw fetch: HTTP 404", "fix the URL")
-                )
-            return commands.FetchResult(text=PAGE, source="direct HTTP, markdown")
-
-        output = io.StringIO()
-        with (
-            patch.object(commands, "fetch_result", side_effect=retrieve),
-            contextlib.redirect_stdout(output),
-        ):
-            commands.fetch(
-                self.args("fetch", "https://a.test", "https://b.test", "--json")
-            )
-        first, second = map(json.loads, output.getvalue().splitlines())
-        self.assertEqual(Path(first["saved"]).read_text(), PAGE)
+    def test_exa_objective_filters_and_chars_select_its_search_tool(self):
+        self.providers(lambda name, query: [hit("https://x.test")])
+        self.ok("web", "query", "--backend", "exa", "--objective", "goal")
+        self.ok("web", "query", "--backend", "exa", "--domain", "example.com")
+        self.ok("web", "query", "--backend", "exa", "--chars", "321")
+        basic, filtered, chars = self.requests["exa"]
         self.assertEqual(
-            (first["lines"], first["source"]), (20, "direct HTTP, markdown")
+            (basic["tool"], basic["objective"]), ("web_search_exa", "goal")
         )
+        self.assertEqual(filtered["tool"], "web_search_advanced_exa")
+        self.assertEqual(filtered["textMaxCharacters"], 1500)
+        self.assertEqual(filtered["includeDomains"], ["example.com"])
         self.assertEqual(
-            second,
-            {
-                "url": "https://b.test",
-                "error": "raw fetch: HTTP 404",
-                "hint": "fix the URL",
-                "notices": [],
-            },
+            (chars["textMaxCharacters"], chars["enableHighlights"]), (321, False)
         )
 
-    def provider_client(self, body, status=200):
-        requests = []
-
-        def handler(request):
-            requests.append(request)
-            return httpx2.Response(status, json=body)
-
-        return httpx2.Client(transport=httpx2.MockTransport(handler)), requests
-
-    def test_brave_builds_operators_and_unescapes_entities(self):
-        body = {
-            "web": {
-                "results": [
-                    {
-                        "title": "A &amp; B",
-                        "url": "https://a.test",
-                        "description": "say &quot;hi&quot;",
-                        "page_age": "2026-05-06T01:02:03",
-                    }
-                ]
-            }
-        }
-        client, requests = self.provider_client(body)
-        arguments = {
-            "queries": ["q"],
-            "n": 50,
-            "chars": 1500,
-            "domains": ["a.test", "b.test"],
-            "exclude": ["c.test"],
-            "after": "2026-01-01",
-            "before": "2026-02-01",
-        }
-        with patch.object(providers, "provider_key", return_value="secret"):
-            results = json.loads(providers.search_brave(arguments, client=client))
-        params = requests[0].url.params
-        self.assertEqual(params["q"], "(site:a.test OR site:b.test) q -site:c.test")
+    def test_brave_builds_site_operators_and_unescapes_entities(self):
+        self.providers(
+            lambda name, query: [
+                hit("https://a.test", "say &quot;hi&quot;", "A &amp; B")
+            ]
+        )
+        output = self.ok(
+            "web",
+            "q",
+            "--backend",
+            "brave",
+            "-n",
+            "50",
+            "--domain",
+            "a.test",
+            "--domain",
+            "b.test",
+            "--exclude",
+            "c.test",
+            "--after",
+            "2026-01-01",
+            "--before",
+            "2026-02-01",
+        ).stdout
+        sent = self.requests["brave"][0]
+        self.assertEqual(sent["q"], "(site:a.test OR site:b.test) q -site:c.test")
         self.assertEqual(
-            (params["count"], params["freshness"]), ("20", "2026-01-01to2026-02-01")
+            (sent["count"], sent["freshness"]), ("20", "2026-01-01to2026-02-01")
         )
-        self.assertEqual(requests[0].headers["X-Subscription-Token"], "secret")
-        self.assertEqual(
-            results,
-            [
-                {
-                    "title": "A & B",
-                    "url": "https://a.test",
-                    "date": "2026-05-06T01:02:03",
-                    "text": 'say "hi"',
-                }
-            ],
-        )
+        self.assertIn('1. A & B\nhttps://a.test\nsay "hi"', output)
+        brave = next(s for s in self.web.sent if "brave" in s.url)
+        self.assertEqual(brave.headers["x-subscription-token"], "test-key")
 
-    def test_parallel_and_tavily_send_filters_and_normalize_results(self):
-        client, requests = self.provider_client(
-            {
-                "results": [
-                    {
-                        "title": "P",
-                        "url": "https://p.test",
-                        "publish_date": None,
-                        "excerpts": ["one", "two"],
-                    }
-                ]
-            }
+    def test_parallel_and_tavily_map_filters_onto_their_apis(self):
+        self.providers(lambda name, query: [hit(f"https://{name}.test")])
+        self.ok(
+            "web",
+            "a",
+            "--backend",
+            "parallel",
+            "-n",
+            "4",
+            "--chars",
+            "700",
+            "--domain",
+            "p.test",
+            "--after",
+            "2026-01-01",
         )
-        arguments = {
-            "queries": ["a", "b"],
-            "n": 4,
-            "chars": 700,
-            "domains": ["p.test"],
-            "after": "2026-01-01",
-        }
-        with patch.object(providers, "provider_key", return_value="secret"):
-            results = json.loads(providers.search_parallel(arguments, client=client))
-        sent = json.loads(requests[0].content)
-        self.assertEqual((sent["search_queries"], sent["objective"]), (["a", "b"], "a"))
+        self.ok("web", "a", "--backend", "tavily", "--before", "2026-02-01")
+        parallel = self.requests["parallel"][0]
         self.assertEqual(
-            sent["advanced_settings"],
+            parallel["advanced_settings"],
             {
                 "max_results": 4,
                 "excerpt_settings": {"max_chars_per_result": 700},
@@ -505,489 +187,281 @@ class SearchTests(unittest.TestCase):
                 },
             },
         )
+        tavily = self.requests["tavily"][0]
+        self.assertEqual((tavily["query"], tavily["end_date"]), ("a", "2026-02-01"))
+        auth = next(s for s in self.web.sent if "tavily" in s.url).headers[
+            "authorization"
+        ]
+        self.assertEqual(auth, "Bearer test-key")
+
+    def test_site_operators_become_domain_filters_except_for_brave(self):
+        self.providers(lambda name, query: [hit("https://x.test")])
+        self.ok("web", "site:github.com/ijl/orjson free threading", "--backend", "all")
+        exa = self.requests["exa"][0]
         self.assertEqual(
-            results,
-            [
-                {
-                    "title": "P",
-                    "url": "https://p.test",
-                    "date": "",
-                    "text": "one\n...\ntwo",
-                }
-            ],
+            (exa["includeDomains"], exa["query"]),
+            (["github.com"], "free threading ijl orjson"),
+        )
+        parallel = self.requests["parallel"][0]
+        self.assertEqual(parallel["search_queries"], ["free threading"])
+        self.assertEqual(
+            parallel["advanced_settings"]["source_policy"]["include_domains"],
+            ["github.com/ijl/orjson"],
+        )
+        self.assertEqual(self.requests["tavily"][0]["include_domains"], ["github.com"])
+        self.assertEqual(
+            self.requests["brave"][0]["q"], "site:github.com/ijl/orjson free threading"
         )
 
-        client, requests = self.provider_client(
-            {
-                "results": [
-                    {
-                        "title": "T",
-                        "url": "https://t.test",
-                        "content": "c",
-                        "published_date": "2026-03-04",
-                    }
-                ]
-            }
-        )
-        with patch.object(providers, "provider_key", return_value="secret"):
-            results = json.loads(
-                providers.search_tavily(
-                    {"queries": ["a"], "n": 3, "chars": 1, "before": "2026-02-01"},
-                    client=client,
-                )
-            )
-        sent = json.loads(requests[0].content)
-        self.assertEqual(
-            (sent["query"], sent["max_results"], sent["end_date"]),
-            ("a", 3, "2026-02-01"),
-        )
-        self.assertEqual(requests[0].headers["Authorization"], "Bearer secret")
-        self.assertEqual(results[0]["date"], "2026-03-04")
-
-    def test_provider_http_errors_name_the_key_or_suggest_another_backend(self):
+    def test_provider_errors_name_the_key_or_suggest_another_backend(self):
         for status, hint in (
             (401, "~/.secrets/tavily-api-key"),
             (429, "another --backend"),
         ):
-            client, _ = self.provider_client({"detail": "no"}, status)
-            with (
-                self.subTest(status=status),
-                self.assertRaises(config.ResearchError) as raised,
-            ):
-                providers.search_tavily(
-                    {"queries": ["a"], "n": 3, "chars": 1}, client=client
+            with self.subTest(status=status):
+                self.web.serve(
+                    "api.tavily.com",
+                    lambda status=status: httpx2.Response(status, json={}),
                 )
-            self.assertIn(hint, raised.exception.hint)
+                result = self.fails("web", "q", "--backend", "tavily", "--fresh")
+                self.assertIn(hint, result.stderr)
+                self.assertIn("error: every provider failed:", result.stderr)
+                self.assertNotIn("rephrase", result.stderr)
 
-    def test_cache_dispatches_and_reuses_provider_searches(self):
-        searcher = unittest.mock.Mock(return_value="[]")
-        with patch.dict(cache.SEARCHERS, {"brave": searcher}):
-            for _ in range(2):
-                self.assertEqual(
-                    cache.cached_call("brave", "search", {"queries": ["q"]}), "[]"
-                )
-        searcher.assert_called_once_with({"queries": ["q"]})
-
-    def test_short_hit_brings_the_paragraph_that_explains_it(self):
-        text = "## API\n\nshutdown(immediate=False)\n\nStops the queue.\n\nOther words."
-        self.assertEqual(
-            out.ranked_passages(text, "shutdown", 400),
-            "[lines 3-5 | API]\nshutdown(immediate=False)\n\nStops the queue.",
-        )
-
-    def test_heading_labels_drop_permalinks_and_link_targets(self):
-        lines = [
-            '## Queue[¶](#queue "Link to this heading")',
-            "## [Docs](https://x.test)",
-        ]
-        self.assertEqual([name for *_, name in out.headings(lines)], ["Queue", "Docs"])
-
-    def test_garbled_snippet_is_dropped_and_filled_by_another_provider(self):
-        garbled = hit("https://a.test", "\ufffd\x01" * 40)
-        (merged,) = search.fuse(
-            [("exa", [garbled]), ("brave", [hit("https://a.test", "clean")])], 5
-        )
-        self.assertEqual(
-            (merged["text"], merged["providers"]), ("clean", ["exa", "brave"])
-        )
-
-    def test_dates_normalize_to_iso_or_empty(self):
-        cases = {
-            "2026-05-06T01:02:03Z": "2026-05-06T01:02:03Z",
-            "2026-05-06T01:02:03.456+05:30": "2026-05-06T01:02:03+05:30",
-            "2026-05-06 01:02": "2026-05-06T01:02",
-            "2026-05-06T00:00:00.000Z": "2026-05-06",
-            "2026-05-06": "2026-05-06",
-            "Mon, 05 Oct 2026 10:00:00 GMT": "2026-10-05T10:00:00Z",
-            "Mon, 05 Oct 2026 00:00:00 GMT": "2026-10-05",
-            "3 days ago": "",
-            None: "",
-        }
-        for value, expected in cases.items():
-            self.assertEqual(dates.iso_timestamp(value), expected)
-
-    def test_github_file_pages_are_read_as_raw_source_with_page_fallback(self):
-        url = "https://github.com/o/r/blob/main/src/a.py"
-        seen = []
-
-        def download(target, *args, **kwargs):
-            seen.append(target)
-            if "raw.githubusercontent.com" in target and fail:
-                raise config.ResearchError("raw fetch: HTTP 404")
-            return "# not a heading\nprint(1)\n", "text/plain"
-
-        for fail in (False, True):
-            seen.clear()
-            with patch.object(pages, "download", side_effect=download):
-                self.assertIn("print(1)", pages.fetch_page(url))
-            raw = "https://raw.githubusercontent.com/o/r/main/src/a.py"
-            self.assertEqual(seen, [raw, url] if fail else [raw])
-
-    def test_brave_retries_when_rate_limited_then_gives_up(self):
+    def test_brave_retries_rate_limits_then_gives_up(self):
         responses = [
             httpx2.Response(429, json={}),
-            httpx2.Response(200, json={"web": {}}),
-        ]
-        client = httpx2.Client(
-            transport=httpx2.MockTransport(lambda r: responses.pop(0))
-        )
-        with (
-            patch.object(providers, "provider_key", return_value="secret"),
-            patch.object(providers, "BRAVE_INTERVAL_SECONDS", 0),
-        ):
-            self.assertEqual(
-                providers.search_brave({"queries": ["q"], "n": 1}, client=client), "[]"
-            )
-            with self.assertRaises(config.ResearchError) as raised:
-                responses.extend([httpx2.Response(429, json={})] * 3)
-                providers.search_brave({"queries": ["q"], "n": 1}, client=client)
-        self.assertEqual(raised.exception.status, 429)
-
-    def test_oversized_and_javascript_pages_fail_in_the_right_direction(self):
-        with patch.object(config, "MAX_RAW_BYTES", 10):
-            client = httpx2.Client(
-                transport=httpx2.MockTransport(
-                    lambda request: httpx2.Response(200, text="x" * 50)
-                )
-            )
-            with self.assertRaises(config.ResearchError) as raised:
-                pages.download("https://big.test/api.json", client=client)
-        self.assertTrue(raised.exception.final)
-        shell = (
-            "<main><h1>Wheels</h1><p>"
-            + "intro " * 60
-            + "</p><p>This site requires JavaScript to be enabled.</p></main>"
-        )
-        with (
-            patch.object(pages, "download", return_value=(shell, "text/html")),
-            self.assertRaisesRegex(config.ResearchError, "needs JavaScript") as raised,
-        ):
-            pages.fetch_page("https://shell.test")
-        self.assertFalse(raised.exception.final)
-
-    def test_broad_match_previews_the_rarest_alternative_first(self):
-        text = "\n".join(
-            [*(f"index entry {n}" for n in range(60)), "io_uring needs liburing"]
-        )
-        excerpt = out.matching_lines(text, re.compile("index|io_uring"), 2, 300)
-        self.assertIn("61: io_uring needs liburing", excerpt)
-        self.assertRegex(excerpt, r"^\[\d+ of 61 matching lines, rarest")
-        self.assertLessEqual(len(excerpt), 300)
-        self.assertNotIn(
-            "matching lines,", out.matching_lines(text, re.compile("io_uring"), 0, 300)
-        )
-
-    def test_bot_challenge_headings_trigger_extraction_fallback(self):
-        for heading in (
-            "Just a moment...",
-            "Attention Required! | Cloudflare",
-            "Client Challenge",
-            "Reddit - Prove your humanity",
-        ):
-            with self.subTest(heading=heading):
-                html = (
-                    f"<main><h1>{heading}</h1><p>"
-                    + "Checking access. " * 100
-                    + "</p></main>"
-                )
-                with (
-                    patch.object(pages, "download", return_value=(html, "text/html")),
-                    self.assertRaisesRegex(
-                        config.ResearchError, "bot challenge"
-                    ) as raised,
-                ):
-                    pages.fetch_page("https://challenge.test")
-                self.assertFalse(raised.exception.final)
-        article = "# Handling bot challenges\n\n" + "A guide. " * 100
-        article += "\n\n## Client Challenge\n\nJust a moment..."
-        pages.require_rendered(article)
-
-    def test_challenge_response_uses_exa_instead_of_returning_the_challenge(self):
-        html = (
-            "<main><h1>Client Challenge</h1><p>"
-            + "Checking access. " * 100
-            + "</p></main>"
-        )
-        url = "https://challenge.test"
-        with (
-            httpx2.Client(
-                transport=httpx2.MockTransport(
-                    lambda request: httpx2.Response(200, html=html)
-                )
-            ) as client,
-            patch.object(commands, "exa_fetch", return_value=PAGE) as extract,
-            patch.object(commands, "api_key", return_value=None),
-        ):
-            result = commands.fetch_result(
-                self.args("fetch", url, "--fresh"), url, lambda: client
-            )
-        self.assertIsNone(result.error)
-        self.assertEqual((result.source, result.text), ("Exa", PAGE))
-        self.assertIn("bot challenge", " ".join(result.notices))
-        extract.assert_called_once()
-
-    def test_lines_selector_prints_the_cited_range(self):
-        pages_ = {"https://a.test": PAGE}
-        output = self.fetch("https://a.test", "--lines", "14-16", pages=pages_)
-        self.assertIn("14: ## Proxies\n15: \n16: Set trust_env", output)
-        self.assertIn(
-            "No such lines; this response has 20.",
-            self.fetch("https://a.test", "--lines", "90-95", pages=pages_),
-        )
-        for bad in ("5", "9-3", "0-4"):
-            with self.subTest(bad=bad), self.assertRaises(config.ResearchError):
-                self.args("fetch", "https://a.test", "--lines", bad)
-
-    def test_page_title_and_date_outside_the_article_are_kept(self):
-        html = (
-            "<html><head><title>Redpanda 21.10.1 | Jepsen</title></head><body>"
-            "<header><h1>Redpanda 21.10.1</h1><div class=date>2022-04-29</div></header>"
-            "<article><h1>1 Background</h1><p>"
-            + "text " * 80
-            + "</p></article></body></html>"
-        )
-        markdown = pages.html_to_markdown(html, "https://jepsen.test/a")
-        self.assertTrue(
-            markdown.startswith(
-                "# Redpanda 21.10.1 | Jepsen\n\nPublished: 2022-04-29\n\n# 1 Background"
-            )
-        )
-        titled = html.replace("<h1>1 Background</h1>", "<h1>Redpanda 21.10.1</h1>")
-        self.assertTrue(
-            pages.html_to_markdown(titled, "https://jepsen.test/a").startswith(
-                "Published: 2022-04-29\n\n# Redpanda"
-            )
-        )
-
-    def test_page_timestamps_keep_their_offset_and_flag_several_posts(self):
-        post = "<article><time datetime='{}'>Oct 6</time><p>{}</p></article>"
-        page = "<html><head><title>Results</title></head><body>{}</body></html>"
-        body = "text " * 80
-        single = page.format(post.format("2026-10-07T05:09:04.000Z", body))
-        self.assertIn(
-            "Published: 2026-10-07T05:09:04Z\n",
-            pages.html_to_markdown(single, "https://a.test"),
-        )
-        feed = page.format(
-            post.format("2026-10-07T05:09:04Z", body)
-            + post.format("2026-10-07T05:09:04Z", body)
-            + post.format("2026-10-01T09:00:00Z", body)
-        )
-        self.assertIn(
-            "Published: 2026-10-07T05:09:04Z (first of 2 timestamps on the page)",
-            pages.html_to_markdown(feed, "https://a.test"),
-        )
-
-    def test_relative_links_use_the_redirect_destination(self):
-        def handler(request):
-            if request.url.host == "old.test":
-                return httpx2.Response(
-                    302, headers={"Location": "https://docs.test/v2/guide/"}
-                )
-            return httpx2.Response(
+            httpx2.Response(
                 200,
-                html=(
-                    "<main><h1>Guide</h1><p>"
-                    + "Content. " * 100
-                    + '</p><a href="../reference/">API</a> '
-                    + '<a href="examples/">Examples</a> '
-                    + '<a href="#section">Section</a></main>'
-                ),
-            )
+                json={
+                    "web": {
+                        "results": [
+                            {
+                                "title": "B",
+                                "url": "https://b.test",
+                                "description": "found",
+                            }
+                        ]
+                    }
+                },
+            ),
+        ]
+        self.web.serve("api.search.brave.com", lambda: responses.pop(0))
+        self.assertIn("found", self.ok("web", "q", "--backend", "brave").stdout)
+        responses.extend(httpx2.Response(429, json={}) for _ in range(3))
+        result = self.fails("web", "q", "--backend", "brave", "--fresh")
+        self.assertIn("brave: HTTP 429", result.stderr)
+        self.assertEqual(responses, [])
 
-        with httpx2.Client(transport=httpx2.MockTransport(handler)) as client:
-            text = pages.fetch_page("https://old.test/start", client=client)
-        self.assertTrue(text.startswith("[redirected to https://docs.test/v2/guide/;"))
-        self.assertIn("[API](https://docs.test/v2/reference/)", text)
-        self.assertIn("[Examples](https://docs.test/v2/guide/examples/)", text)
-        self.assertIn("[Section](#section)", text)
-
-    def test_redirected_pages_say_where_they_came_from(self):
-        def handler(request):
-            if request.url.path == "/old":
-                return httpx2.Response(
-                    302, headers={"Location": "https://docs.test/landing"}
-                )
-            return httpx2.Response(
-                200, html="<main><h1>Landing</h1><p>" + "x " * 150 + "</p></main>"
-            )
-
-        client = httpx2.Client(transport=httpx2.MockTransport(handler))
-        page = pages.fetch_page("https://docs.test/old", client=client)
-        self.assertTrue(page.startswith("[redirected to https://docs.test/landing;"))
-        self.assertNotIn(
-            "redirected",
-            pages.fetch_page("https://www.docs.test/landing/", client=client),
+    def test_backend_selection_errors_are_actionable(self):
+        self.assertIn(
+            "unknown backend 'bing'", self.fails("web", "q", "--backend", "bing").stderr
         )
-        body = {
-            "success": True,
-            "data": {
-                "markdown": "generic guide",
-                "metadata": {"url": "https://docs.test/home", "statusCode": 200},
-            },
-        }
-        client = httpx2.Client(
-            transport=httpx2.MockTransport(lambda r: httpx2.Response(200, json=body))
+        self.assertIn(
+            "Exa-only",
+            self.fails("web", "q", "--backend", "all", "--category", "news").stderr,
         )
-        with patch.object(firecrawl, "api_key", return_value="k"):
-            self.assertTrue(
-                firecrawl.scrape_page(
-                    "https://docs.test/aio", client=client
-                ).startswith("[redirected to https://docs.test/home;")
-            )
+        import os
 
-    def test_missing_github_path_hint_names_the_directory_listing(self):
-        client = httpx2.Client(
-            transport=httpx2.MockTransport(lambda r: httpx2.Response(404))
+        del os.environ["BRAVE_API_KEY"]
+        result = self.fails("web", "q", "--backend", "brave")
+        self.assertIn(
+            "brave key not configured | hint: set $BRAVE_API_KEY", result.stderr
         )
-        for url in (
-            "https://raw.githubusercontent.com/tikv/pd/v8.5.0/pkg/tso/timestamp.go",
-            "https://github.com/tikv/pd/blob/v8.5.0/pkg/tso/timestamp.go",
+
+
+class CombinationTests(SearchTestCase):
+    def test_auto_falls_back_and_reports_the_failure(self):
+        self.providers(
+            lambda name, query: [hit("https://docs.test/page", "from parallel")]
+        )
+        self.web.serve("mcp.exa.ai", lambda: httpx2.Response(429, text="slow down"))
+        output = self.ok("web", "query").stdout
+        self.assertIn(
+            "[exa failed: web_search_exa: HTTP 429 slow down; rate limited", output
+        )
+        self.assertIn("[web: 1 results via parallel]", output)
+        self.assertNotIn("brave", self.requests)
+
+    def test_every_provider_failing_lists_each_reason(self):
+        for host in (
+            "mcp.exa.ai",
+            "api.parallel.ai",
+            "api.search.brave.com",
+            "api.tavily.com",
         ):
-            with (
-                self.subTest(url=url),
-                self.assertRaises(config.ResearchError) as raised,
-            ):
-                pages.fetch_page(url, client=client)
-            self.assertIn(
-                "api.github.com/repos/tikv/pd/contents/pkg/tso?ref=v8.5.0",
-                raised.exception.hint,
-            )
-            self.assertIn("--repo tikv/pd", raised.exception.hint)
+            self.web.serve(host, lambda: httpx2.Response(500, text="down"))
+        result = self.fails("web", "query")
+        self.assertRegex(result.stderr, r"exa.*parallel.*brave.*tavily")
+
+    def test_fusion_merges_one_page_across_providers_and_ranks_agreement_first(self):
+        def hits(name: str, query: str) -> list[dict[str, Any]]:
+            if name == "exa":
+                return [
+                    hit("https://solo.test", "x", "Only Exa"),
+                    hit(
+                        "https://www.shared.test/doc/?utm_source=a",
+                        "exa text",
+                        "Shared",
+                    ),
+                ]
+            return [hit("https://shared.test/doc", "brave text", "Shared")]
+
+        self.providers(hits)
+        output = self.ok("web", "query", "--backend", "exa,brave").stdout
+        self.assertIn("[web: 2 results via exa, brave]", output)
+        self.assertLess(output.index("Shared [exa, brave]"), output.index("Only Exa"))
+        self.assertIn("exa text", output)
+        self.assertNotIn("brave text", output)
+
+    def test_garbled_text_is_replaced_by_another_providers_copy(self):
+        garbled = SearchResult("T", "https://a.test", "", "�\x01" * 40)
+        clean = SearchResult("T", "https://a.test", "", "clean")
+        (merged,) = fuse([("exa", [garbled]), ("brave", [clean])], 5)
+        self.assertEqual((merged.text, merged.providers), ("clean", ["exa", "brave"]))
+
+    def test_several_queries_alternate_and_keep_their_ids(self):
+        def hits(name: str, query: str) -> list[dict[str, Any]]:
+            shared = [hit("https://shared.test")] if query == "two" else []
+            return [
+                hit(f"https://{query}.test/{n}", title=f"{query}{n}") for n in range(3)
+            ] + shared
+
+        self.providers(hits)
+        output = self.ok(
+            "web", "one", "two", "--backend", "parallel,brave", "-n", "4"
+        ).stdout
+        self.assertEqual(
+            re.findall(r"^\d\. (\w+)", output, re.MULTILINE),
+            ["one0", "two0", "one1", "two1"],
+        )
+        self.assertIn('Queries:\nQ1: "one"\nQ2: "two"', output)
+        self.assertIn("one0 [parallel, brave] [queries: Q1]", output)
+        self.assertEqual(len(self.requests["brave"]), 2)
+
+    def test_shared_results_keep_every_query_id_in_text_file_and_json(self):
+        def hits(name: str, query: str) -> list[dict[str, Any]]:
+            return [
+                hit("https://shared.test", "shared passage " * 100, "Shared"),
+                hit(f"https://{query}.test", title=query),
+            ]
+
+        self.providers(hits)
+        args = ("web", "one", "one", "two", "--backend", "brave", "--max-chars", "500")
+        record = json.loads(self.ok(*args, "--json").stdout)
+        self.assertEqual(record["queries"], ["one", "two"])
+        self.assertEqual(
+            [r["query_ids"] for r in record["results"]], [[1, 2], [1], [2]]
+        )
+        self.assertIn("Shared [queries: Q1, Q2]", Path(record["saved"]).read_text())
+        text = self.ok(*args).stdout
+        self.assertIn("Shared [queries: Q1, Q2]", text)
+        self.assertTrue(self.saved(text).startswith('Queries:\nQ1: "one"\nQ2: "two"'))
+
+    def test_a_query_without_results_is_reported_and_keeps_its_id(self):
+        self.providers(
+            lambda name, query: [] if "one" in query else [hit("https://two.test")]
+        )
+        output = self.ok("web", "one", "two", "--backend", "brave").stdout
+        self.assertIn("[brave (query 1): no results]", output)
+        self.assertIn("[queries: Q2]", output)
 
     def test_result_count_scales_with_the_number_of_queries(self):
-        def respond(service, tool, arguments, fresh, **options):
-            return json.dumps(
-                [hit(f"https://{arguments['queries'][0]}.test/{n}") for n in range(9)]
-            )
-
-        _, call = self.run_web(
-            "a", "b", "c", "d", "e", "--backend", "tavily", respond=respond
+        self.providers(
+            lambda name, query: [hit(f"https://{query}.test/{n}") for n in range(9)]
         )
-        self.assertEqual(call.call_args.args[2]["n"], 15)
+        self.ok("web", "a", "b", "c", "d", "e", "--backend", "tavily")
+        self.assertEqual(self.requests["tavily"][0]["max_results"], 15)
 
-    def test_matches_are_labelled_with_their_governing_heading(self):
-        text = "# Notes\n\n## September 4, 2025\n\nIn-place resize is available.\n\n## October 1, 2025\n\nfiller\n\nResize limits changed."
-        self.assertEqual(
-            out.matching_lines(text, re.compile("(?i)resize"), 0),
-            "§ September 4, 2025 (line 3)\n5: In-place resize is available.\n"
-            "§ October 1, 2025 (line 7)\n...\n11: Resize limits changed.",
+    def test_read_swaps_snippets_for_passages_from_the_saved_page(self):
+        self.providers(
+            lambda name, query: [
+                hit("https://a.test", "snippet"),
+                hit("https://b.test"),
+            ]
         )
-        self.assertEqual(
-            out.matching_lines(text, re.compile("October"), 0), "7: ## October 1, 2025"
+        self.web.serve(
+            "a.test",
+            lambda: httpx2.Response(
+                200, text=PAGE, headers={"Content-Type": "text/markdown"}
+            ),
         )
+        output = self.ok(
+            "web", "trust_env proxy", "--backend", "brave", "--read", "1"
+        ).stdout
+        self.assertIn("[lines 5-5 | Proxies]\nSet trust_env to False", output)
+        self.assertNotIn("snippet", output)
+        folder = re.search(r"pages saved in (\S+)\]", output)
+        page = re.search(r"page saved: (\S+)", output)
+        assert folder
+        assert page
+        self.assertEqual(Path(folder.group(1), page.group(1)).read_text(), PAGE)
+        self.assertNotIn("b.test", self.web.urls("b.test"))
 
-    def test_github_threads_render_state_dates_and_maintainer_comments(self):
-        issue = {
-            "title": "Fix resize race",
-            "number": 136160,
-            "repository_url": "https://api.github.com/repos/kubernetes/kubernetes",
-            "state": "closed",
-            "created_at": "2026-01-02T03:04:05Z",
-            "closed_at": "2026-06-14T00:00:00Z",
-            "user": {"login": "alice"},
-            "author_association": "CONTRIBUTOR",
-            "labels": [{"name": "sig/node"}],
-            "body": "Body text.",
-            "comments": 2,
-            "pull_request": {"merged_at": None},
-        }
-        comments = [
-            {
-                "user": {"login": "bob"},
-                "author_association": "MEMBER",
-                "created_at": "2026-06-14T01:00:00Z",
-                "body": "Closing: superseded.",
-            },
-            {
-                "user": {"login": "carol"},
-                "author_association": "NONE",
-                "created_at": "2026-06-15T01:00:00Z",
-                "body": "ok",
-            },
+    def test_json_reports_fitted_text_and_the_saved_path(self):
+        self.providers(
+            lambda name, query: [
+                hit("https://a.test", "x" * 900),
+                hit("https://b.test"),
+            ]
+        )
+        data = json.loads(
+            self.ok(
+                "web", "q", "--backend", "tavily", "--json", "--max-chars", "400"
+            ).stdout
+        )
+        self.assertEqual(data["providers"], ["tavily"])
+        self.assertEqual(data["results"][0]["chars"], 900)
+        self.assertLess(len(data["results"][0]["text"]), 400)
+        self.assertIn("x" * 900, Path(data["saved"]).read_text())
+
+    def test_provider_answers_are_cached_per_request(self):
+        self.providers(lambda name, query: [hit("https://a.test")])
+        self.ok("web", "q", "--backend", "brave")
+        self.ok("web", "q", "--backend", "brave")
+        self.ok("web", "q", "--backend", "brave", "--fresh")
+        self.assertEqual(len(self.requests["brave"]), 2)
+
+
+class LayoutTests(unittest.TestCase):
+    def results(self, *texts: str) -> list[SearchResult]:
+        return [
+            SearchResult("", f"https://{n}.test", "", text)
+            for n, text in enumerate(texts)
         ]
-        requests = []
 
-        def handler(request):
-            requests.append(request)
-            return httpx2.Response(
-                200, json=comments if request.url.path.endswith("/comments") else issue
-            )
+    def test_tight_preview_keeps_every_result_and_points_into_the_saved_file(self):
+        results = self.results("zero " + "word " * 300, "short", "two " + "word " * 300)
+        layout = layout_results(results, 900, show_providers=False, queries=["q"])
+        self.assertLessEqual(len(layout.compact), 900)
+        for n in range(3):
+            self.assertIn(f"https://{n}.test", layout.compact)
+        self.assertEqual(layout.fitted[1], "short")
+        line = int(re.findall(r"saved line (\d+)", layout.compact)[-1])
+        self.assertTrue(layout.full.splitlines()[line - 2].startswith("two word"))
 
-        client = httpx2.Client(transport=httpx2.MockTransport(handler))
-        with patch.object(github, "github_token", return_value="tok"):
-            page = pages.fetch_page(
-                "https://github.com/kubernetes/kubernetes/pull/136160", client=client
-            )
-        self.assertTrue(
-            page.startswith(
-                "# Fix resize race\n\nPull request #136160 in kubernetes/kubernetes: closed without merging | opened 2026-01-02 by alice | closed 2026-06-14 | labels: sig/node"
-            )
+    def test_query_map_keeps_saved_line_references_exact(self):
+        doc = " ".join(f"word{n}" for n in range(60))
+        results = self.results(doc, doc[::-1])
+        results[1].query_ids = [2]
+        layout = layout_results(
+            results, 300, show_providers=False, queries=["one", "two"]
         )
-        self.assertIn(
-            "## Comments (2 of 2); review comments on the diff are not included", page
+        cited = re.search(r"saved line (\d+)", layout.fitted[1])
+        assert cited
+        line = int(cited.group(1))
+        self.assertEqual(layout.full.splitlines()[line - 1], doc[::-1][: len(doc)])
+
+    def test_a_result_repeating_an_earlier_one_is_collapsed(self):
+        doc = " ".join(f"word{n}" for n in range(60))
+        results = self.results(
+            doc, f"[lines 30-41 | H]\n[a](https://x.test) {doc}", doc[::-1]
         )
-        self.assertIn("### bob (member) on 2026-06-14\n\nClosing: superseded.", page)
-        self.assertIn("### carol on 2026-06-15", page)
-        self.assertEqual({r.url.host for r in requests}, {"api.github.com"})
-        self.assertEqual(requests[0].headers["Authorization"], "Bearer tok")
+        layout = layout_results(results, None, show_providers=False, queries=["q"])
+        self.assertEqual(layout.full.count("word59"), 2)
+        self.assertEqual(layout.fitted[1], "[same text as result 1; saved line 5]")
+        self.assertEqual(layout.full.splitlines()[4], "[lines 30-41 | H]")
 
-    def test_github_token_stays_on_the_api_host_and_rate_limits_are_final(self):
-        with patch.object(github, "github_token", return_value="tok"):
-            self.assertEqual(github.api_headers("https://github.com/o/r"), {})
-            self.assertEqual(github.api_headers("http://api.github.com/x"), {})
-            self.assertEqual(
-                github.api_headers("https://raw.githubusercontent.com/o/r/m/f"), {}
-            )
-            client = httpx2.Client(
-                transport=httpx2.MockTransport(lambda r: httpx2.Response(403))
-            )
-            with self.assertRaises(config.ResearchError) as raised:
-                pages.download(
-                    "https://api.github.com/repos/o/r/git/trees/x", client=client
-                )
-            self.assertTrue(raised.exception.final)
-            self.assertIn("GITHUB_TOKEN", raised.exception.hint)
-            html = "<main><h1>Issue page</h1><p>" + "words " * 100 + "</p></main>"
 
-            def handler(request):
-                if request.url.host == "api.github.com":
-                    return httpx2.Response(403)
-                return httpx2.Response(200, html=html)
-
-            client = httpx2.Client(transport=httpx2.MockTransport(handler))
-            self.assertIn(
-                "Issue page",
-                pages.fetch_page("https://github.com/o/r/issues/5", client=client),
-            )
-
-    def test_thin_exa_extraction_tries_firecrawl_and_keeps_exa_if_that_fails(self):
-        def retrieve(fail):
-            def respond(service, tool, arguments, fresh, **options):
-                if service == "page":
-                    raise config.ResearchError("page has little static content")
-                if service == "exa":
-                    return "shell"
-                if fail:
-                    raise config.ResearchError("Firecrawl: HTTP 402")
-                return "rendered page"
-
-            return respond
-
-        for fail, expected in ((False, "rendered page"), (True, "shell")):
-            output = io.StringIO()
-            with (
-                patch.object(commands, "cached_call", side_effect=retrieve(fail)),
-                patch.object(commands, "api_key", return_value="key"),
-                contextlib.redirect_stdout(output),
-            ):
-                commands.fetch(self.args("fetch", "https://app.test"))
-            self.assertIn(
-                "[Exa returned only 5 chars; trying Firecrawl]", output.getvalue()
-            )
-            self.assertTrue(output.getvalue().rstrip().endswith(expected))
-
-    def test_same_content_from_two_urls_is_saved_to_two_paths(self):
-        first = out.save_text("same", "fetch-https://github.com/o/r/blob/v1/a.rs")
-        second = out.save_text("same", "fetch-https://github.com/o/r/blob/v2/a.rs")
-        self.assertNotEqual(first, second)
+if __name__ == "__main__":
+    unittest.main()
