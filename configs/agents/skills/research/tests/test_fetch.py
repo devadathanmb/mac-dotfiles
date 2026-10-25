@@ -1,599 +1,706 @@
-import contextlib
-import gzip
-import io
-import tempfile
+"""`fetch`: direct reads, site APIs, fallbacks, batches, and selectors."""
+
+import json
 import threading
 import unittest
-import zlib
-from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
-from compression import zstd
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import httpx2
 
-from research_cli import cache, cli, commands, config, firecrawl, mcp, network, pages
+from research_cli import config, transport
+from support import ResearchTestCase, html_page, mcp_text, tool_call
+
+PAGE = """# Guide
+
+Intro paragraph about nothing in particular.
+
+## Install
+
+Run the installer and wait.
+
+```sh
+# not a heading
+make install
+```
+
+## Proxies
+
+Set trust_env to False to ignore proxy variables.
+
+### Details
+
+Unrelated closing words.
+"""
+ARTICLE = "<main><h1>Article</h1><p>" + "Readable content. " * 40 + "</p></main>"
+SHELL = "<html><body><div id='root'></div><script>app()</script></body></html>"
 
 
-class FetchTests(unittest.TestCase):
-    def setUp(self):
-        temp = tempfile.TemporaryDirectory()
-        self.addCleanup(temp.cleanup)
-        transport = patch.object(
-            httpx2.HTTPTransport,
-            "handle_request",
-            side_effect=AssertionError("unit tests must not make live HTTP requests"),
+def markdown(text: str = PAGE) -> httpx2.Response:
+    return httpx2.Response(200, text=text, headers={"Content-Type": "text/markdown"})
+
+
+class DirectFetchTests(ResearchTestCase):
+    def test_markdown_passes_through_from_the_browser_client(self):
+        self.web.serve("docs.test", markdown)
+        result = self.ok("fetch", "https://docs.test/guide")
+        self.assertIn(
+            "URL: https://docs.test/guide [direct HTTP, markdown]", result.stdout
         )
-        transport.start()
-        self.addCleanup(transport.stop)
-        for name in ("CACHE", "OUTPUT"):
-            directory = Path(temp.name) / name.lower()
-            directory.mkdir()
-            patcher = patch.object(config, name, directory)
-            patcher.start()
-            self.addCleanup(patcher.stop)
+        self.assertIn("Set trust_env to False", result.stdout)
+        sent = self.web.sent[0]
+        self.assertEqual(sent.transport, "browser")
+        self.assertTrue(sent.headers["accept"].startswith("text/markdown"))
 
-    def args(self, *tokens):
-        args = cli.build_parser().parse_args(tokens)
-        cli.validate_args(args)
-        return args
-
-    def capture(self, args):
-        output = io.StringIO()
-        with contextlib.redirect_stdout(output):
-            commands.fetch(args)
-        return output.getvalue()
-
-    def test_batch_is_concurrent_bounded_and_uses_one_client(self):
-        args = self.args("fetch", *(f"https://example.com/{i}" for i in range(12)))
-        condition = threading.Condition()
-        gate = threading.Event()
-        started = []
-        clients = []
-        active = peak = 0
-
-        def retrieve(args, url, client):
-            nonlocal active, peak
-            with condition:
-                started.append(url)
-                clients.append(client())
-                active += 1
-                peak = max(peak, active)
-                condition.notify_all()
-            try:
-                if not gate.wait(5):
-                    raise RuntimeError("fetch workers did not overlap")
-                return commands.FetchResult(text=url, source="direct HTTP, markdown")
-            finally:
-                with condition:
-                    active -= 1
-
-        with (
-            patch.object(commands, "fetch_result", side_effect=retrieve),
-            ThreadPoolExecutor(max_workers=1) as driver,
+    def test_html_becomes_main_content_markdown_with_absolute_links(self):
+        html = (
+            "<nav><a href='/nav'>Navigation</a></nav><main><h1>Title</h1><p>"
+            + "Body text. " * 30
+            + "</p><a href='/guide'>guide</a> <a href='#frag'>frag</a> <a href>bare</a>"
+            "<pre><code>print('hi')</code></pre><img src='x.png' alt='pic'></main>"
+            "<footer>Copyright</footer><script>var x=1</script>"
+        )
+        self.web.serve("example.test", lambda: html_page(html, "t"))
+        output = self.ok(
+            "fetch", "https://example.test/docs/", "--max-chars", "0"
+        ).stdout
+        for expected in (
+            "# Title",
+            "(https://example.test/guide)",
+            "(#frag)",
+            "```",
+            "bare",
         ):
-            future = driver.submit(self.capture, args)
-            try:
-                with condition:
-                    self.assertTrue(
-                        condition.wait_for(
-                            lambda: len(started) == config.MAX_FETCH_WORKERS, timeout=5
-                        )
-                    )
-                    self.assertEqual(peak, config.MAX_FETCH_WORKERS)
-            finally:
-                gate.set()
-            output = future.result(timeout=5)
-        self.assertEqual(Counter(started), Counter(args.urls))
-        self.assertEqual(len({id(client) for client in clients}), 1)
-        self.assertTrue(clients[0].is_closed)
-        self.assertEqual(output.count("URL:"), len(args.urls))
+            self.assertIn(expected, output)
+        for noise in ("Navigation", "Copyright", "var x", "x.png"):
+            self.assertNotIn(noise, output)
 
-    def test_pending_submissions_stay_bounded_beyond_the_first_window(self):
-        urls = [f"https://example.com/{i}" for i in range(18)]
-        args = self.args("fetch", *urls[:7], urls[0], *urls[7:], urls[2], urls[2])
-        pending = peak = 0
-        submitted = []
+    def test_page_title_and_date_outside_the_article_lead_the_text(self):
+        html = (
+            "<header><h1>Redpanda 21.10.1</h1><div class=date>2022-04-29</div></header>"
+            "<article><h1>1 Background</h1><p>" + "text " * 80 + "</p></article>"
+        )
+        self.web.serve(
+            "jepsen.test", lambda: html_page(html, "Redpanda 21.10.1 | Jepsen")
+        )
+        output = self.ok("fetch", "https://jepsen.test/a").stdout
+        self.assertIn(
+            "# Redpanda 21.10.1 | Jepsen\n\nPublished: 2022-04-29\n\n# 1 Background",
+            output,
+        )
 
-        class Submitted:
-            def __init__(self, url):
-                self.url = url
+    def test_several_timestamps_are_flagged_as_the_first_of_many(self):
+        post = "<article><time datetime='{}'>Oct</time><p>{}</p></article>"
+        body = "".join(
+            post.format(stamp, "text " * 80)
+            for stamp in ("2026-10-07T05:09:04Z", "2026-10-07T05:09:04Z", "2026-10-01")
+        )
+        self.web.serve("feed.test", lambda: html_page(body, "Results"))
+        self.assertIn(
+            "Published: 2026-10-07T05:09:04Z (first of 2 timestamps on the page)",
+            self.ok("fetch", "https://feed.test").stdout,
+        )
 
-            def result(self):
-                nonlocal pending
-                pending -= 1
-                return commands.FetchResult(
-                    text=self.url, source="direct HTTP, markdown"
+    def test_json_is_pretty_printed_for_line_based_reading(self):
+        self.web.serve("api.test", lambda: httpx2.Response(200, json={"a": {"b": 1}}))
+        self.assertIn(
+            '{\n  "a": {\n    "b": 1\n  }\n}',
+            self.ok("fetch", "https://api.test/x").stdout,
+        )
+
+    def test_redirect_is_announced_and_relative_links_follow_the_destination(self):
+        self.web.serve(
+            "old.test",
+            lambda: httpx2.Response(
+                302, headers={"Location": "https://docs.test/v2/guide/"}
+            ),
+        )
+        links = '<a href="../reference/">API</a> <a href="#section">Section</a></main>'
+        body = ARTICLE.replace("</main>", links)
+        self.web.serve("docs.test", lambda: html_page(body))
+        self.web.serve("www.docs.test", lambda: html_page(body))
+        output = self.ok("fetch", "https://old.test/start", "--max-chars", "0").stdout
+        self.assertIn("[redirected to https://docs.test/v2/guide/;", output)
+        self.assertIn("[API](https://docs.test/v2/reference/)", output)
+        self.assertIn("[Section](#section)", output)
+        self.assertNotIn(
+            "redirected", self.ok("fetch", "https://www.docs.test/v2/guide/").stdout
+        )
+
+    def test_refused_browser_is_retried_with_the_plain_client(self):
+        def picky(request, name):
+            if name == "browser":
+                return httpx2.Response(403, text="denied")
+            return markdown()
+
+        self.web.route("picky.test", picky)
+        output = self.ok("fetch", "https://picky.test").stdout
+        self.assertIn("Set trust_env", output)
+        self.assertEqual(
+            [sent.transport for sent in self.web.sent], ["browser", "plain"]
+        )
+
+
+class FallbackTests(ResearchTestCase):
+    def exa_returns(self, text: str) -> list[dict]:
+        calls: list[dict] = []
+
+        def handler(request, name):
+            tool, arguments = tool_call(request)
+            calls.append({"tool": tool, **arguments})
+            return mcp_text(text)
+
+        self.web.route("mcp.exa.ai", handler)
+        return calls
+
+    def test_unrendered_pages_fall_back_to_exa(self):
+        cases = {
+            "shell": html_page(SHELL),
+            "javascript": html_page(
+                "<main><h1>Wheels</h1><p>"
+                + "intro " * 60
+                + "</p><p>This site requires JavaScript to be enabled.</p></main>"
+            ),
+            "challenge": html_page(
+                "<main><h1>Just a moment...</h1><p>"
+                + "Checking. " * 100
+                + "</p></main>"
+            ),
+            "loading": html_page("A required part of this site couldn’t load. " * 3),
+        }
+        for name, response in cases.items():
+            with self.subTest(name=name):
+                self.web.serve(f"{name}.test", lambda response=response: response)
+                calls = self.exa_returns(PAGE)
+                output = self.ok("fetch", f"https://{name}.test", "--fresh").stdout
+                self.assertIn("falling back to Exa", output)
+                self.assertIn(f"URL: https://{name}.test [Exa]", output)
+                self.assertEqual(calls[-1]["urls"], [f"https://{name}.test"])
+
+    def test_sign_in_redirect_is_not_returned_as_the_page(self):
+        self.web.serve(
+            "app.test",
+            lambda: httpx2.Response(302, headers={"Location": "/login?next=/thread"}),
+        )
+        self.web.serve("app.test/login", lambda: html_page(ARTICLE))
+        self.exa_returns(PAGE)
+        output = self.ok("fetch", "https://app.test/thread").stdout
+        self.assertIn("redirected to a sign-in page", output)
+        self.assertIn("[Exa]", output)
+
+    def test_missing_page_skips_extraction_and_the_batch_continues(self):
+        self.web.serve("gone.test", lambda: httpx2.Response(404))
+        self.web.serve("live.test", markdown)
+        output = self.ok("fetch", "https://gone.test/x", "https://live.test").stdout
+        self.assertIn("[error: HTTP 404 | hint: not served now;", output)
+        self.assertIn("Set trust_env", output)
+        self.assertNotIn("mcp.exa.ai", " ".join(self.web.urls()))
+        result = self.fails("fetch", "https://gone.test/x")
+        self.assertIn("error: no URL could be fetched", result.stderr)
+
+    def test_firecrawl_takes_over_when_exa_fails(self):
+        self.set_key("firecrawl")
+        self.web.serve("blocked.test", lambda: html_page(SHELL))
+        self.web.serve("mcp.exa.ai", lambda: httpx2.Response(400, text="bad request"))
+        self.web.serve(
+            "api.firecrawl.dev",
+            lambda: httpx2.Response(
+                200, json={"success": True, "data": {"markdown": "# Rendered"}}
+            ),
+        )
+        output = self.ok("fetch", "https://blocked.test", "--fresh").stdout
+        self.assertIn("falling back to Firecrawl", output)
+        self.assertIn("URL: https://blocked.test [Firecrawl]", output)
+        firecrawl = next(sent for sent in self.web.sent if "firecrawl" in sent.url)
+        self.assertEqual(firecrawl.json()["maxAge"], 0)
+        self.assertEqual(firecrawl.headers["authorization"], "Bearer test-key")
+
+    def test_thin_exa_text_tries_firecrawl_and_is_kept_if_firecrawl_fails(self):
+        self.set_key("firecrawl")
+        self.web.serve("app.test", lambda: html_page(SHELL))
+        self.exa_returns("shell")
+        for status, expected in ((200, "# Rendered"), (402, "shell")):
+            with self.subTest(status=status):
+                self.web.serve(
+                    "api.firecrawl.dev",
+                    lambda status=status: httpx2.Response(
+                        status,
+                        json={"success": True, "data": {"markdown": "# Rendered"}},
+                    ),
                 )
+                output = self.ok("fetch", "https://app.test", "--fresh").stdout
+                self.assertIn("[Exa returned only 5 chars; trying Firecrawl]", output)
+                self.assertTrue(output.rstrip().endswith(expected))
 
-        class TrackingExecutor:
-            def __init__(self, *, max_workers):
-                pass
+    def test_unconfigured_firecrawl_reports_the_exa_failure(self):
+        self.web.serve("blocked.test", lambda: html_page(SHELL))
+        self.web.serve("mcp.exa.ai", lambda: httpx2.Response(400, text="bad"))
+        output = self.fails("fetch", "https://blocked.test").stdout
+        self.assertIn("[error: web_fetch_exa: HTTP 400 bad", output)
+        self.assertNotIn("firecrawl", " ".join(self.web.urls()))
 
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *args):
-                pass
-
-            def submit(self, function, args, url, client):
-                nonlocal pending, peak
-                submitted.append(url)
-                pending += 1
-                peak = max(peak, pending)
-                return Submitted(url)
-
-        with (
-            patch.object(commands, "ThreadPoolExecutor", TrackingExecutor),
-            httpx2.Client() as client,
-        ):
-            results = list(commands.fetch_results(args, lambda: client))
-        self.assertEqual([url for url, result in results], args.urls)
-        self.assertEqual(submitted, urls)
-        self.assertEqual(peak, config.MAX_FETCH_WORKERS)
-        self.assertEqual(pending, 0)
-
-    def test_out_of_order_completion_does_not_interleave_notices_or_output(self):
-        args = self.args(
-            "fetch", "https://example.com/first", "https://example.com/second"
+    def test_exa_flag_sends_one_deduplicated_batch(self):
+        calls = self.exa_returns(PAGE)
+        self.ok(
+            "fetch", "--exa", "https://one.test", "https://one.test", "https://two.test"
         )
-        second_done = threading.Event()
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0]["urls"], ["https://one.test", "https://two.test"])
 
-        def retrieve(args, url, client):
-            if url.endswith("first"):
-                if not second_done.wait(5):
-                    raise RuntimeError("second fetch did not run concurrently")
-            else:
-                second_done.set()
-            return commands.FetchResult(
-                text=f"body {url}",
-                source="direct HTTP, markdown",
-                notices=[f"notice {url}"],
+    def test_firecrawl_flag_reads_only_through_firecrawl(self):
+        self.set_key("firecrawl")
+        self.web.serve(
+            "api.firecrawl.dev",
+            lambda: httpx2.Response(
+                200,
+                json={
+                    "success": True,
+                    "data": {
+                        "markdown": "guide",
+                        "metadata": {"url": "https://docs.test/home"},
+                    },
+                },
+            ),
+        )
+        output = self.ok("fetch", "--firecrawl", "https://docs.test/aio").stdout
+        self.assertIn("[Firecrawl]", output)
+        self.assertIn("[redirected to https://docs.test/home;", output)
+        self.assertEqual(len(self.web.sent), 1)
+        self.assertNotIn("maxAge", self.web.sent[0].json())
+
+    def test_firecrawl_errors_are_actionable_and_never_echo_the_body(self):
+        self.set_key("firecrawl", "secret-key")
+        for status, hint in (
+            (401, "FIRECRAWL_API_KEY"),
+            (402, "credits"),
+            (500, "another source"),
+        ):
+            with self.subTest(status=status):
+                self.web.serve(
+                    "api.firecrawl.dev",
+                    lambda status=status: httpx2.Response(
+                        status, text="echo secret-key"
+                    ),
+                )
+                output = self.fails(
+                    "fetch", "--firecrawl", "https://a.test", "--fresh"
+                ).stdout
+                self.assertIn(f"Firecrawl: HTTP {status} | hint:", output)
+                self.assertIn(hint, output)
+                self.assertNotIn("secret-key", output)
+
+    def test_firecrawl_rejects_unsuccessful_and_empty_results(self):
+        self.set_key("firecrawl")
+        for body in (
+            [],
+            {"success": False},
+            {"success": True, "data": []},
+            {"success": True, "data": {"markdown": "  "}},
+            {
+                "success": True,
+                "data": {"markdown": "x", "metadata": {"statusCode": 403}},
+            },
+        ):
+            with self.subTest(body=body):
+                self.web.serve(
+                    "api.firecrawl.dev",
+                    lambda body=body: httpx2.Response(200, json=body),
+                )
+                self.fails("fetch", "--firecrawl", "https://a.test", "--fresh")
+        self.assertEqual(list(config.CACHE.iterdir()), [])
+
+    def test_firecrawl_without_a_key_sends_nothing(self):
+        result = self.fails("fetch", "--firecrawl", "https://a.test")
+        self.assertIn("Firecrawl key not configured", result.stdout)
+        self.assertEqual(self.web.sent, [])
+
+    def test_invalid_urls_never_reach_the_network(self):
+        for url in (
+            "file:///etc/passwd",
+            "https://user:secret@example.com",
+            "https://[",
+            "not-a-url",
+        ):
+            for mode in ((), ("--raw",), ("--exa",), ("--firecrawl",)):
+                with self.subTest(url=url, mode=mode):
+                    result = self.fails("fetch", url, *mode)
+                    self.assertNotIn("Exa extraction", result.stdout)
+        self.assertEqual(self.web.sent, [])
+
+
+class SiteApiTests(ResearchTestCase):
+    def test_github_blob_is_read_as_the_raw_file(self):
+        self.web.serve(
+            "raw.githubusercontent.com", lambda: httpx2.Response(200, text="print(1)\n")
+        )
+        output = self.ok("fetch", "https://github.com/o/r/blob/main/src/a.py").stdout
+        self.assertIn("[GitHub raw file]", output)
+        self.assertEqual(
+            self.web.urls(), ["https://raw.githubusercontent.com/o/r/main/src/a.py"]
+        )
+
+    def test_comment_lines_in_source_files_are_not_headings(self):
+        source = "# Copyright\n\nimport os\n\n# helpers\n" + "x = os.sep\n" * 300
+        self.web.serve(
+            "raw.githubusercontent.com", lambda: httpx2.Response(200, text=source)
+        )
+        python = "https://github.com/o/r/blob/main/a.py"
+        output = self.ok("fetch", python, "--match", "os.sep", "--max-chars", "300")
+        self.assertNotIn("§", output.stdout)
+        self.assertNotIn(
+            "Outline", self.ok("fetch", python, "--max-chars", "300").stdout
+        )
+        sections = self.ok("fetch", python, "--section", "helpers").stdout
+        self.assertIn("It has no markdown headings; use --match.", sections)
+        readme = "https://github.com/o/r/blob/main/README.md"
+        matched = self.ok("fetch", readme, "--match", "import", "--context", "0")
+        self.assertIn("§ Copyright (line 1)", matched.stdout)
+        self.assertIn(
+            "[lines 5-", self.ok("fetch", readme, "--section", "helpers").stdout
+        )
+
+    def test_missing_github_path_names_the_directory_listing(self):
+        self.web.serve("raw.githubusercontent.com", lambda: httpx2.Response(404))
+        self.web.serve("github.com", lambda: httpx2.Response(404))
+        for url in (
+            "https://raw.githubusercontent.com/tikv/pd/v8.5.0/pkg/tso/timestamp.go",
+            "https://github.com/tikv/pd/blob/v8.5.0/pkg/tso/timestamp.go",
+        ):
+            with self.subTest(url=url):
+                output = self.fails("fetch", url).stdout
+                self.assertIn(
+                    "api.github.com/repos/tikv/pd/contents/pkg/tso?ref=v8.5.0", output
+                )
+                self.assertIn("--repo tikv/pd", output)
+
+    def test_github_threads_render_state_and_maintainer_comments(self):
+        issue = {
+            "title": "Fix resize race",
+            "number": 7,
+            "repository_url": "https://api.github.com/repos/o/r",
+            "state": "closed",
+            "created_at": "2026-01-02T03:04:05Z",
+            "closed_at": "2026-06-14T00:00:00Z",
+            "user": {"login": "alice"},
+            "author_association": "CONTRIBUTOR",
+            "labels": [{"name": "bug"}],
+            "body": "# Steps\n\nBody text.",
+            "comments": 2,
+            "pull_request": {"merged_at": None},
+        }
+        comments = [
+            {
+                "user": {"login": "bob"},
+                "author_association": "MEMBER",
+                "created_at": "2026-06-14T01:00:00Z",
+                "body": "## Why\nSuperseded.",
+            },
+            {
+                "user": {"login": "carol"},
+                "author_association": "NONE",
+                "created_at": "2026-06-15T01:00:00Z",
+                "body": "ok",
+            },
+        ]
+        self.web.route(
+            "api.github.com",
+            lambda request, name: httpx2.Response(
+                200, json=comments if request.url.path.endswith("/comments") else issue
+            ),
+        )
+        with patch("research_cli.github.github_token", return_value="tok"):
+            output = self.ok(
+                "fetch", "https://github.com/o/r/pull/7", "--max-chars", "0"
+            ).stdout
+        self.assertIn(
+            "Pull request #7 in o/r: closed without merging"
+            " | opened 2026-01-02 by alice | closed 2026-06-14 | labels: bug",
+            output,
+        )
+        self.assertIn(
+            "## Comments (2 of 2); review comments on the diff are not included", output
+        )
+        self.assertIn("### bob (member) on 2026-06-14\n\n##### Why", output)
+        self.assertIn("### Steps", output)  # body headings sit below the title
+        self.assertEqual(
+            {sent.headers["authorization"] for sent in self.web.sent}, {"Bearer tok"}
+        )
+
+    def test_rate_limited_github_api_falls_back_to_the_page(self):
+        self.web.serve("api.github.com", lambda: httpx2.Response(403))
+        self.web.serve("github.com/o/r/issues", lambda: html_page(ARTICLE))
+        output = self.ok("fetch", "https://github.com/o/r/issues/5").stdout
+        self.assertIn(
+            "[GitHub API unavailable: GitHub API: HTTP 403 (rate limit)", output
+        )
+        self.assertIn("Readable content", output)
+
+    def test_direct_github_api_rate_limit_is_final_with_a_token_hint(self):
+        self.web.serve("api.github.com", lambda: httpx2.Response(403))
+        output = self.fails(
+            "fetch", "https://api.github.com/repos/o/r/git/trees/x"
+        ).stdout
+        self.assertIn("GITHUB_TOKEN", output)
+        self.assertNotIn("Exa", output)
+
+    def test_token_is_sent_only_to_the_api_host(self):
+        from research_cli import github
+
+        with patch.object(github, "github_token", return_value="tok"):
+            self.assertEqual(github.api_headers("https://github.com/o/r"), {})
+            self.assertEqual(github.api_headers("http://api.github.com/x"), {})
+            self.assertEqual(
+                github.api_headers("https://api.github.com/x"),
+                {"Authorization": "Bearer tok"},
             )
 
-        with patch.object(commands, "fetch_result", side_effect=retrieve):
-            output = self.capture(args)
-        self.assertEqual(
-            output.splitlines(),
-            [
-                f"notice {args.urls[0]}",
-                f"URL: {args.urls[0]} [direct HTTP, markdown]",
-                f"body {args.urls[0]}",
-                f"notice {args.urls[1]}",
-                f"URL: {args.urls[1]} [direct HTTP, markdown]",
-                f"body {args.urls[1]}",
+    def stack_exchange(
+        self, answers: list[dict], extra: list[dict] | None = None
+    ) -> list[str]:
+        question = {
+            "question_id": 11,
+            "title": "How &amp; why?",
+            "score": 5,
+            "answer_count": 3,
+            "accepted_answer_id": 30,
+            "creation_date": 1_700_000_000,
+            "tags": ["python"],
+            "owner": {"display_name": "Ann"},
+            "body": "<p>Question body</p><h1>Context</h1>",
+        }
+        paths: list[str] = []
+
+        def handler(request, name):
+            paths.append(f"{request.url.path}?{request.url.query.decode()}")
+            path = request.url.path
+            if path.endswith("/answers"):
+                return httpx2.Response(200, json={"items": answers})
+            if path.startswith("/2.3/answers/"):
+                return httpx2.Response(200, json={"items": extra or []})
+            return httpx2.Response(200, json={"items": [question]})
+
+        self.web.route("api.stackexchange.com", handler)
+        return paths
+
+    def answer(
+        self, answer_id: int, score: int, *, body: bool = True, accepted: bool = False
+    ) -> dict:
+        item = {
+            "answer_id": answer_id,
+            "question_id": 11,
+            "score": score,
+            "is_accepted": accepted,
+            "creation_date": 1_700_100_000,
+            "owner": {"display_name": f"user{answer_id}"},
+        }
+        if body:
+            item["body"] = f"<p>Answer {answer_id} text</p><h2>Detail</h2>"
+        return item
+
+    def test_stack_exchange_question_renders_votes_acceptance_and_dates(self):
+        self.stack_exchange([self.answer(20, 9), self.answer(30, 4, accepted=True)])
+        output = self.ok(
+            "fetch",
+            "https://stackoverflow.com/questions/11/how-why",
+            "--max-chars",
+            "0",
+        ).stdout
+        self.assertIn(
+            "URL: https://stackoverflow.com/questions/11/how-why [Stack Exchange API]",
+            output,
+        )
+        self.assertIn("# How & why?", output)
+        self.assertIn(
+            "Question 11 on stackoverflow.com | score 5 | asked 2023-11-14 by Ann",
+            output,
+        )
+        self.assertIn("## Answers (2 of 3, highest score first)", output)
+        self.assertIn(
+            "### Answer 30: score 4, accepted | answered 2023-11-16 by user30", output
+        )
+        self.assertIn("### Context", output)
+        self.assertIn("##### Detail", output)
+        self.assertLess(output.index("Answer 20:"), output.index("Answer 30:"))
+
+    def test_answer_links_mark_the_linked_answer_and_refetch_missing_bodies(self):
+        paths = self.stack_exchange(
+            [self.answer(20, 9, body=False)],
+            extra=[
+                self.answer(20, 9),
+                self.answer(30, 4, accepted=True),
+                self.answer(40, 1),
             ],
         )
-
-    def test_output_failure_closes_client_only_after_inflight_fetch_finishes(self):
-        self.check_failure_cleanup(worker_failure=False)
-
-    def test_worker_failure_closes_client_only_after_inflight_fetch_finishes(self):
-        self.check_failure_cleanup(worker_failure=True)
-
-    def check_failure_cleanup(self, *, worker_failure):
-        args = self.args("fetch", "https://first.test", "https://second.test")
-        second_started = threading.Event()
-        failure_seen = threading.Event()
-        release_second = threading.Event()
-        client = httpx2.Client(
-            transport=httpx2.MockTransport(lambda request: httpx2.Response(200))
+        linked = {"items": [{"answer_id": 40, "question_id": 11}]}
+        self.web.serve(
+            "api.stackexchange.com/2.3/answers/40",
+            lambda: httpx2.Response(200, json=linked),
         )
+        output = self.ok(
+            "fetch", "https://unix.stackexchange.com/a/40", "--max-chars", "0"
+        ).stdout
+        self.assertIn("Answer 20 text", output)
+        self.assertIn("### Answer 40: score 1, the linked answer", output)
+        self.assertTrue(any("answers/20;30;40" in path for path in paths), paths)
+        self.assertTrue(all("site=unix.stackexchange.com" in path for path in paths))
 
-        def retrieve(args, url, get_client):
-            self.assertIs(get_client(), client)
-            if url == "https://second.test":
-                second_started.set()
-                if not release_second.wait(5):
-                    raise RuntimeError("second fetch was not released")
-                self.assertFalse(client.is_closed)
-            elif not second_started.wait(5):
-                raise RuntimeError("second fetch did not start")
-            elif worker_failure:
-                failure_seen.set()
-                raise RuntimeError("worker unavailable")
-            return commands.FetchResult(text="page", source="direct HTTP, markdown")
+    def test_stack_exchange_failure_falls_back_to_the_page(self):
+        self.web.serve(
+            "api.stackexchange.com",
+            lambda: httpx2.Response(400, json={"error_name": "throttle_violation"}),
+        )
+        self.web.serve("serverfault.com", lambda: html_page(ARTICLE))
+        output = self.ok("fetch", "https://serverfault.com/questions/5").stdout
+        self.assertIn("[Stack Exchange API: HTTP 400", output)
+        self.assertIn("Readable content", output)
 
-        def fail_output(*args, **kwargs):
-            failure_seen.set()
-            raise OSError("output unavailable")
+    def test_non_question_stack_exchange_pages_are_read_directly(self):
+        self.web.serve("stackexchange.com", lambda: html_page(ARTICLE))
+        self.web.serve("stackoverflow.com", lambda: html_page(ARTICLE))
+        self.ok(
+            "fetch",
+            "https://stackexchange.com/questions/5",
+            "https://stackoverflow.com/users/1",
+        )
+        self.assertNotIn("api.stackexchange.com", " ".join(self.web.urls()))
 
-        with (
-            patch.object(network, "create_client", return_value=client),
-            patch.object(commands, "fetch_result", side_effect=retrieve),
-            patch.object(commands, "render_response", side_effect=fail_output),
-            ThreadPoolExecutor(max_workers=1) as driver,
-        ):
-            future = driver.submit(self.capture, args)
-            try:
-                self.assertTrue(failure_seen.wait(5))
-                self.assertFalse(future.done())
-                self.assertFalse(client.is_closed)
-            finally:
-                release_second.set()
-            error_type = RuntimeError if worker_failure else OSError
-            with self.assertRaisesRegex(error_type, "unavailable"):
-                future.result(timeout=5)
-        self.assertTrue(client.is_closed)
 
-    def test_duplicate_urls_are_retrieved_once_even_when_fresh(self):
-        args = self.args(
+class BatchTests(ResearchTestCase):
+    def test_batch_runs_concurrently_bounded_and_prints_in_order(self):
+        urls = [f"https://site{n}.test" for n in range(12)]
+        lock = threading.Condition()
+        active = peak = 0
+        release = threading.Event()
+
+        def slow(request, name):
+            nonlocal active, peak
+            with lock:
+                active += 1
+                peak = max(peak, active)
+                lock.notify_all()
+            if not release.wait(5):
+                raise AssertionError("fetches did not overlap")
+            with lock:
+                active -= 1
+            return markdown(f"# Page {request.url.host}\n")
+
+        for url in urls:
+            self.web.route(url.removeprefix("https://"), slow)
+        with lock:
+            pass
+
+        def open_gate():
+            with lock:
+                lock.wait_for(lambda: active == config.MAX_WORKERS, timeout=5)
+            release.set()
+
+        threading.Thread(target=open_gate).start()
+        output = self.ok("fetch", *urls).stdout
+        self.assertEqual(peak, config.MAX_WORKERS)
+        order = [
+            line.split()[1] for line in output.splitlines() if line.startswith("URL:")
+        ]
+        self.assertEqual(order, urls)
+        self.assertEqual(len(self.browsers), 1)
+        self.assertTrue(self.browsers[0].closed)
+
+    def test_duplicates_are_fetched_once_and_printed_each_time(self):
+        self.web.serve("one.test", lambda: markdown("one"))
+        self.web.serve("two.test", lambda: markdown("two"))
+        output = self.ok(
             "fetch",
             "https://one.test",
             "https://two.test",
             "https://one.test",
-            "--raw",
             "--fresh",
-        )
-
-        def retrieve(service, tool, arguments, fresh, *, client):
-            self.assertTrue(fresh)
-            return arguments["url"]
-
-        with patch.object(commands, "cached_call", side_effect=retrieve) as call:
-            output = self.capture(args)
-        self.assertEqual(call.call_count, 2)
+        ).stdout
         self.assertEqual(output.count("URL: https://one.test"), 2)
-        self.assertLess(
-            output.index("URL: https://one.test"), output.index("URL: https://two.test")
+        self.assertEqual(len(self.web.sent), 2)
+
+    def test_failed_duplicates_share_one_attempt(self):
+        self.web.serve("bad.test", lambda: httpx2.Response(404))
+        output = self.fails("fetch", *["https://bad.test"] * 3).stdout
+        self.assertEqual(output.count("[error: HTTP 404"), 3)
+        self.assertEqual(len(self.web.sent), 1)
+
+    def test_cached_batch_opens_no_client(self):
+        self.web.serve("one.test", lambda: markdown("cached one"))
+        first = self.ok("fetch", "https://one.test").stdout
+        with (
+            patch.object(transport, "new_browser_session", side_effect=AssertionError),
+            patch.object(transport, "new_api_client", side_effect=AssertionError),
+        ):
+            self.assertEqual(self.ok("fetch", "https://one.test").stdout, first)
+
+    def test_raw_batch_splits_the_inline_budget_and_saves_exact_bodies(self):
+        self.web.serve("one.test", lambda: httpx2.Response(200, text="a" * 40))
+        self.web.serve("two.test", lambda: httpx2.Response(200, text="b\r\n" * 20))
+        output = self.ok(
+            "fetch",
+            "--raw",
+            "https://one.test",
+            "https://two.test",
+            "--max-chars",
+            "20",
+        ).stdout
+        self.assertIn("\n" + "a" * 10 + "\n", output)
+        self.assertEqual(output.count("preview 10/"), 1)
+        saved = {path.read_bytes() for path in config.OUTPUT.iterdir()}
+        self.assertEqual(saved, {b"a" * 40, b"b\r\n" * 20})
+
+    def test_json_emits_one_record_per_url_including_failures(self):
+        self.web.serve("a.test", markdown)
+        self.web.serve("b.test", lambda: httpx2.Response(404))
+        first, second = map(
+            json.loads,
+            self.ok("fetch", "https://a.test", "https://b.test", "--json").lines,
         )
-
-    def test_exa_batch_deduplicates_urls_in_one_provider_call(self):
-        args = self.args("fetch", "https://one.test", "https://one.test", "--exa")
-        with patch.object(commands, "cached_call", return_value="page") as call:
-            self.capture(args)
-        call.assert_called_once()
-        self.assertEqual(call.call_args.args[2]["urls"], ["https://one.test"])
-
-    def test_invalid_exa_batch_does_not_print_notice_or_call_provider(self):
-        args = self.args("fetch", "https://one.test", "not-a-url", "--exa")
-        output = io.StringIO()
-        with (
-            patch.object(commands, "cached_call") as call,
-            contextlib.redirect_stdout(output),
-            self.assertRaises(config.ResearchError),
-        ):
-            commands.fetch(args)
-        self.assertEqual(output.getvalue(), "")
-        call.assert_not_called()
-
-    def test_cached_batch_does_not_create_an_http_client(self):
-        args = self.args("fetch", "https://one.test", "https://two.test")
-        with patch.dict(cache.DIRECT_FETCHERS, {"page": Mock(return_value="# cached")}):
-            for url in args.urls:
-                cache.cached_call("page", "fetch", {"url": url})
-        with patch.object(
-            network, "create_client", side_effect=AssertionError("unexpected client")
-        ) as create:
-            output = self.capture(args)
-        create.assert_not_called()
-        self.assertEqual(output.count("# cached"), 2)
-
-    def test_all_failures_raise_after_reporting_every_url(self):
-        args = self.args("fetch", "https://one.test", "https://two.test", "--raw")
-        output = io.StringIO()
-        with (
-            patch.object(
-                commands, "cached_call", side_effect=config.ResearchError("failed")
-            ),
-            contextlib.redirect_stdout(output),
-            self.assertRaisesRegex(config.ResearchError, "no URL could be fetched"),
-        ):
-            commands.fetch(args)
-        self.assertEqual(output.getvalue().count("[error: failed"), 2)
-
-    def test_client_creation_failure_is_reported_per_url_without_fallback(self):
-        args = self.args("fetch", "https://one.test", "https://two.test")
-        output = io.StringIO()
-        with (
-            patch.object(httpx2, "Client", side_effect=OSError("no such CA bundle")),
-            contextlib.redirect_stdout(output),
-            self.assertRaisesRegex(config.ResearchError, "no URL could be fetched"),
-        ):
-            commands.fetch(args)
+        self.assertEqual(Path(first["saved"]).read_text(), PAGE)
         self.assertEqual(
-            output.getvalue().count(
-                "[error: cannot create HTTP client: no such CA bundle"
-            ),
-            2,
+            (first["lines"], first["source"]), (20, "direct HTTP, markdown")
         )
-        self.assertNotIn("falling back", output.getvalue())
+        self.assertEqual(second["url"], "https://b.test")
+        self.assertEqual(second["error"], "HTTP 404")
+        self.assertIn("not served now", second["hint"])
 
-    def test_failed_duplicates_share_one_attempt_and_report_each_occurrence(self):
-        for include_success in (False, True):
-            with self.subTest(include_success=include_success):
-                urls = ["https://failed.test"] * 3
-                if include_success:
-                    urls.insert(1, "https://success.test")
-                args = self.args("fetch", *urls, "--raw", "--fresh")
-                output = io.StringIO()
 
-                def retrieve(service, tool, arguments, fresh, **options):
-                    self.assertTrue(fresh)
-                    if arguments["url"] == "https://failed.test":
-                        raise config.ResearchError("failed", "try another source")
-                    return "success"
+class SelectorTests(ResearchTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.web.serve("a.test", markdown)
 
-                with (
-                    patch.object(commands, "cached_call", side_effect=retrieve) as call,
-                    contextlib.redirect_stdout(output),
-                ):
-                    if include_success:
-                        commands.fetch(args)
-                    else:
-                        with self.assertRaisesRegex(
-                            config.ResearchError, "no URL could be fetched"
-                        ):
-                            commands.fetch(args)
-                self.assertEqual(call.call_count, 2 if include_success else 1)
-                self.assertEqual(output.getvalue().count("[error: failed"), 3)
+    def test_query_returns_relevant_passages_with_line_labels(self):
+        output = self.ok(
+            "fetch", "https://a.test", "--query", "ignore proxy variables"
+        ).stdout
+        self.assertIn("[lines 16-16 | Proxies]", output)
+        self.assertIn("| excerpt", output)
 
-    def test_shared_client_propagates_through_each_cache_backend(self):
-        with httpx2.Client() as client:
-            for service in ("raw", "page", "firecrawl", "exa"):
-                with self.subTest(service=service):
-                    if service in cache.DIRECT_FETCHERS:
-                        call = Mock(return_value="page")
-                        with patch.dict(cache.DIRECT_FETCHERS, {service: call}):
-                            self.assertEqual(
-                                cache.cached_call(
-                                    service,
-                                    "fetch",
-                                    {"url": "https://one.test"},
-                                    client=lambda: client,
-                                ),
-                                "page",
-                            )
-                        call.assert_called_once_with("https://one.test", client=client)
-                    elif service == "firecrawl":
-                        with patch.object(
-                            cache, "scrape_page", return_value="page"
-                        ) as call:
-                            cache.cached_call(
-                                service,
-                                "fetch",
-                                {"url": "https://one.test"},
-                                client=lambda: client,
-                            )
-                        call.assert_called_once_with(
-                            "https://one.test", fresh=False, client=client
-                        )
-                    else:
-                        with patch.object(
-                            cache, "request_tool", return_value="page"
-                        ) as call:
-                            cache.cached_call(
-                                service,
-                                "fetch",
-                                {"url": "https://one.test"},
-                                client=lambda: client,
-                            )
-                        call.assert_called_once_with(
-                            service, "fetch", {"url": "https://one.test"}, client=client
-                        )
+    def test_section_returns_whole_sections(self):
+        output = self.ok("fetch", "https://a.test", "--section", "install").stdout
+        self.assertIn("[lines 5-13]", output)
+        self.assertNotIn("trust_env", output)
 
-    def test_compressed_page_and_raw_preserve_text_and_client(self):
-        text = b"  # Doc\r\nFull text\r\n"
-        seen = []
-
-        def handler(request):
-            seen.append(request)
-            compressed = request.headers["Accept-Encoding"] != "identity"
-            headers = {"Content-Type": "text/markdown"}
-            if compressed:
-                headers["Content-Encoding"] = "gzip"
-            return httpx2.Response(
-                200,
-                headers=headers,
-                stream=httpx2.ByteStream(gzip.compress(text) if compressed else text),
-            )
-
-        with httpx2.Client(transport=httpx2.MockTransport(handler)) as client:
-            self.assertEqual(
-                pages.fetch_page("https://one.test", client=client), text.decode()
-            )
-            self.assertEqual(
-                pages.fetch_raw("https://one.test", client=client), text.decode()
-            )
-            self.assertFalse(client.is_closed)
-        for request in seen:
-            encodings = set(request.headers["Accept-Encoding"].split(", "))
-            self.assertTrue({"gzip", "deflate", "zstd"} <= encodings)
-        self.assertEqual(seen[0].extensions["timeout"]["connect"], 5)
-        self.assertEqual(seen[0].extensions["timeout"]["read"], 90)
-
-    def test_size_limit_applies_to_decompressed_page(self):
-        def handler(request):
-            return httpx2.Response(
-                200,
-                headers={"Content-Type": "text/markdown", "Content-Encoding": "gzip"},
-                stream=httpx2.ByteStream(gzip.compress(b"a" * 2048)),
-            )
-
-        with (
-            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
-            patch.object(config, "MAX_RAW_BYTES", 1024),
-            self.assertRaisesRegex(config.ResearchError, "exceeds"),
-        ):
-            pages.fetch_page("https://one.test", client=client)
-
-    def test_compression_formats_preserve_text_and_enforce_decoded_limits(self):
-        text = b"  # Doc\r\n" + b"Content with spacing.  \r\n" * 100
-        for encoding, encode in (
-            ("gzip", gzip.compress),
-            ("deflate", zlib.compress),
-            ("zstd", zstd.compress),
-        ):
-            for fetch in (pages.fetch_page, pages.fetch_raw):
-                with self.subTest(encoding=encoding, fetch=fetch.__name__):
-
-                    def handler(request):
-                        return httpx2.Response(
-                            200,
-                            headers={
-                                "Content-Type": "text/markdown; charset=utf-8",
-                                "Content-Encoding": encoding,
-                            },
-                            stream=httpx2.ByteStream(encode(text)),
-                        )
-
-                    with httpx2.Client(
-                        transport=httpx2.MockTransport(handler)
-                    ) as client:
-                        self.assertEqual(
-                            fetch("https://one.test", client=client), text.decode()
-                        )
-                        with (
-                            patch.object(config, "MAX_RAW_BYTES", 1024),
-                            self.assertRaises(config.ResearchError) as raised,
-                        ):
-                            fetch("https://one.test", client=client)
-                        self.assertTrue(raised.exception.final)
-
-    def test_invalid_compressed_body_is_a_recoverable_fetch_error(self):
-        with httpx2.Client(
-            transport=httpx2.MockTransport(
-                lambda request: httpx2.Response(
-                    200,
-                    headers={"Content-Type": "text/html", "Content-Encoding": "gzip"},
-                    stream=httpx2.ByteStream(b"invalid gzip bytes"),
-                )
-            )
-        ) as client:
-            with self.assertRaises(config.ResearchError) as raised:
-                pages.fetch_page("https://one.test", client=client)
-            self.assertFalse(raised.exception.final)
-
-    def test_backend_timeouts_keep_service_read_budgets(self):
-        for service, read in config.REQUEST_TIMEOUT_SECONDS.items():
-            with self.subTest(service=service):
-                timeout = network.request_timeout(service)
-                self.assertEqual(timeout.connect, 5)
-                self.assertEqual(timeout.read, read)
-
-    def test_mcp_and_firecrawl_use_supplied_client(self):
-        calls = []
-
-        def handler(request):
-            calls.append(request)
-            if request.url.host == "api.firecrawl.dev":
-                return httpx2.Response(
-                    200, json={"success": True, "data": {"markdown": "page"}}
-                )
-            return httpx2.Response(
-                200,
-                json={
-                    "id": 1,
-                    "result": {"content": [{"type": "text", "text": "docs"}]},
-                },
-            )
-
-        with (
-            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
-            patch.object(firecrawl, "api_key", return_value="test-key"),
-        ):
-            self.assertEqual(mcp.request_tool("dw", "tool", {}, client=client), "docs")
-            self.assertEqual(
-                firecrawl.scrape_page("https://one.test", client=client), "page"
-            )
-            self.assertFalse(client.is_closed)
-        self.assertEqual(
-            [request.extensions["timeout"]["read"] for request in calls], [240, 75]
+    def test_lines_print_the_cited_range(self):
+        self.assertIn(
+            "14: ## Proxies\n15: \n16: Set trust_env",
+            self.ok("fetch", "https://a.test", "--lines", "14-16").stdout,
+        )
+        self.assertIn(
+            "No such lines; this response has 20.",
+            self.ok("fetch", "https://a.test", "--lines", "90-95").stdout,
         )
 
-    def test_firecrawl_redirect_is_rejected_even_with_redirecting_shared_client(self):
-        requests = []
+    def test_long_page_preview_leads_with_its_outline(self):
+        self.web.serve("long.test", lambda: markdown(PAGE + "filler line\n" * 200))
+        output = self.ok("fetch", "https://long.test", "--max-chars", "600").stdout
+        self.assertIn("Outline (line: heading)", output)
+        self.assertIn("14: ## Proxies", output)
 
-        def handler(request):
-            requests.append(request)
-            if request.url.host == "api.firecrawl.dev":
-                return httpx2.Response(
-                    302, headers={"Location": "https://other.test/scrape"}
-                )
-            return httpx2.Response(
-                200, json={"success": True, "data": {"markdown": "page"}}
-            )
-
-        with (
-            httpx2.Client(
-                transport=httpx2.MockTransport(handler), follow_redirects=True
-            ) as client,
-            patch.object(firecrawl, "api_key", return_value="test-key"),
-            self.assertRaisesRegex(config.ResearchError, "HTTP 302"),
-        ):
-            firecrawl.scrape_page("https://one.test", client=client)
-        self.assertEqual(len(requests), 1)
-
-    def test_mcp_redirect_does_not_forward_custom_api_keys(self):
-        for service, header in (("exa", "x-api-key"), ("c7", "CONTEXT7_API_KEY")):
-            for target in (
-                "https://other.test/mcp",
-                "http://same.test/mcp",
-                "https://same.test:8443/mcp",
-            ):
-                with self.subTest(service=service, target=target):
-                    requests = []
-
-                    def handler(request, requests=requests, target=target):
-                        requests.append(request)
-                        return httpx2.Response(307, headers={"Location": target})
-
-                    with (
-                        httpx2.Client(
-                            transport=httpx2.MockTransport(handler),
-                            follow_redirects=True,
-                        ) as client,
-                        patch.dict(
-                            config.ENDPOINTS, {service: "https://same.test/mcp"}
-                        ),
-                        patch.object(mcp, "api_key", return_value="test-key"),
-                        self.assertRaisesRegex(
-                            config.ResearchError, "cross-origin redirect refused"
-                        ) as caught,
-                    ):
-                        mcp.request_tool(service, "tool", {}, client=client)
-                    self.assertEqual(len(requests), 1)
-                    self.assertEqual(requests[0].headers[header], "test-key")
-                    self.assertIn("canonical MCP endpoint", caught.exception.hint)
-
-    def test_mcp_same_origin_redirect_keeps_method_body_and_key(self):
-        requests = []
-
-        def handler(request):
-            requests.append(request)
-            if request.url.path == "/mcp":
-                return httpx2.Response(307, headers={"Location": "/canonical"})
-            return httpx2.Response(
-                200,
-                json={
-                    "id": 1,
-                    "result": {"content": [{"type": "text", "text": "docs"}]},
-                },
-            )
-
-        with (
-            httpx2.Client(transport=httpx2.MockTransport(handler)) as client,
-            patch.dict(config.ENDPOINTS, {"exa": "https://same.test/mcp"}),
-            patch.object(mcp, "api_key", return_value="test-key"),
-        ):
-            self.assertEqual(mcp.request_tool("exa", "tool", {}, client=client), "docs")
-            self.assertFalse(client.is_closed)
-        self.assertEqual(len(requests), 2)
-        self.assertEqual([request.method for request in requests], ["POST", "POST"])
-        self.assertEqual(requests[0].content, requests[1].content)
-        self.assertEqual(
-            [request.headers["x-api-key"] for request in requests],
-            ["test-key", "test-key"],
-        )
-
-    def test_html_anchor_without_value_does_not_crash(self):
-        html = (
-            "<html><body><main><a href>anchor</a><p>"
-            + "body " * 50
-            + "</p></main></body></html>"
-        )
-        self.assertIn("anchor", pages.html_to_markdown(html, "https://one.test"))
+    def test_no_match_saves_the_full_response_and_says_so(self):
+        output = self.ok("fetch", "https://a.test", "--match", "absent").stdout
+        self.assertIn("--match: 0 matching lines; full response saved", output)
+        self.assertEqual(self.saved(output), PAGE)
 
 
 if __name__ == "__main__":

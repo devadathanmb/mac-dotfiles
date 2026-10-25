@@ -1,114 +1,111 @@
-"""Direct HTTP page fetching, with HTML converted to compact markdown."""
+"""Reading a URL directly: a site's API when it has a better copy, else the page."""
 
 import json
-import re
-from urllib.parse import urljoin, urlsplit
+from dataclasses import dataclass
+from pathlib import PurePosixPath
+from urllib.parse import urlsplit
 
-import httpx2
-from html_to_markdown import convert
-from selectolax.lexbor import LexborHTMLParser
+from . import github, stackexchange
+from .errors import ResearchError
+from .extract import html_to_markdown, require_public, require_rendered
+from .transport import GONE_STATUSES, Download, Http
 
-from . import config, github
-from .config import ResearchError
-from .dates import iso_timestamp
-from .network import open_client, request_timeout
-
-HTML_MIMES = ("text/html", "application/xhtml+xml")
-TEXT_MIMES = (
-    "application/json",
-    "application/xml",
-    "application/javascript",
-    "application/yaml",
-    "application/x-yaml",
-    "application/toml",
-    "application/octet-stream",
-)
+HTML_MIMES = frozenset({"text/html", "application/xhtml+xml"})
 # Servers that support markdown negotiation (e.g. Cloudflare) return it directly.
 PAGE_ACCEPT = "text/markdown, text/html;q=0.9, text/plain;q=0.8, */*;q=0.5"
-# Below this the page is likely JS-rendered or blocked; callers use scraping fallbacks.
-MIN_PAGE_CHARS = 200
-NOISE = (
-    "script, style, noscript, template, svg, canvas, iframe, form, button, "
-    "img, picture, video, audio, nav, aside, footer, [role=navigation], "
-    "[role=banner], [aria-hidden=true], a.headerlink, a.anchor, a.hash-link"
+DIRECT = "direct HTTP, markdown"
+# Languages where a line starting `# ` is a comment, not a markdown heading.
+HASH_COMMENT_SUFFIXES = frozenset(
+    {
+        ".py",
+        ".pyi",
+        ".sh",
+        ".bash",
+        ".zsh",
+        ".fish",
+        ".rb",
+        ".pl",
+        ".r",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".ini",
+        ".cfg",
+        ".conf",
+        ".tf",
+        ".nix",
+        ".cmake",
+        ".ps1",
+        ".jl",
+        ".ex",
+        ".exs",
+        ".cr",
+        ".nim",
+        ".coffee",
+    }
 )
-# Where pages state their publication date, most reliable first: (selector, attribute).
-DATE_SOURCES = (
-    ('meta[property="article:published_time"]', "content"),
-    ('meta[name="date"]', "content"),
-    ("time[datetime]", "datetime"),
-    (".date, .published, .post-date, .entry-date", None),
+HASH_COMMENT_NAMES = frozenset({"dockerfile", "makefile", "gemfile", "rakefile"})
+GONE_HINT = (
+    "not served now; fix the URL, find it with `web`, "
+    "or try `fetch --exa` for an indexed copy"
 )
-# A short page that asks for JavaScript has not rendered its real content.
-JS_NOTICE = re.compile(r"(?i)(requires?|enable|turn on|without) javascript")
-JS_NOTICE_PAGE_CHARS = 5000
-CHALLENGE_HEADING = re.compile(
-    r"(?i)^#\s+(?:just a moment(?:\.{3}|…)?|"
-    r"attention required!?\s*[|·]\s*cloudflare|client challenge|"
-    r"(?:reddit\s*[-–—]\s*)?prove your humanity)\s*$"
-)
+
+
+@dataclass(frozen=True)
+class Page:
+    text: str
+    source: str  # the API or method that produced `text`
 
 
 def validate_url(url: str) -> None:
     try:
         parts = urlsplit(url)
-        if (
-            parts.scheme not in ("http", "https")
-            or not parts.hostname
-            or parts.username
-            or parts.password
-        ):
-            raise ValueError
-    except ValueError as error:
+        valid = (
+            parts.scheme in ("http", "https")
+            and bool(parts.hostname)
+            and not parts.username
+            and not parts.password
+        )
+    except ValueError:
+        valid = False
+    if not valid:
         raise ResearchError(
             "fetch requires an HTTP(S) URL without credentials", final=True
-        ) from error
+        )
 
 
-def download(
-    url: str,
-    accept: str = "*/*",
-    *,
-    client: httpx2.Client | None = None,
-    final_urls: list[str] | None = None,
-) -> tuple[str, str]:
-    """Return (text, lowercase mime) for an HTTP(S) URL, enforcing size/text limits.
-
-    The URL that answered, after redirects, is appended to `final_urls`.
-    """
+def download(http: Http, url: str, accept: str = "*/*") -> Download:
+    """GET `url`, with errors that say how to find what the URL should have been."""
     validate_url(url)
+    api = urlsplit(url).hostname == github.API_HOST
     try:
-        with open_client(client) as http:
-            return download_response(http, url, accept, final_urls)
-    except httpx2.HTTPStatusError as error:
-        status = error.response.status_code
-        if github.is_api_rate_limit(url, status):
-            # A scraper cannot stand in for an API; its copy would not be the JSON.
+        return http.download(
+            url, accept=accept, headers=github.api_headers(url), impersonate=not api
+        )
+    except ResearchError as error:
+        if github.is_api_rate_limit(url, error.status):
+            raise github.rate_limit_error(error.status) from error
+        if error.status in GONE_STATUSES:
+            hint = github.missing_path_hint(url) or GONE_HINT
             raise ResearchError(
-                f"GitHub API: HTTP {status} (rate limit)",
-                "set $GITHUB_TOKEN or run `gh auth login`, or fetch the "
-                "github.com page instead",
-                final=True,
+                error.message, hint, final=True, status=error.status
             ) from error
-        if status in (404, 410):
+        if error.status is not None and not error.hint:
             raise ResearchError(
-                f"raw fetch: HTTP {status}",
-                github.missing_path_hint(url)
-                or "not served now; fix the URL, find it with `web`, or try "
-                "`fetch --exa` for an indexed copy",
-                final=True,
+                error.message, "check the URL or try fetch --exa", status=error.status
             ) from error
-        raise ResearchError(
-            f"raw fetch: HTTP {status}", "check the URL or try fetch --exa"
-        ) from error
-    except (UnicodeError, LookupError) as error:
-        raise ResearchError(
-            "raw response could not be decoded as text", "use fetch --exa"
-        ) from error
-    except (httpx2.RequestError, httpx2.InvalidURL, OSError, ValueError) as error:
-        raise ResearchError(
-            f"raw fetch: {error}", "check the URL and network, then retry"
-        ) from error
+        raise
+
+
+def fetch_raw(http: Http, url: str) -> str:
+    return download(http, url).text()
+
+
+def has_markdown_headings(url: str) -> bool:
+    """False for source files whose `#` lines are comments, judged by file name."""
+    name = PurePosixPath(urlsplit(url).path).name.lower()
+    suffix = PurePosixPath(name).suffix
+    return suffix not in HASH_COMMENT_SUFFIXES and name not in HASH_COMMENT_NAMES
 
 
 def redirect_notice(requested: str, final: str) -> str:
@@ -123,188 +120,48 @@ def redirect_notice(requested: str, final: str) -> str:
     return f"[redirected to {final}; this may not be the page you asked for]\n\n"
 
 
-def download_response(
-    client: httpx2.Client,
-    url: str,
-    accept: str,
-    final_urls: list[str] | None = None,
-) -> tuple[str, str]:
-    with client.stream(
-        "GET",
-        url,
-        headers={
-            "User-Agent": "research-cli/2.0",
-            "Accept": accept,
-            **github.api_headers(url),
-        },
-        timeout=request_timeout("exa"),
-        follow_redirects=True,
-    ) as response:
-        response.raise_for_status()
-        if final_urls is not None:
-            final_urls.append(str(response.url))
-        mime = (
-            response.headers.get("Content-Type", "text/plain")
-            .split(";", 1)[0]
-            .strip()
-            .lower()
-        )
-        if not (
-            mime.startswith("text/")
-            or mime.endswith(("+json", "+xml"))
-            or mime in TEXT_MIMES
-            or mime in HTML_MIMES
-        ):
-            raise ResearchError(
-                f"raw fetch expected text, got {mime}",
-                "use fetch --exa for page extraction",
-            )
-        body = bytearray()
-        for chunk in response.iter_bytes(chunk_size=64 * 1024):
-            if len(body) + len(chunk) > config.MAX_RAW_BYTES:
-                # An extraction service would only return a broken fragment of it.
-                raise ResearchError(
-                    "response exceeds 10 MiB",
-                    "request a narrower URL: a versioned, filtered, or paginated "
-                    "endpoint, or one file instead of an index",
-                    final=True,
-                )
-            body.extend(chunk)
-        text = body.decode(response.charset_encoding or "utf-8")
-        if "\x00" in text:
-            raise ResearchError(
-                "raw response contains binary data",
-                "use a text source or fetch --exa",
-            )
-        return text, mime
-
-
-def fetch_raw(url: str, *, client: httpx2.Client | None = None) -> str:
-    return download(url, client=client)[0]
-
-
-def page_heading(tree: LexborHTMLParser) -> tuple[str, list[str]]:
-    """(title, publication dates) from the document, which often sit outside <main>.
-
-    Several dates mean a feed or thread that dates every post; the first may not
-    be the page's own.
-    """
-    node = tree.css_first("title")
-    title = " ".join(node.text().split()) if node else ""
-    for selector, attribute in DATE_SOURCES:
-        stamps = [
-            iso_timestamp(node.attrs.get(attribute) if attribute else node.text())
-            for node in tree.css(selector)
-        ]
-        if published := list(dict.fromkeys(filter(None, stamps))):
-            return title, published
-    return title, []
-
-
-def main_content(body, base_url: str) -> str:
-    """Markdown of the page's main region, falling back to wider ones if it is thin."""
-    articles = body.css("article")
-    candidates = [body.css_first("main, [role=main]")]
-    if len(articles) == 1:
-        candidates.append(articles[0])
-    candidates.append(body)
-    result = ""
-    for root in filter(None, candidates):
-        for node in root.css(NOISE):
-            node.decompose()
-        if root is body:  # <header> inside main/article often holds the title
-            for node in root.css("header"):
-                node.decompose()
-        for link in root.css("a[href]"):
-            href = link.attrs["href"]
-            if href is not None and not href.startswith("#"):
-                link.attrs["href"] = urljoin(base_url, href)
-        result = str(convert(root.html or "").content).strip()
-        if len(result) >= MIN_PAGE_CHARS:
-            break
-    return result
-
-
-def html_to_markdown(html: str, base_url: str) -> str:
-    """Convert a page's main content to markdown without nav/scripts/images."""
-    tree = LexborHTMLParser(html)
-    if tree.body is None:
-        return ""
-    # Read before main_content, which strips headers out of the tree.
-    title, published = page_heading(tree)
-    result = main_content(tree.body, base_url)
-    if len(result) < MIN_PAGE_CHARS:
-        return result
-    # Site names follow a separator in <title>; the page's own name comes first.
-    name = re.split(r"\s+[|·–—]\s+", title)[0]
-    lead = [f"# {title}"] if name and name.lower() not in result[:400].lower() else []
-    if published and published[0] not in result[:400]:
-        count = len(published)
-        note = f" (first of {count} timestamps on the page)" if count > 1 else ""
-        lead.append(f"Published: {published[0]}{note}")
-    return "\n\n".join([*lead, result])
-
-
-def require_rendered(markdown: str) -> None:
-    """Raise, so the caller falls back to a scraper, if the page did not render."""
-    first_line = markdown.lstrip().split("\n", 1)[0].strip()
-    if CHALLENGE_HEADING.fullmatch(first_line):
-        raise ResearchError(
-            "page returned a bot challenge", "try a scraping fallback"
-        )
-    if len(markdown) < 1000 and "a required part of this site couldn't load" in (
-        markdown.lower().replace("’", "'")
-    ):
-        raise ResearchError("page returned a loading error", "try a scraping fallback")
-    if len(markdown) < JS_NOTICE_PAGE_CHARS and JS_NOTICE.search(markdown):
-        raise ResearchError(
-            "page says it needs JavaScript", "its content is rendered client-side"
-        )
-    if len(markdown) < MIN_PAGE_CHARS:
-        raise ResearchError(
-            f"page has little static content ({len(markdown)} chars after conversion)",
-            "likely JS-rendered or blocked; use fetch --exa",
-        )
-
-
-def fetch_thread(api: str, client: httpx2.Client | None) -> str:
-    """A GitHub issue or pull request, with its comments, read through the API."""
-    issue = json.loads(download(api, client=client)[0])
-    comments: list[dict] = []
-    for page in range(1, github.COMMENT_PAGES + 1):
-        url = github.comments_api_url(api, page)
-        batch = json.loads(download(url, client=client)[0])
-        comments.extend(batch)
-        if len(batch) < github.COMMENTS_PER_PAGE:
-            break
-    return github.render_thread(issue, comments)
-
-
-def fetch_page(url: str, *, client: httpx2.Client | None = None) -> str:
-    """Fetch a URL; markdown/plain text passes through, HTML is converted."""
+def from_site_api(http: Http, url: str, notices: list[str]) -> Page | None:
+    """The page's source from the site's API, or None to read the page itself."""
     if raw := github.raw_file_url(url):
         try:
-            return download(raw, client=client)[0]
-        except ResearchError:
-            pass  # e.g. a ref containing "/"; the page itself may still work
+            return Page(fetch_raw(http, raw), "GitHub raw file")
+        except ResearchError as error:  # e.g. a ref containing "/"
+            notices.append(f"[raw file unavailable: {error}; reading the page]")
     if api := github.thread_api_url(url):
         try:
-            return fetch_thread(api, client)
-        except (ResearchError, ValueError, KeyError, TypeError, AttributeError):
-            pass  # rate-limited or an unexpected shape; the page still has the text
-    final_urls: list[str] = []
-    text, mime = download(
-        url, PAGE_ACCEPT, client=client, final_urls=final_urls
-    )
-    if mime == "application/json" or mime.endswith("+json"):
+            return Page(github.fetch_thread(http, api), "GitHub API")
+        except ResearchError as error:
+            notices.append(f"[GitHub API unavailable: {error}; reading the page]")
+    try:
+        if (question := stackexchange.fetch_question(http, url)) is not None:
+            return Page(question, "Stack Exchange API")
+    except ResearchError as error:
+        notices.append(f"[{error}; reading the page]")
+    return None
+
+
+def fetch_page(http: Http, url: str, notices: list[str]) -> Page:
+    """The URL as markdown; markdown and plain text pass through, HTML is converted.
+
+    Raises when the page did not render (a bot challenge, a JS shell, a sign-in
+    redirect), so the caller can try an extraction service.
+    """
+    validate_url(url)
+    if (found := from_site_api(http, url, notices)) is not None:
+        return found
+    page = download(http, url, PAGE_ACCEPT)
+    text = page.text()
+    if page.mime == "application/json" or page.mime.endswith("+json"):
         # Minified JSON is one line, which defeats --match and line-based reads.
         try:
-            return json.dumps(json.loads(text), indent=2, ensure_ascii=False)
+            return Page(
+                json.dumps(json.loads(text), indent=2, ensure_ascii=False), DIRECT
+            )
         except ValueError:
-            return text
-    if mime not in HTML_MIMES:
-        return text
-    final_url = final_urls[0] if final_urls else url
-    markdown = html_to_markdown(text, final_url)
+            return Page(text, DIRECT)
+    if page.mime not in HTML_MIMES:
+        return Page(text, DIRECT)
+    require_public(url, page.url)
+    markdown = html_to_markdown(text, page.url)
     require_rendered(markdown)
-    return redirect_notice(url, final_url) + markdown
+    return Page(redirect_notice(url, page.url) + markdown, DIRECT)

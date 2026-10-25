@@ -4,11 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-research-cli"
-version = "0.1.0"
+version = "0.2.0"
 description = "Research docs, web pages, repositories, and public code."
 readme = "README.md"
 requires-python = ">=3.14,<3.15"
 dependencies = [
+    # Page downloads impersonate a browser's TLS and HTTP/2 fingerprint.
+    "curl-cffi>=0.16,<0.17",
+    # API calls verify TLS with the system trust store.
     "httpx2>=2.16,<3",
     "html-to-markdown>=3,<4",
     "selectolax>=0.4,<1",
@@ -17,5 +20,47 @@ dependencies = [
 [project.scripts]
 research = "research_cli.cli:main"
 
+[dependency-groups]
+dev = ["pyright>=1.1.400", "ruff>=0.14"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["scripts/research_cli"]
+
+[tool.ruff]
+src = ["scripts", "tests"]
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "B",    # bugbear
+    "C4",   # comprehensions
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "PIE",
+    "PL",   # pylint
+    "PT",   # pytest style, also flags unittest assert misuse
+    "RET",
+    "RUF",
+    "SIM",
+    "UP",   # pyupgrade
+    "W",
+]
+ignore = [
+    "PLR0911", # several early returns read better than nested branches
+    "PLR0912",
+    "PLR0913", # option-heavy CLI functions take keyword arguments
+    "PLR2004", # thresholds are named where they carry meaning
+    "PT009",   # tests are unittest.TestCase classes
+    "PT027",
+    "RUF001",  # output uses typographic characters deliberately
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLC0415", "PLR0915"]
+
+[tool.pyright]
+include = ["scripts", "tests"]
+extraPaths = ["scripts", "tests"]
+pythonVersion = "3.14"
+typeCheckingMode = "standard"

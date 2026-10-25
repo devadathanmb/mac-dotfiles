@@ -1,9 +1,18 @@
-"""GitHub URL forms: raw files, API authorization, and issue or PR threads."""
+"""GitHub pages read through their source: raw files, and issues or PRs via the API.
 
+A `blob` page is a JS shell around the file, and an issue page hides years,
+collapses long threads, and buries whether a pull request merged.
+"""
+
+import json
 import re
+from typing import Any
 from urllib.parse import urlsplit
 
 from .credentials import github_token
+from .errors import ResearchError
+from .excerpts import demote_headings
+from .transport import Http
 
 API_HOST = "api.github.com"
 # github.com/<owner>/<repo>/blob/<ref>/<path>: the HTML page is a JS shell.
@@ -13,6 +22,7 @@ THREAD = re.compile(r"https?://github\.com/([^/]+/[^/]+)/(?:issues|pull)/(\d+)/?
 COMMENTS_PER_PAGE = 100
 COMMENT_PAGES = 3
 MAINTAINER_ROLES = ("OWNER", "MEMBER", "COLLABORATOR")
+API_ACCEPT = "application/vnd.github+json"
 
 
 def raw_file_url(url: str) -> str | None:
@@ -32,8 +42,19 @@ def api_headers(url: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"} if token else {}
 
 
-def is_api_rate_limit(url: str, status: int) -> bool:
+def is_api_rate_limit(url: str, status: int | None) -> bool:
     return urlsplit(url).hostname == API_HOST and status in (403, 429)
+
+
+def rate_limit_error(status: int | None) -> ResearchError:
+    # A scraper cannot stand in for an API; its copy would not be the JSON.
+    return ResearchError(
+        f"GitHub API: HTTP {status} (rate limit)",
+        "set $GITHUB_TOKEN or run `gh auth login`, "
+        "or fetch the github.com page instead",
+        final=True,
+        status=status,
+    )
 
 
 def missing_path_hint(url: str) -> str:
@@ -62,14 +83,14 @@ def comments_api_url(thread_url: str, page: int) -> str:
     return f"{thread_url}/comments?per_page={COMMENTS_PER_PAGE}&page={page}"
 
 
-def author(item: dict) -> str:
+def author(item: dict[str, Any]) -> str:
     """Login plus the repository role that marks a maintainer's statement."""
     login = (item.get("user") or {}).get("login", "unknown")
     role = item.get("author_association", "")
     return f"{login} ({role.lower()})" if role in MAINTAINER_ROLES else login
 
 
-def thread_state(issue: dict) -> str:
+def thread_state(issue: dict[str, Any]) -> str:
     state = issue.get("state", "")
     pull = issue.get("pull_request")
     if pull and state == "closed":
@@ -80,7 +101,7 @@ def thread_state(issue: dict) -> str:
     return state
 
 
-def render_thread(issue: dict, comments: list[dict]) -> str:
+def render_thread(issue: dict[str, Any], comments: list[dict[str, Any]]) -> str:
     """An issue or pull request as markdown: state, dates, body, and comments.
 
     The HTML page hides the year of dates, collapses long threads, and buries
@@ -103,12 +124,41 @@ def render_thread(issue: dict, comments: list[dict]) -> str:
     parts = [
         f"# {issue.get('title', '')}",
         " | ".join(facts),
-        issue.get("body") or "",
+        demote_headings(issue.get("body") or "", 2),
         heading,
         *(
             f"### {author(comment)} on {comment.get('created_at', '')[:10]}\n\n"
-            + (comment.get("body") or "").strip()
+            + demote_headings((comment.get("body") or "").strip(), 3)
             for comment in comments
         ),
     ]
     return "\n\n".join(part.strip() for part in parts if part.strip())
+
+
+def api_json(http: Http, url: str) -> Any:
+    try:
+        download = http.download(
+            url, accept=API_ACCEPT, headers=api_headers(url), impersonate=False
+        )
+    except ResearchError as error:
+        if is_api_rate_limit(url, error.status):
+            raise rate_limit_error(error.status) from error
+        raise
+    try:
+        return json.loads(download.text())
+    except ValueError as error:
+        raise ResearchError("GitHub API: invalid JSON response") from error
+
+
+def fetch_thread(http: Http, api_url: str) -> str:
+    """An issue or pull request with its comments, read through the API."""
+    issue = api_json(http, api_url)
+    comments: list[dict[str, Any]] = []
+    for page in range(1, COMMENT_PAGES + 1):
+        batch = api_json(http, comments_api_url(api_url, page))
+        if not isinstance(issue, dict) or not isinstance(batch, list):
+            raise ResearchError("GitHub API: unexpected response shape")
+        comments.extend(batch)
+        if len(batch) < COMMENTS_PER_PAGE:
+            break
+    return render_thread(issue, comments)
