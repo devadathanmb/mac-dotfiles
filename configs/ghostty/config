@@ -5,22 +5,22 @@
 font-family = "Maple Mono NF"
 font-style = Medium
 font-size = 16.3
-font-thicken = true
+font-feature = cv01
+font-feature = zero
+font-feature = cv61
 adjust-cell-width = "-8%"
 adjust-cell-height = 18%
 
 # Window
 window-padding-x = 10
-window-padding-y = 2,8
+window-padding-y = 6
+window-padding-balance = true
+window-padding-color = extend
 window-save-state = always
 quit-after-last-window-closed = true
 confirm-close-surface = false
 macos-titlebar-style = transparent
-
-# Rendering / performance
-window-vsync = true
-background-opacity = 1
-background-blur = false
+resize-overlay = never
 
 # Cursor
 cursor-style = bar
@@ -30,10 +30,10 @@ adjust-cursor-thickness = 3
 # Shell
 command = /opt/homebrew/bin/fish --login --interactive
 shell-integration = fish
-shell-integration-features = no-cursor
+shell-integration-features = no-cursor,ssh-terminfo,ssh-env,sudo
 
 # macOS
-macos-option-as-alt = true
+macos-option-as-alt = left
 
 # Clipboard
 clipboard-paste-protection = false
@@ -47,7 +47,7 @@ minimum-contrast = 1.2
 selection-foreground = "#0D1117"
 selection-background = "#A3B0BF"
 
-palette = 0=#000000
+palette = 0=#1C2128
 palette = 8=#6F757D
 
 # Keybinds
@@ -56,6 +56,8 @@ keybind = cmd+h=previous_tab
 keybind = cmd+l=next_tab
 keybind = cmd+shift+h=move_tab:-1
 keybind = cmd+shift+l=move_tab:+1
+
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
 
 keybind = alt+left=unbind
 keybind = alt+right=unbind
@@ -67,3 +69,5 @@ notify-on-command-finish-after = 10s
 
 # QoL
 mouse-hide-while-typing = true
+scrollback-limit = 50000000
+auto-update = download
