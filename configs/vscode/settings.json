@@ -1,13 +1,17 @@
 {
   // Custom UI Style
-  "custom-ui-style.font.sansSerif": "Maple Mono NF Medium",
-  "custom-ui-style.font.monospace": "Maple Mono NF Medium",
+  "custom-ui-style.font.sansSerif": "Maple Mono NF",
+  "custom-ui-style.font.monospace": "Maple Mono NF",
   "custom-ui-style.stylesheet": {
-    "body *:not(.monaco-editor *):not(.monaco-editor), .find-widget .monaco-inputbox .input, .mdc-editor, .mdc-editor *, .composer-code-block-container, .composer-code-block-container *, .composer-message-codeblock, .composer-message-codeblock *, .suggest-input-container *, .simple-code-render *": {
-      "letter-spacing": "-0.40px !important"
+    // Inherit Medium without overriding bold labels, editor weights, or icon faces.
+    "body, .monaco-workbench, input, textarea, select, button": {
+      "font-weight": "500 !important",
+      "font-feature-settings": "'calt', 'cv01', 'zero', 'cv61' !important",
+      "-webkit-font-smoothing": "antialiased"
     },
-    ":is(.interactive-input-editor, .scm-editor-container) :is(.native-edit-context, .view-lines, .view-overlays, .margin-view-overlays, .cursors-layer .cursor, .inline-edits-view-gutter-indicator)": {
-      "letter-spacing": "-0.40px !important"
+    // -8% of Maple's 0.6em advance; scales with each UI element's font size.
+    "body *:not(.monaco-editor *):not(.monaco-editor), .find-widget .monaco-inputbox .input, .mdc-editor, .mdc-editor *, .composer-code-block-container, .composer-code-block-container *, .composer-message-codeblock, .composer-message-codeblock *, .suggest-input-container *, .simple-code-render *": {
+      "letter-spacing": "-0.048em !important"
     }
   },
   "custom-ui-style.webview.enable": true,
@@ -24,8 +28,13 @@
   ],
   "custom-ui-style.webview.sansSerifSelector": [],
   "custom-ui-style.webview.stylesheet": {
+    "html, body, input, textarea, select, button": {
+      "font-weight": "500 !important",
+      "font-feature-settings": "'calt', 'cv01', 'zero', 'cv61' !important",
+      "-webkit-font-smoothing": "antialiased"
+    },
     "html, body, body *": {
-      "letter-spacing": "-0.40px !important"
+      "letter-spacing": "-0.048em !important"
     },
     "input, textarea, [contenteditable='true']": {
       "font-family": "var(--cus-monospace-font) !important"
@@ -38,13 +47,17 @@
   "editor.cursorSmoothCaretAnimation": "off",
   "editor.smoothScrolling": false,
   "editor.stickyScroll.enabled": false,
-  "editor.fontFamily": "Maple Mono",
+  // Match Ghostty's static NF Medium face and its explicitly enabled features.
+  "editor.fontFamily": "'Maple Mono NF', monospace",
   "editor.fontWeight": "500",
-  "editor.fontLigatures": "'cv01', 'zero', 'cv41', 'cv02', 'cv08', 'cv34', 'cv62', 'ss05', 'ss07', 'ss08', 'ss09', 'ss10', 'ss11', 'calt'",
-  "editor.fontVariations": true,
-  "editor.letterSpacing": -0.5,
+  "editor.fontLigatures": "'calt', 'cv01', 'zero', 'cv61'",
+  "editor.fontVariations": false,
+  // At zoomLevel 1 (1.2x): 14px -> 16.8; 0.6em advance * -8% -> -0.672px.
+  "editor.letterSpacing": -0.67,
   "editor.bracketPairColorization.enabled": true,
-  "editor.fontSize": 13.0,
+  "editor.fontSize": 14,
+  // Maple's 1.32em line box * Ghostty's 1.14 cell-height adjustment, rounded.
+  "editor.lineHeight": 21,
   "editor.minimap.enabled": false,
   "editor.quickSuggestionsDelay": 10,
   "editor.scrollbar.horizontal": "hidden",
@@ -104,6 +117,7 @@
   "editor.colorDecorators": true,
   "editor.cursorSurroundingLines": 8,
   // Workbench / UI
+  "workbench.fontAliasing": "antialiased",
   "workbench.reduceMotion": "on",
   "workbench.modernUIFrostedGlass": false,
   "workbench.experimental.modernUIEditorTabStyle": "pill",
@@ -137,7 +151,7 @@
       "modernEditorTab.hoverBackground": "#0d1117",
       "modernEditorTab.inactiveBackground": "#000000",
       "statusBar.foreground": "#E1E4E8",
-      "editorWhitespace.foreground": "#4e4d4d"
+      "editorWhitespace.foreground": "#343333"
     }
   },
   "workbench.editor.showTabs": "multiple",
@@ -275,10 +289,10 @@
   "terminal.integrated.fontFamily": "Maple Mono NF",
   "terminal.integrated.fontLigatures.featureSettings": "\"calt\", \"zero\", \"cv01\", \"cv61\"",
   "terminal.integrated.fontWeight": "500",
-  "terminal.integrated.lineHeight": 1.15,
+  "terminal.integrated.lineHeight": 1.14,
   "terminal.integrated.fontRendering": "grayscale",
-  "terminal.integrated.letterSpacing": -0.2,
-  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.letterSpacing": -0.67,
+  "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontLigatures.enabled": true,
   "terminal.integrated.shellIntegration.enabled": false,
   "terminal.integrated.suggest.enabled": false,
