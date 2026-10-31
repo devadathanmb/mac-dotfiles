@@ -37,6 +37,7 @@ plug "thirteen37/fzf-brew"
 plug ~/.config/zsh/init.zsh
 
 # Initialize Tools
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi
@@ -52,15 +53,5 @@ fi
 
 eval "$(atuin init zsh --disable-up-arrow)"
 
-export PATH="$PATH:$HOME/.spicetify"
-
-# Added by Antigravity
-export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
-
-# pnpm
+# pnpm executables are managed by mise.
 export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
