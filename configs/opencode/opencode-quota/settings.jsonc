@@ -1,0 +1,52 @@
+// OpenCode Quota 6 settings. Unspecified settings follow plugin defaults.
+// https://github.com/slkiser/opencode-quota/blob/v6.0.0/docs/readme/configuration.md
+{
+  "version": 6,
+  "sidebar": {
+    "show": true,
+    "sessionTokens": false
+  },
+  "statusLine": {
+    "show": true,
+    "withSidebar": true,
+    "home": true,
+    "detail": "bar"
+  },
+  "layout": {
+    "bar": "blocks",
+    "barWidth": 10
+  },
+  "toast": {
+    "show": false,
+    "sessionTokens": false
+  },
+  "words": {
+    "percent": "left",
+    "sessionTokens": "current"
+  },
+  "providers": {
+    "off": [
+      "opencode-go",
+      "anthropic",
+      "copilot",
+      "openrouter",
+      "cursor",
+      "alibaba-coding-plan",
+      "alibaba-token-plan",
+      "google-gemini-cli",
+      "google-agy",
+      "zai",
+      "zhipu",
+      "minimax-coding-plan",
+      "minimax-china-coding-plan",
+      "kimi-code-plan-global",
+      "kimi-code-plan-cn",
+      "deepseek",
+      "xai",
+      "xiaomi",
+      "opencode",
+      "ollama-cloud",
+      "custom"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "openai/gpt-6-luna",
+  "model": "openai/gpt-6.1-sol",
   "update": "notify",
   "share": "disabled",
   "disabled_providers": [],
@@ -33,33 +33,6 @@
   //     "disabled": true
   //   }
   // },
-  "mcp": {
-    "servers": {
-      "context7": {
-        "type": "remote",
-        "url": "https://mcp.context7.com/mcp",
-        "disabled": true,
-      },
-      "deepwiki": {
-        "type": "remote",
-        "url": "https://mcp.deepwiki.com/mcp",
-        "disabled": true
-      },
-      "exa": {
-        "type": "remote",
-        "url": "https://mcp.exa.ai/mcp",
-        "disabled": true,
-        "headers": {
-          "x-api-key": "{file:~/.secrets/exa-api-key}"
-        }
-      },
-      "grep_app": {
-        "type": "remote",
-        "url": "https://mcp.grep.app",
-        "disabled": true
-      }
-    }
-  },
   "permissions": [
     {
       "action": "skill",
