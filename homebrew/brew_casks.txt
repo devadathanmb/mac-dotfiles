@@ -1,12 +1,10 @@
 alt-tab
 android-platform-tools
-antigravity
 balenaetcher
 bruno
 calibre
 chatgpt
 claude
-codexbar
 discord
 docker-desktop
 fluidvoice
@@ -22,7 +20,6 @@ iterm2
 localsend
 mitmproxy
 obsidian
-ollama-app
 onlyoffice
 paper
 protonvpn

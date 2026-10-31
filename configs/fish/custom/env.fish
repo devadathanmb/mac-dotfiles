@@ -14,13 +14,8 @@ set -gx PNPM_HOME "$HOME/Library/pnpm"
 fish_add_path --global --path --prepend --move /opt/homebrew/bin
 fish_add_path --global --path --prepend \
     /opt/homebrew/sbin \
-    /opt/homebrew/opt/postgresql@17/bin \
-    $PNPM_HOME \
-    ~/.local/bin \
-    ~/.spicetify \
-    ~/.amp/bin \
-    ~/.antigravity/antigravity/bin \
-    ~/.bun/bin
+    /opt/homebrew/opt/libpq/bin \
+    ~/.local/bin
 fish_add_path --global --path --append \
     ~/go/bin \
     ~/Library/Python/3.9/bin

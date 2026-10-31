@@ -19,6 +19,17 @@ agy = "latest"
 bun = "latest"
 go = "latest"
 node = "26.9.0"
+pnpm = "latest"
+
+# Linters and formatters are managed here rather than through Homebrew.
+# ansible-core does not yet support the global Python 3.15 runtime.
+"pypi:ansible-lint" = { version = "latest", python = "3.14" }
+prettier = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+swiftformat = "latest"
+swiftlint = "latest"
+yamllint = "latest"
 
 # AI coding CLIs. The npm backend installs each package into its own tool
 # directory, so the commands resolve regardless of which Node version a project
