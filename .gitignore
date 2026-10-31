@@ -17,6 +17,9 @@ configs/codex/config.toml
 configs/zoxide/db.zo
 configs/mpv/watch_later/
 
+# Zed's local prompt library database and lock files are application state.
+configs/zed/prompts/
+
 # Private agent skills (local only; name them private-<name>)
 configs/agents/skills/private-*/
 
