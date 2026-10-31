@@ -39,6 +39,7 @@
     ~/.config/opencode/opencode-quota/quota-toast.jsonc: configs/opencode/opencode-quota/quota-toast.jsonc
     ~/.config/opencode/opencode.jsonc: configs/opencode/opencode.jsonc
     ~/.config/opencode/themes/github-dark-default.json: configs/opencode/themes/github-dark-default.json
+    ~/.config/opencode/themes/opencode-black.json: configs/opencode/themes/opencode-black.json
     ~/.config/snapzy/config.toml: configs/snapzy/config.toml
     ~/.codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.claude/:
