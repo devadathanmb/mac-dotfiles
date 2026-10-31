@@ -7,33 +7,37 @@
     {
         "bindings": {
             // Toggle explorer (cursor: ctrl+e → workbench.view.explorer)
-            "ctrl-e": "project_panel::Toggle",
+            "ctrl-e": "project_panel::ToggleFocus",
             // Toggle terminal panel
             "ctrl-/": "terminal_panel::Toggle",
             "ctrl-\\": "terminal_panel::Toggle",
             "ctrl-shift-t": "terminal_panel::Toggle",
+            "alt-j": "terminal_panel::ToggleFocus",
         },
     },
 
     // ─── Project Panel (File Explorer) ───────────────────────────────────────────
     // Vim-style navigation inside the file tree
     {
-        "context": "ProjectPanel",
+        "context": "ProjectPanel && not_editing",
         "bindings": {
             "j": "menu::SelectNext",
             "k": "menu::SelectPrevious",
+            "g g": "menu::SelectFirst",
+            "shift-g": "menu::SelectLast",
             "h": "project_panel::CollapseSelectedEntry",
             "l": "project_panel::Open",
             "enter": "project_panel::OpenPermanent",
             "r": "project_panel::Rename",
             "a": "project_panel::NewFile",
             "shift-a": "project_panel::NewDirectory",
-            "d": "project_panel::Delete",
+            "d": ["project_panel::Trash", { "skip_prompt": false }],
             "x": "project_panel::Cut",
             "y": "project_panel::Copy",
             "p": "project_panel::Paste",
             // Return focus to editor
             "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-x": "workspace::CloseActiveDock",
         },
     },
 
@@ -81,6 +85,7 @@
             // Escape terminal focus back to adjacent editor panes
             "ctrl-h": "workspace::ActivatePaneLeft",
             "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-x": "workspace::CloseActiveDock",
         },
     },
 
@@ -188,9 +193,10 @@
             // ── Search (space s) ─────────────────────────────────────────────────────
             "space s f": "file_finder::Toggle",
             "space s l": "pane::DeploySearch",
-            "space s s": "outline_panel::ToggleFocus",
+            "space s s": "outline::Toggle",
             "space s b": "tab_switcher::OpenInActivePane",
             "space s p": "pane::DeploySearch",
+            "space s shift-l": "project_search::SearchInNew",
 
             // ── Find & Replace (space r) ─────────────────────────────────────────────
             "space r f": "buffer_search::Deploy",
@@ -210,6 +216,9 @@
             "space u j": "workspace::ToggleBottomDock",
             "space u r": "workspace::ToggleRightDock",
             "space u z": "workspace::ToggleCenteredLayout",
+
+            // Same Error Lens toggle chord as VS Code.
+            "space E t": "editor::ToggleInlineDiagnostics",
 
             // ── Window / Splits (space w) ────────────────────────────────────────────
             "space w v": "pane::SplitRight",
@@ -251,6 +260,24 @@
         "bindings": {
             "ctrl-j": "menu::SelectNext",
             "ctrl-k": "menu::SelectPrevious",
+        },
+    },
+
+    // Search-specific bindings must follow Vim pane navigation so they win here.
+    {
+        "context": "ProjectSearchBar && !in_replace > Editor",
+        "bindings": {
+            "ctrl-j": "project_search::ToggleFocus",
+            "enter": "project_search::ToggleFocus",
+        },
+    },
+    {
+        "context": "ProjectSearchView && !ProjectSearchBar",
+        "bindings": {
+            "ctrl-j": "search::SelectNextMatch",
+            "ctrl-k": "search::FocusSearch",
+            "ctrl-n": "search::SelectNextMatch",
+            "ctrl-p": "search::SelectPreviousMatch",
         },
     },
 ]
