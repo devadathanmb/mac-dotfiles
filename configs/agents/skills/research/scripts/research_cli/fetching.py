@@ -75,13 +75,24 @@ def scrape(http: Http, url: str, options: FetchOptions) -> str:
 
 
 def direct(http: Http, url: str, options: FetchOptions, notices: list[str]) -> Page:
-    text = cached(
-        "page",
-        url,
-        lambda: json.dumps(asdict(fetch_page(http, url, notices))),
-        fresh=options.fresh,
-    )
-    return Page(**json.loads(text))
+    """The page, with the notices saying how it was read saved alongside it.
+
+    A cached copy read through a fallback would otherwise look like a clean read.
+    """
+    start = len(notices)
+    computed = False
+
+    def compute() -> str:
+        nonlocal computed
+        computed = True
+        page = fetch_page(http, url, notices)
+        return json.dumps({**asdict(page), "notices": notices[start:]})
+
+    saved = json.loads(cached("page", url, compute, fresh=options.fresh))
+    saved_notices = saved.pop("notices", [])
+    if not computed:
+        notices.extend(saved_notices)
+    return Page(**saved)
 
 
 def read_with_fallbacks(

@@ -3,13 +3,21 @@
 import json
 import threading
 import unittest
+from collections.abc import Sequence
 from pathlib import Path
 from unittest.mock import patch
 
 import httpx2
 
-from research_cli import config, transport
-from support import ResearchTestCase, html_page, mcp_text, tool_call
+from research_cli import config, health, transport
+from support import (
+    ResearchTestCase,
+    html_page,
+    in_turn,
+    mcp_text,
+    stall,
+    tool_call,
+)
 
 PAGE = """# Guide
 
@@ -563,6 +571,135 @@ class SiteApiTests(ResearchTestCase):
             "https://stackoverflow.com/users/1",
         )
         self.assertNotIn("api.stackexchange.com", " ".join(self.web.urls()))
+
+
+SOURCE = "package main\n\nfunc NewExporter() {}\n"
+BLOB = "https://github.com/o/r/blob/v1/main.go"
+RAW = "https://raw.githubusercontent.com/o/r/v1/main.go"
+CONTENTS = "https://api.github.com/repos/o/r/contents/main.go?ref=v1"
+# What converting a blob page leaves: headings and file metadata, no code.
+BLOB_CHROME = (
+    "<main><h1>r/main.go at v1 · o/r</h1><p>"
+    + "Latest commit, history, 109 lines (98 loc), 3.72 KB, Raw. " * 8
+    + "</p></main>"
+)
+
+
+def blob_page(lines: Sequence[str] | None) -> httpx2.Response:
+    data = {
+        "payload": {
+            "codeViewBlobLayoutRoute.StyledBlob": {
+                "rawLines": None if lines is None else list(lines)
+            }
+        }
+    }
+    script = (
+        '<script type="application/json" data-target="react-app.embeddedData">'
+        f"{json.dumps(data)}</script>"
+    )
+    return html_page(BLOB_CHROME + script)
+
+
+class GitHubFileTests(ResearchTestCase):
+    """A file's three hosts: raw content, the contents API, and the blob page."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        patcher = patch.object(config, "CONNECT_TIMEOUTS_SECONDS", (0.01,) * 3)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_stalled_handshake_is_retried_on_a_fresh_connection(self):
+        self.web.route(
+            "raw.githubusercontent.com",
+            in_turn(stall, lambda request, name: httpx2.Response(200, text=SOURCE)),
+        )
+        output = self.ok("fetch", BLOB, "--max-chars", "0").stdout
+        self.assertIn("[GitHub raw file]", output)
+        self.assertIn("func NewExporter", output)
+        self.assertEqual(self.web.urls(), [RAW, RAW])
+
+    def test_stalled_raw_host_falls_back_to_the_contents_api(self):
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve(
+            "api.github.com",
+            lambda: httpx2.Response(
+                200, text=SOURCE, headers={"Content-Type": "application/vnd.github.raw"}
+            ),
+        )
+        output = self.ok("fetch", BLOB, "--max-chars", "0").stdout
+        self.assertIn("[GitHub contents API]", output)
+        self.assertIn("func NewExporter", output)
+        self.assertIn("connection to raw.githubusercontent.com stalled", output)
+        # Two browser attempts, then the plain client, then the API.
+        self.assertEqual(
+            [(sent.url, sent.transport) for sent in self.web.sent],
+            [(RAW, "browser"), (RAW, "browser"), (RAW, "plain"), (CONTENTS, "plain")],
+        )
+        self.assertEqual(
+            self.web.sent[-1].headers["accept"], "application/vnd.github.raw"
+        )
+        self.assertTrue(health.stalled_recently("raw.githubusercontent.com"))
+
+    def test_recently_stalled_raw_host_is_tried_last(self):
+        health.record_stall("raw.githubusercontent.com")
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve("api.github.com", lambda: httpx2.Response(200, text=SOURCE))
+        self.ok("fetch", RAW)
+        self.assertEqual(self.web.urls(), [CONTENTS])
+
+    def test_blob_page_yields_its_embedded_file_when_apis_fail(self):
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve(
+            "api.github.com", lambda: httpx2.Response(403, text="rate limit exceeded")
+        )
+        self.web.serve("github.com", lambda: blob_page(SOURCE.splitlines()))
+        output = self.ok("fetch", BLOB, "--match", "NewExporter").stdout
+        self.assertIn("[GitHub file page]", output)
+        self.assertIn("func NewExporter() {}", output)
+        self.assertNotIn("Latest commit", output)
+        self.assertEqual(self.saved(output), SOURCE)
+
+    def test_blob_page_without_the_file_is_not_returned_as_content(self):
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve("api.github.com", lambda: httpx2.Response(500))
+        self.web.serve("github.com", lambda: html_page(BLOB_CHROME))
+        self.web.serve("mcp.exa.ai", lambda: mcp_text(SOURCE * 40))
+        output = self.ok("fetch", BLOB, "--max-chars", "0").stdout
+        self.assertIn("GitHub file page unavailable: GitHub page did not embed", output)
+        self.assertIn(f"URL: {BLOB} [Exa]", output)
+        self.assertNotIn("Latest commit", output)
+
+    def test_ref_containing_a_slash_is_resolved_by_the_page(self):
+        self.web.serve("raw.githubusercontent.com", lambda: httpx2.Response(404))
+        self.web.serve("github.com", lambda: blob_page(["x = 1"]))
+        url = "https://github.com/o/r/blob/release/1.0/a.py"
+        output = self.ok("fetch", url).stdout
+        self.assertIn("[GitHub file page]", output)
+        # The API splits the ref where raw does, so its 404 is not worth asking for.
+        self.assertEqual(self.web.urls("api.github.com"), [])
+
+    def test_full_ref_names_reach_the_contents_api_intact(self):
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve("api.github.com", lambda: httpx2.Response(200, text=SOURCE))
+        self.ok("fetch", "https://raw.githubusercontent.com/o/r/refs/heads/main/a/b.go")
+        self.assertEqual(
+            self.web.urls("api.github.com"),
+            [
+                "https://api.github.com/repos/o/r/contents/a/b.go?ref=refs%2Fheads%2Fmain"
+            ],
+        )
+
+    def test_cached_fallback_read_keeps_its_notices(self):
+        self.web.route("raw.githubusercontent.com", stall)
+        self.web.serve("api.github.com", lambda: httpx2.Response(200, text=SOURCE))
+        first = self.ok("fetch", BLOB).stdout
+        sent = len(self.web.sent)
+        second = self.ok("fetch", BLOB).stdout
+        self.assertEqual(len(self.web.sent), sent)
+        for output in (first, second):
+            self.assertIn("GitHub raw file unavailable", output)
+            self.assertIn("[GitHub contents API]", output)
 
 
 class BatchTests(ResearchTestCase):

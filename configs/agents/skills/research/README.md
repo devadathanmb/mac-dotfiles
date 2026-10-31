@@ -27,12 +27,12 @@ research --help
 
 ## How pages are fetched
 
-1. **Site APIs** answer URLs they have a better copy of: Stack Exchange questions and answers, GitHub issues, pull requests, and `blob` files.
+1. **Site APIs** answer URLs they have a better copy of: Stack Exchange questions and answers, GitHub issues and pull requests. A GitHub file (a `blob` or `raw.githubusercontent.com` URL) is read from raw content, then the contents API, then the file text the `blob` page embeds; a host whose handshakes stalled in the last 10 minutes is tried last.
 2. **Browser fingerprint:** [curl_cffi](https://curl-cffi.readthedocs.io/) impersonates Chrome's TLS and HTTP/2 handshake, which bot protection checks. It still sends `Accept: text/markdown` first, so sites that serve markdown to agents (Cloudflare docs, GitHub docs) do.
 3. **Plain client:** [HTTPX2](https://pydantic.dev/docs/httpx2/) retries when the browser fingerprint is refused (some sites block it), or when TLS fails: curl_cffi reads `SSL_CERT_FILE`, Python's CA file, or certifi, while HTTPX2 also trusts the macOS keychain, where corporate proxy roots live.
 4. **Exa**, then **Firecrawl** (with a key), when the page is blocked, a bot challenge, a sign-in redirect, or rendered by JavaScript.
 
-A 404 stops the chain. Bodies are capped at 10 MiB after decompression (gzip, deflate, and Zstandard; Brotli too in the browser client). API calls (search providers, MCP servers, GitHub, Stack Exchange) use HTTPX2.
+A connection whose TCP or TLS handshake stalls is retried on a fresh one (3s, 3s, then 6s), since some networks drop a share of handshakes to particular hosts; a slow response is not retried. A 404 stops the chain. Bodies are capped at 10 MiB after decompression (gzip, deflate, and Zstandard; Brotli too in the browser client). API calls (search providers, MCP servers, GitHub, Stack Exchange) use HTTPX2.
 
 ## Layout
 
@@ -48,6 +48,7 @@ A 404 stops the chain. Bodies are capped at 10 MiB after decompression (gzip, de
 | `mcp.py`, `firecrawl.py` | Hosted MCP servers and Firecrawl |
 | `excerpts.py`, `output.py` | Outlines, selectors, previews, and saved files |
 | `cache.py`, `config.py`, `credentials.py` | Cache, limits and timeouts, keys |
+| `health.py` | Hosts whose handshakes stalled recently, shared across commands |
 
 ## Development
 

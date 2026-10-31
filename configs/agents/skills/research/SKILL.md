@@ -1,11 +1,11 @@
 ---
 name: research
-description: Research current library/SDK docs, API examples, errors, changelogs, Stack Overflow answers, GitHub issues and source, OSS internals, public code, and multi-source deep-research questions via Context7, multi-provider web search (Exa, Parallel, Brave, Tavily), DeepWiki, and grep.app. Use when local evidence is insufficient, a quick web lookup doesn't settle it, or version-sensitive facts need verification.
+description: Read public web pages and GitHub files, and research current library/SDK docs, API examples, errors, changelogs, Stack Overflow answers, GitHub issues and source, OSS internals, public code, and multi-source deep-research questions via Context7, multi-provider web search (Exa, Parallel, Brave, Tavily), DeepWiki, and grep.app. Prefer it over curl or wget for reading any public URL. Use when local evidence is insufficient or version-sensitive facts need verification.
 ---
 
 # research
 
-Run `research <command>` in the shell; `<command> --help` lists uncommon options.
+Run `research <command>` in the shell, unpiped (see Reading output); `<command> --help` lists uncommon options.
 
 | Need                                     | Command                                                                |
 | ---------------------------------------- | ---------------------------------------------------------------------- |
@@ -30,18 +30,17 @@ Check local evidence first, then pick one command for the missing fact; these ar
   - `--backend auto` (default) tries Exa → Parallel → Brave → Tavily until one returns results. `--backend all` or a list (`exa,brave`) fuses them and tags each result with its providers; use it when one index may miss (new, obscure, contested topics), as it spends each provider's quota. Brave is a keyword index: best for exact error strings.
   - Filters: `--domain D` / `--exclude D` (repeatable), `--after` / `--before` (YYYY-MM-DD). `[same text as result N]` marks a mirror of an earlier result.
 - `fetch <url>...`: the full page as markdown, not a summary. Pass several URLs in one call (quote URLs containing `?` or `&`); they are fetched concurrently, printed in order, and share the inline limit.
-  - Some URLs are read through the site's API, which is more complete than the page: a Stack Exchange question or answer (top answers by score, the accepted and linked ones marked, with dates), a GitHub issue or PR (state, merged or not, every comment, maintainers marked), a GitHub `blob` (the raw file). JSON APIs are pretty-printed; `llms.txt` and source files pass through.
+  - Some URLs are read through the site's API, which is more complete than the page: a Stack Exchange question or answer (top answers by score, the accepted and linked ones marked, with dates), a GitHub issue or PR (state, merged or not, every comment, maintainers marked), a GitHub `blob` or `raw.githubusercontent.com` URL (the file itself, from whichever GitHub host answers). JSON APIs are pretty-printed; `llms.txt` and source files pass through.
   - Other pages are downloaded with a browser fingerprint, then a plain client, then Exa's index, then Firecrawl (if configured) when blocked or rendered by JavaScript. Reddit refuses every route; rely on search snippets or another source.
   - A 404/410 stops the chain for that URL; don't guess repository paths, follow the hint. Binary files and responses over 10 MiB are rejected.
   - A long page previews as a line-numbered outline. Select instead of reading it whole, one selector per call (reselecting is served from cache):
     - `--section "<heading regex>"`: whole sections (`"install|upgrade"` takes several).
     - `--query "<words>"`: paragraphs sharing the most words with the query. Word overlap, not meaning: use the page's vocabulary, one topic per call. JSON and logs have no paragraphs; use `--match` on a key or message instead.
     - `--lines A-B`: the range an outline or excerpt cites.
-    - `--match "<regex>"` (any command): numbered matching lines with `--context N` around each; `(?i)` ignores case. Keep it narrow; past the preview, the rarest alternative's lines come first.
-    - An empty selection is not evidence of absence; check the outline or the saved file.
+    - `--match "<regex>"`: exact keys, names, or messages (see Reading output).
   - `--exa` / `--firecrawl` force one extractor (Firecrawl spends credits). `--raw` returns the decoded body unconverted, exact to the byte; never use it to read an HTML page.
 - `code` (grep.app): literal text as it appears in source (`useOptimistic(`), not a description; `--regex`, `--case`, `--word`, `--path`, repeatable `--lang`; no `-n`.
-  - Output starts with an `Index` of every hit (repo, path:lines). For "find N examples", one search is enough: pick 2–3 candidates from the Index and read them with `fetch --match`.
+  - Output starts with an `Index` of every hit (repo, path:lines). For "find N examples", one search is enough: pick 2–3 candidates from the Index and read them with `fetch --match`. To show only certain lines of the hits, add `--match`.
   - On "no matches", loosen the snippet or drop a filter; don't probe repositories one by one. After two misses, switch to `examples` or `web`.
 - `examples` (Exa code index): `-n` defaults to 3.
 - `wiki` (DeepWiki): `ask` takes up to 10 comma-separated repos and 10–60 s; run it in the background if your shell can, and keep working meanwhile, without polling or repeating it. It covers only the default branch: for tags, branches, or unreleased work, `fetch` the source. `wiki outline` lists topics; avoid `wiki read` (the whole wiki) unless needed.
@@ -50,9 +49,12 @@ Check local evidence first, then pick one command for the missing fact; these ar
 
 - `URL: <url> [<source>]` heads each page. `GitHub API`, `GitHub raw file`, `Stack Exchange API`, and `direct HTTP` are the source itself; `Exa` and `Firecrawl` are extractions that can drop or garble parts, so verify decisive details elsewhere.
 - Bracketed lines (`[direct fetch failed: …; falling back to Exa]`, `[brave (query 2) failed: …]`) report fallbacks and partial failures. They need no action unless the result is missing.
-- Inline output is capped at 4,000 characters per command. Oversized output and every selector result are saved whole, announced by a `[saved: <path> | …]` line before the preview. `--max-chars N` changes the preview, never the saved text. Don't pipe output through `head`/`tail`.
-- To see more, run `rg -n -m 20 -C 2 '<pattern>' <saved-path>` or Read the cited lines with `offset`/`limit` ≤ 100. Don't `cat` saved files or raise `--max-chars` to reread them.
-- `web --json` prints one object and `fetch --json` one per URL, with `saved` paths and capped `text`; pipe into `jq`.
+- Never pipe `research` into `rg`, `grep`, `head`, or `tail`. A pipe filters only the capped preview, so it drops hits the full response has, can hide the `[saved: …]` line and error hints, and turns "no match" and "filtered away" into the same empty output. Narrow with the tool's own selectors instead.
+- `--match "<regex>"` (every command) prints numbered matching lines of the full response with `--context N` (default 2) around each; `(?i)` ignores case. Keep it narrow; past the preview, the rarest alternative's lines come first. `fetch` adds `--section`, `--query`, and `--lines`. One selector per call.
+- Inline output is capped at 4,000 characters per command. Oversized output and every selector result are saved whole, announced by a `[saved: <path> | …]` line before the preview. `--max-chars N` changes the preview, never the saved text.
+- An empty selection is not evidence of absence; check the outline or the saved file.
+- To see more, rerun with another selector (served from cache), run `rg -n -m 20 -C 2 '<pattern>' <saved-path>`, or Read the cited lines with `offset`/`limit` ≤ 100. Don't `cat` saved files or raise `--max-chars` to reread them.
+- `web --json` prints one object and `fetch --json` one per URL, with `saved` paths and capped `text`; piping these into `jq` is the one allowed pipe.
 - Results are cached (pages and searches 1 hour, code 6 hours, docs and wiki 1 day); `--fresh` bypasses the local cache.
 
 ## Failures
