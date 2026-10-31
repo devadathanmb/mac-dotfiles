@@ -1,13 +1,16 @@
-"""GitHub pages read through their source: raw files, and issues or PRs via the API.
+"""GitHub pages read through their source: files, and issues or PRs via the API.
 
-A `blob` page is a JS shell around the file, and an issue page hides years,
+A `blob` page renders the file with JS, and an issue page hides years,
 collapses long threads, and buries whether a pull request merged.
 """
 
 import json
 import re
+from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
+
+from selectolax.lexbor import LexborHTMLParser
 
 from .credentials import github_token
 from .errors import ResearchError
@@ -15,22 +18,93 @@ from .excerpts import demote_headings
 from .transport import Http
 
 API_HOST = "api.github.com"
-# github.com/<owner>/<repo>/blob/<ref>/<path>: the HTML page is a JS shell.
+RAW_HOST = "raw.githubusercontent.com"
+# github.com/<owner>/<repo>/blob/<ref>/<path>: the page renders the file with JS.
 BLOB = re.compile(r"https?://github\.com/([^/]+/[^/]+)/blob/([^?#]+)")
-RAW = re.compile(r"https://raw\.githubusercontent\.com/([^/]+/[^/]+)/([^/]+)/([^?#]+)")
+# raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>, the ref possibly in refs/.
+RAW_FILE = re.compile(r"https://raw\.githubusercontent\.com/([^/]+/[^/]+)/([^?#]+)")
+# refs/heads/<branch> and refs/tags/<tag> spell a ref in three segments.
+FULL_REF = re.compile(r"refs/(?:heads|tags)/[^/]+")
 THREAD = re.compile(r"https?://github\.com/([^/]+/[^/]+)/(?:issues|pull)/(\d+)/?")
 COMMENTS_PER_PAGE = 100
 COMMENT_PAGES = 3
 MAINTAINER_ROLES = ("OWNER", "MEMBER", "COLLABORATOR")
 API_ACCEPT = "application/vnd.github+json"
+RAW_ACCEPT = "application/vnd.github.raw"
+PAGE_DATA = 'script[type="application/json"][data-target="react-app.embeddedData"]'
 
 
-def raw_file_url(url: str) -> str | None:
-    """The raw-content URL for a `blob` page URL, or None for any other URL."""
-    blob = BLOB.fullmatch(url)
-    if not blob:
+@dataclass(frozen=True)
+class RepoFile:
+    """A file in a repository, which three hosts serve."""
+
+    repo: str  # owner/name
+    location: str  # <ref>/<path>; a ref may itself contain "/"
+
+    @property
+    def raw_url(self) -> str:
+        return f"https://{RAW_HOST}/{self.repo}/{self.location}"
+
+    @property
+    def page_url(self) -> str:
+        return f"https://github.com/{self.repo}/blob/{self.location}"
+
+    def contents_url(self) -> str | None:
+        """The contents API URL, guessing where the ref ends; None without a path.
+
+        A wrong guess (a branch named `release/1.0`) answers 404, as raw does.
+        """
+        full = FULL_REF.match(self.location)
+        ref, _, path = (
+            (full.group(), "/", self.location[full.end() + 1 :])
+            if full
+            else self.location.partition("/")
+        )
+        if not path:
+            return None
+        return (
+            f"https://{API_HOST}/repos/{self.repo}/contents/{path}"
+            f"?ref={quote(ref, safe='')}"
+        )
+
+
+def repo_file(url: str) -> RepoFile | None:
+    """The file a `blob` page or raw-content URL names, or None for other URLs."""
+    match = BLOB.fullmatch(url) or RAW_FILE.fullmatch(url)
+    return RepoFile(match.group(1), match.group(2)) if match else None
+
+
+def find_raw_lines(data: Any) -> list[str] | None:
+    if isinstance(data, dict):
+        if isinstance(lines := data.get("rawLines"), list):
+            return [str(line) for line in lines]
+        children = data.values()
+    elif isinstance(data, list):
+        children = data
+    else:
         return None
-    return f"https://raw.githubusercontent.com/{blob.group(1)}/{blob.group(2)}"
+    for child in children:
+        if (lines := find_raw_lines(child)) is not None:
+            return lines
+    return None
+
+
+def file_from_page(html: str) -> str:
+    """The file's text from a `blob` page, which embeds it as JSON for its script.
+
+    Converting the page instead keeps only its headings and file metadata.
+    """
+    node = LexborHTMLParser(html).css_first(PAGE_DATA)
+    try:
+        lines = find_raw_lines(json.loads(node.text())) if node else None
+    except ValueError:
+        lines = None
+    if lines is None:
+        raise ResearchError(
+            "GitHub page did not embed the file's text",
+            "the file may be binary or too large to display; try fetch --exa",
+        )
+    return "\n".join(lines) + "\n" if lines else ""
 
 
 def api_headers(url: str) -> dict[str, str]:
@@ -59,10 +133,10 @@ def rate_limit_error(status: int | None) -> ResearchError:
 
 def missing_path_hint(url: str) -> str:
     """How to locate a file whose guessed repository path does not exist."""
-    match = RAW.match(raw_file_url(url) or url)
+    match = BLOB.match(url) or RAW_FILE.match(url)
     if not match:
         return ""
-    repo, ref, path = match.groups()
+    repo, (ref, _, path) = match.group(1), match.group(2).partition("/")
     folder = path.rpartition("/")[0]
     return (
         f"no such path at {ref}; list the directory with `fetch "

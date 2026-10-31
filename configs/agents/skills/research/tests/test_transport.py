@@ -3,15 +3,18 @@
 import contextlib
 import gzip
 import socket
+import tempfile
 import threading
+import time
 import unittest
 import zlib
 from collections.abc import Callable
 from compression import zstd
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from unittest.mock import patch
 
-from research_cli import config
+from research_cli import config, health
 from research_cli.errors import ResearchError
 from research_cli.transport import Http
 
@@ -24,7 +27,8 @@ ENCODERS: dict[str, Callable[[bytes], bytes]] = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    """Paths: /<encoding>, /bomb, /pdf, /nul, /redirect, /picky, /blocked, /gone."""
+    """Paths: /<encoding>, /bomb, /pdf, /nul, /redirect, /picky, /blocked, /gone,
+    /slow."""
 
     seen: list[tuple[str, dict[str, str]]]
 
@@ -74,6 +78,10 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(403, b"denied", "text/html")
         elif path == "gone":
             self.reply(404, b"missing", "text/html")
+        elif path == "slow":  # outlasts the client, which hangs up first
+            time.sleep(3)
+            with contextlib.suppress(OSError):
+                self.reply(200, b"late", "text/plain")
         else:
             self.reply(500, b"unknown path", "text/plain")
 
@@ -96,6 +104,11 @@ class TransportTests(unittest.TestCase):
         self.seen.clear()
         self.http = Http()
         self.addCleanup(self.http.close)
+        cache = tempfile.TemporaryDirectory()
+        self.addCleanup(cache.cleanup)
+        patcher = patch.object(config, "CACHE", Path(cache.name))
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def download(self, path: str, *, impersonate: bool = True) -> bytes:
         return self.http.download(self.base + path, impersonate=impersonate).body
@@ -175,12 +188,96 @@ class TransportTests(unittest.TestCase):
                 self.download("/broken-gzip", impersonate=impersonate)
             self.assertFalse(raised.exception.final)
 
+    def test_read_timeout_is_reported_once_not_retried(self):
+        for impersonate in (True, False):
+            with (
+                self.subTest(impersonate=impersonate),
+                # A streamed curl read times out after connect + read seconds,
+                # rounded up, without data.
+                patch.dict(config.TIMEOUT_SECONDS, {"page": 0.5}),
+                patch.object(config, "CONNECT_TIMEOUTS_SECONDS", (0.2, 0.2, 0.4)),
+                self.assertRaises(ResearchError) as raised,
+            ):
+                self.seen.clear()
+                self.download("/slow", impersonate=impersonate)
+            self.assertEqual(raised.exception.message, "no response within 0.5s")
+            self.assertEqual(len(self.seen), 1)
+
     def test_unreachable_host_is_reported_not_raised_as_oserror(self):
         with socket.socket() as probe:
             probe.bind(("127.0.0.1", 0))
             port = probe.getsockname()[1]
         with self.assertRaises(ResearchError):
             self.http.download(f"http://127.0.0.1:{port}/")
+
+
+class SilentTlsServer:
+    """Accepts TCP connections and never answers the TLS handshake.
+
+    Some networks drop handshakes to particular hosts this way: the TCP
+    connect succeeds and the server's reply to the ClientHello never arrives.
+    """
+
+    def __init__(self) -> None:
+        self.listener = socket.create_server(("127.0.0.1", 0))
+        self.url = f"https://127.0.0.1:{self.listener.getsockname()[1]}/file"
+        self.accepted: list[socket.socket] = []
+        threading.Thread(target=self.accept, daemon=True).start()
+
+    def accept(self) -> None:
+        with contextlib.suppress(OSError):
+            while True:
+                self.accepted.append(self.listener.accept()[0])
+
+    def hang_up(self) -> None:
+        for connection in self.accepted:
+            connection.close()
+        self.accepted.clear()
+
+    def close(self) -> None:
+        self.listener.close()
+        self.hang_up()
+
+
+class StallTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.server = SilentTlsServer()
+        self.addCleanup(self.server.close)
+        self.http = Http()
+        self.addCleanup(self.http.close)
+        cache = tempfile.TemporaryDirectory()
+        self.addCleanup(cache.cleanup)
+        for patcher in (
+            patch.object(config, "CACHE", Path(cache.name)),
+            patch.object(config, "CONNECT_TIMEOUTS_SECONDS", (0.2, 0.2, 0.4)),
+        ):
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def test_stalled_handshakes_are_retried_then_reported_as_stalls(self):
+        for impersonate in (True, False):
+            with self.subTest(impersonate=impersonate):
+                self.server.hang_up()
+                started = time.monotonic()
+                with self.assertRaises(ResearchError) as raised:
+                    self.http.download(self.server.url, impersonate=impersonate)
+                self.assertLess(time.monotonic() - started, 3)
+                self.assertEqual(
+                    raised.exception.message,
+                    "connection to 127.0.0.1 stalled: no TCP/TLS handshake "
+                    "in 3 attempts (0.8s)",
+                )
+                self.assertFalse(raised.exception.final)
+                self.assertEqual(len(self.server.accepted), 3)
+        self.assertTrue(health.stalled_recently("127.0.0.1"))
+
+    def test_api_calls_retry_stalled_handshakes(self):
+        with self.assertRaises(ResearchError) as raised:
+            self.http.call_api(
+                "github", "GET", self.server.url, label="GitHub API", hint="retry"
+            )
+        self.assertTrue(raised.exception.message.startswith("GitHub API: connection"))
+        self.assertEqual(len(self.server.accepted), 3)
 
 
 if __name__ == "__main__":

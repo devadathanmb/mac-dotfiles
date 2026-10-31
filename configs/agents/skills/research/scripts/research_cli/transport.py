@@ -5,21 +5,27 @@ downloaded with curl_cffi impersonating Chrome. Some sites block that fingerprin
 instead, and curl_cffi does not read the macOS keychain (where a corporate
 proxy's root certificate lives), so a refused browser download is retried with
 httpx2. API calls use httpx2 directly: an API needs no disguise.
+
+Some networks drop a share of TLS handshakes to particular hosts (by the name a
+client sends, not its fingerprint), so a connection that does not finish its
+handshake is retried on a fresh one before the request is reported as failed.
 """
 
 import threading
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from email.message import Message
+from functools import partial
 from types import TracebackType
 from typing import Any, Protocol, Self, cast
+from urllib.parse import urlsplit
 
 import httpx2
 from curl_cffi import requests as curl_requests
 from curl_cffi.requests import exceptions as curl_errors
 
-from . import config
+from . import config, health
 from .errors import ResearchError
 
 IMPERSONATE = "chrome"
@@ -38,7 +44,14 @@ TEXT_MIMES = frozenset(
         "application/x-yaml",
         "application/toml",
         "application/octet-stream",
+        "application/vnd.github.raw",  # the contents API's raw file media type
     }
+)
+# curl's messages for a timeout before the request was sent.
+CURL_CONNECT_TIMEOUTS = (
+    "Connection timed out",
+    "Resolving timed out",
+    "SSL connection timeout",
 )
 TOO_LARGE_HINT = (
     "request a narrower URL: a versioned, filtered, or paginated endpoint, "
@@ -89,9 +102,46 @@ class Refused(ResearchError):
     """A browser-fingerprint download that a plain client may still complete."""
 
 
-def timeout(service: str) -> httpx2.Timeout:
+class Stalled(Exception):
+    """A connection that did not finish its TCP or TLS handshake in time.
+
+    The request was never sent, so retrying it is safe for any method.
+    """
+
+
+def connect_timeout(attempt: int) -> float:
+    timeouts = config.CONNECT_TIMEOUTS_SECONDS
+    return timeouts[min(attempt, len(timeouts) - 1)]
+
+
+def timeout(service: str, attempt: int = 0) -> httpx2.Timeout:
     return httpx2.Timeout(
-        config.TIMEOUT_SECONDS[service], connect=config.CONNECT_TIMEOUT_SECONDS
+        config.TIMEOUT_SECONDS[service], connect=connect_timeout(attempt)
+    )
+
+
+def host_of(url: str) -> str:
+    try:
+        return urlsplit(url).hostname or url
+    except ValueError:
+        return url
+
+
+def stalled_error(host: str, attempts: int, label: str = "") -> ResearchError:
+    seconds = sum(connect_timeout(attempt) for attempt in range(attempts))
+    prefix = f"{label}: " if label else ""
+    return ResearchError(
+        f"{prefix}connection to {host} stalled: no TCP/TLS handshake "
+        f"in {attempts} attempts ({seconds:g}s)",
+        "the network path to this host is dropping connections; "
+        "read the same content from another host, or use fetch --exa",
+    )
+
+
+def read_timeout_error() -> ResearchError:
+    return ResearchError(
+        f"no response within {config.TIMEOUT_SECONDS['page']:g}s",
+        "the server is slow; try fetch --exa",
     )
 
 
@@ -231,18 +281,22 @@ class Http:
         """GET a text body of at most `MAX_BODY_BYTES`, following redirects.
 
         With `impersonate`, a browser fingerprint is tried first and a plain
-        client second, when the site refuses the browser.
+        client second, when the site refuses the browser. A stalled handshake
+        is retried on a fresh connection, the last time over the plain client.
         """
         request_headers = {"Accept": accept, **(headers or {})}
+        plain = partial(self._download_plain, url, request_headers)
+        attempts = len(config.CONNECT_TIMEOUTS_SECONDS)
         if not impersonate:
-            return self._download_plain(url, request_headers)
+            return retry_stalls(url, [plain] * attempts)
+        browser = partial(self._download_impersonated, url, request_headers)
         try:
-            return self._download_impersonated(url, request_headers)
+            return retry_stalls(url, [browser] * (attempts - 1) + [plain])
         except Refused as error:
             refusal = error
         # Outside the handler, so the plain client's errors do not chain to curl's.
         try:
-            return self._download_plain(url, request_headers)
+            return retry_stalls(url, [plain] * attempts)
         except ResearchError as error:
             if error.message == refusal.message:
                 message = f"{error.message} (browser and plain clients)"
@@ -252,16 +306,15 @@ class Http:
                 message, error.hint, final=error.final, status=error.status
             ) from error
 
-    def _download_impersonated(self, url: str, headers: dict[str, str]) -> Download:
+    def _download_impersonated(
+        self, url: str, headers: dict[str, str], connect: float
+    ) -> Download:
         try:
             with self.browser.stream(
                 "GET",
                 url,
                 headers=headers,
-                timeout=(
-                    config.CONNECT_TIMEOUT_SECONDS,
-                    config.TIMEOUT_SECONDS["page"],
-                ),
+                timeout=(connect, config.TIMEOUT_SECONDS["page"]),
                 allow_redirects=True,
                 max_redirects=MAX_REDIRECTS,
             ) as response:
@@ -276,22 +329,25 @@ class Http:
                 raise Refused(error.message, status=error.status) from error
             raise
         except curl_errors.Timeout as error:
-            raise ResearchError(
-                "timeout", "the server is slow; try fetch --exa"
-            ) from error
+            # curl raises one type for both; only its message says which phase.
+            if any(phase in str(error) for phase in CURL_CONNECT_TIMEOUTS):
+                raise Stalled(curl_message(error)) from error
+            raise read_timeout_error() from error
         except curl_errors.DNSError as error:
             raise ResearchError("cannot resolve host", "check the URL") from error
         except curl_errors.RequestException as error:
             # TLS (an untrusted proxy root) or HTTP/2 protocol errors.
             raise Refused(f"{type(error).__name__}: {curl_message(error)}") from error
 
-    def _download_plain(self, url: str, headers: dict[str, str]) -> Download:
+    def _download_plain(
+        self, url: str, headers: dict[str, str], connect: float
+    ) -> Download:
         try:
             with self.api.stream(
                 "GET",
                 url,
                 headers={"User-Agent": config.USER_AGENT, **headers},
-                timeout=timeout("page"),
+                timeout=httpx2.Timeout(config.TIMEOUT_SECONDS["page"], connect=connect),
                 follow_redirects=True,
             ) as response:
                 return read_body(
@@ -300,10 +356,10 @@ class Http:
                     response.headers.get("Content-Type"),
                     response.iter_bytes(CHUNK_BYTES),
                 )
+        except httpx2.ConnectTimeout as error:
+            raise Stalled(root_message(error)) from error
         except httpx2.TimeoutException as error:
-            raise ResearchError(
-                "timeout", "the server is slow; try fetch --exa"
-            ) from error
+            raise read_timeout_error() from error
         except httpx2.DecodingError as error:
             raise ResearchError(
                 "invalid compressed response", "retry later or use fetch --exa"
@@ -331,14 +387,25 @@ class Http:
         statuses, and `hint` covers the rest.
         """
         status_hints = status_hints or {}
-        try:
-            response = self.api.request(
-                method, url, timeout=timeout(service), follow_redirects=False, **options
-            )
-        except httpx2.TimeoutException as error:
-            raise ResearchError(f"{label}: timeout", hint) from error
-        except (httpx2.HTTPError, httpx2.InvalidURL) as error:
-            raise ResearchError(f"{label}: {root_message(error)}", hint) from error
+        attempts = len(config.CONNECT_TIMEOUTS_SECONDS)
+        for attempt in range(attempts):
+            try:
+                response = self.api.request(
+                    method,
+                    url,
+                    timeout=timeout(service, attempt),
+                    follow_redirects=False,
+                    **options,
+                )
+                break
+            except httpx2.ConnectTimeout:
+                health.record_stall(host_of(url))
+            except httpx2.TimeoutException as error:
+                raise ResearchError(f"{label}: timeout", hint) from error
+            except (httpx2.HTTPError, httpx2.InvalidURL) as error:
+                raise ResearchError(f"{label}: {root_message(error)}", hint) from error
+        else:
+            raise stalled_error(host_of(url), attempts, label)
         if response.is_success:
             return response
         status = response.status_code
@@ -351,6 +418,17 @@ class Http:
             status_hints.get(status, hint),
             status=status,
         )
+
+
+def retry_stalls(url: str, attempts: Sequence[Callable[[float], Download]]) -> Download:
+    """The first attempt that connects; each gets the next connect timeout."""
+    host = host_of(url)
+    for number, attempt in enumerate(attempts):
+        try:
+            return attempt(connect_timeout(number))
+        except Stalled:
+            health.record_stall(host)
+    raise stalled_error(host, len(attempts))
 
 
 def json_body(response: httpx2.Response, label: str) -> Any:

@@ -33,7 +33,10 @@ DEFAULT_MAX_CHARS = 4000
 # Exa's page text is saved, not printed, so the cap only has to fit a long PDF.
 EXA_PAGE_CHARS = 200_000
 
-CONNECT_TIMEOUT_SECONDS = 5.0
+# Per attempt: a handshake the network dropped is retried on a fresh connection.
+CONNECT_TIMEOUTS_SECONDS = (3.0, 3.0, 6.0)
+# How long a host whose handshake stalled is tried after its alternatives.
+STALL_MEMORY_SECONDS = 600
 # Read budget per service; DeepWiki answers questions by running a model.
 TIMEOUT_SECONDS = {
     "deepwiki": 240.0,

@@ -19,6 +19,7 @@ from unittest.mock import patch
 from urllib.parse import urljoin
 
 import httpx2
+from curl_cffi.requests import exceptions as curl_errors
 
 from research_cli import cli, config, credentials, mcp, providers, transport
 
@@ -107,6 +108,25 @@ class FakeBrowserSession:
 
     def close(self) -> None:
         self.closed = True
+
+
+def stall(request: httpx2.Request, transport_name: str) -> httpx2.Response:
+    """A handshake the network dropped, as each client reports it."""
+    if transport_name == "browser":
+        raise curl_errors.Timeout(
+            "Failed to perform, curl: (28) Connection timed out after 3001 milliseconds"
+        )
+    raise httpx2.ConnectTimeout("handshake timed out", request=request)
+
+
+def in_turn(*handlers: Handler) -> Handler:
+    """A handler answering successive requests with each of `handlers`."""
+    remaining = list(handlers)
+
+    def handle(request: httpx2.Request, transport_name: str) -> httpx2.Response:
+        return remaining.pop(0)(request, transport_name)
+
+    return handle
 
 
 def mcp_text(text: str) -> httpx2.Response:

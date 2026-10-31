@@ -9,7 +9,7 @@ import httpx2
 
 from research_cli import cache, cli, config, credentials, mcp
 from research_cli.errors import ResearchError
-from support import ResearchTestCase, mcp_text, tool_call
+from support import ResearchTestCase, in_turn, mcp_text, stall, tool_call
 
 
 def library(index: int = 0, versions: str = "v14.0.0, v15.0.0") -> str:
@@ -328,6 +328,22 @@ class McpTests(ResearchTestCase):
         self.assertIn("ask_wiki_question: timeout", result.stderr)
         self.assertEqual(len(self.web.urls("deepwiki")), 1)
 
+    def test_stalled_handshakes_are_retried_without_waiting(self):
+        self.web.route(
+            "mcp.grep.app",
+            in_turn(stall, stall, lambda request, name: mcp_text("answer")),
+        )
+        with patch.object(mcp, "sleep") as sleep:
+            self.ok("code", "x")
+        sleep.assert_not_called()
+        self.assertEqual(len(self.web.sent), 3)
+        self.web.route("mcp.deepwiki.com", stall)
+        result = self.fails("wiki", "ask", "o/r", "q")
+        self.assertIn(
+            "ask_wiki_question: connection to mcp.deepwiki.com stalled", result.stderr
+        )
+        self.assertEqual(len(self.web.urls("deepwiki")), 3)
+
     def test_unkeyed_rate_limit_suggests_a_key(self):
         self.web.serve("mcp.exa.ai", lambda: httpx2.Response(429, text="limited"))
         result = self.fails("examples", "q")
@@ -344,7 +360,7 @@ class McpTests(ResearchTestCase):
 
         with patch.object(self.web, "handle", side_effect=spy):
             self.ok("wiki", "outline", "o/r")
-        self.assertEqual((seen[0]["connect"], seen[0]["read"]), (5, 240))
+        self.assertEqual((seen[0]["connect"], seen[0]["read"]), (3, 240))
 
 
 class CacheAndCredentialTests(ResearchTestCase):

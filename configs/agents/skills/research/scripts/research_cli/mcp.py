@@ -7,10 +7,17 @@ from typing import Any
 
 import httpx2
 
-from . import config
+from . import config, health
 from .credentials import KEYS, api_key
 from .errors import ResearchError
-from .transport import Http, response_detail, root_message, timeout
+from .transport import (
+    Http,
+    host_of,
+    response_detail,
+    root_message,
+    stalled_error,
+    timeout,
+)
 
 
 @dataclass(frozen=True)
@@ -150,10 +157,18 @@ def call_tool(http: Http, service: str, tool: str, arguments: dict[str, Any]) ->
                 SERVERS[service].url,
                 json=payload,
                 headers=headers,
-                timeout=timeout(service),
+                timeout=timeout(service, attempt),
                 follow_redirects=False,
             )
             response = follow_same_origin(http.api, response, tool)
+        except httpx2.ConnectTimeout as error:
+            # The request was never sent; a fresh connection often gets through.
+            health.record_stall(host_of(SERVERS[service].url))
+            if not final_attempt:
+                continue
+            raise stalled_error(
+                host_of(SERVERS[service].url), ATTEMPTS, tool
+            ) from error
         except httpx2.TimeoutException as error:
             # The service may still be working; asking again doubles the wait.
             raise ResearchError(

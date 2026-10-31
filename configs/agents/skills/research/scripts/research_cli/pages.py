@@ -1,11 +1,12 @@
 """Reading a URL directly: a site's API when it has a better copy, else the page."""
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 from urllib.parse import urlsplit
 
-from . import github, stackexchange
+from . import github, health, stackexchange
 from .errors import ResearchError
 from .extract import html_to_markdown, require_public, require_rendered
 from .transport import GONE_STATUSES, Download, Http
@@ -120,13 +121,63 @@ def redirect_notice(requested: str, final: str) -> str:
     return f"[redirected to {final}; this may not be the page you asked for]\n\n"
 
 
+def from_repo_file(http: Http, file: github.RepoFile, notices: list[str]) -> Page:
+    """A GitHub file's text from the first of its hosts that serves it.
+
+    Raw content is cheapest, but some networks stall its handshakes, so the
+    contents API and the `blob` page (on hosts that stay reachable) stand in; a
+    host that stalled recently goes last. Only the page resolves a ref that
+    contains "/", so a 404 from the others skips straight to it.
+    """
+    page_route = "GitHub file page"
+    routes: list[tuple[str, Callable[[], str]]] = [
+        ("GitHub raw file", lambda: fetch_raw(http, file.raw_url))
+    ]
+    if contents := file.contents_url():
+        routes.append(
+            (
+                "GitHub contents API",
+                lambda: download(http, contents, github.RAW_ACCEPT).text(),
+            )
+        )
+    routes.append(
+        (page_route, lambda: github.file_from_page(fetch_html(http, file.page_url)))
+    )
+    if health.stalled_recently(github.RAW_HOST):
+        routes.append(routes.pop(0))
+    gone = False
+    failure: ResearchError | None = None
+    for name, read in routes:
+        if gone and name != page_route:
+            continue
+        try:
+            return Page(read(), name)
+        except ResearchError as error:
+            if error.final and name == page_route:
+                raise
+            gone = gone or error.status in GONE_STATUSES
+            failure = error
+            notices.append(f"[{name} unavailable: {error}]")
+    assert failure is not None
+    raise ResearchError(
+        f"no GitHub host served the file; last: {failure.message}",
+        failure.hint or "try fetch --exa",
+        final=failure.final,
+        status=failure.status,
+    )
+
+
+def fetch_html(http: Http, url: str) -> str:
+    page = download(http, url, "text/html")
+    if page.mime not in HTML_MIMES:
+        raise ResearchError(f"expected an HTML page, got {page.mime}")
+    return page.text()
+
+
 def from_site_api(http: Http, url: str, notices: list[str]) -> Page | None:
     """The page's source from the site's API, or None to read the page itself."""
-    if raw := github.raw_file_url(url):
-        try:
-            return Page(fetch_raw(http, raw), "GitHub raw file")
-        except ResearchError as error:  # e.g. a ref containing "/"
-            notices.append(f"[raw file unavailable: {error}; reading the page]")
+    if (file := github.repo_file(url)) is not None:
+        return from_repo_file(http, file, notices)
     if api := github.thread_api_url(url):
         try:
             return Page(github.fetch_thread(http, api), "GitHub API")
