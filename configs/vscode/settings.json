@@ -47,7 +47,7 @@
   "editor.cursorSmoothCaretAnimation": "off",
   "editor.smoothScrolling": false,
   "editor.stickyScroll.enabled": false,
-  // Match Ghostty's static NF Medium face and its explicitly enabled features.
+  // Medium here renders as thin as Ghostty's Regular face; keep its explicit features.
   "editor.fontFamily": "'Maple Mono NF', monospace",
   "editor.fontWeight": "500",
   "editor.fontLigatures": "'calt', 'cv01', 'zero', 'cv61'",

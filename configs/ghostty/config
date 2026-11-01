@@ -3,17 +3,17 @@
 
 # Font
 font-family = "Maple Mono NF"
-font-style = Medium
+font-style = Regular
 font-size = 16.8
 font-thicken = false
 font-feature = cv01
 font-feature = zero
 font-feature = cv61
-adjust-cell-width = "-8%"
+adjust-cell-width = "-3.5%"
 adjust-cell-height = 14%
 
 # Window
-window-padding-x = 10
+window-padding-x = 20
 window-padding-y = 6
 window-padding-balance = true
 window-padding-color = extend
@@ -42,6 +42,7 @@ clipboard-paste-protection = false
 # Readability
 theme = GitHub Dark High Contrast
 background = "#000000"
+foreground = "#D6DBE0"
 minimum-contrast = 1.2
 
 # Make selection visible but subtle
