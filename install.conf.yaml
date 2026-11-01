@@ -68,16 +68,6 @@
     ~/repos/notes/.obsidian/plugins/document-comments/data.json: configs/obsidian/plugins/document-comments/data.json
 
     # Pi Coding Agent
-    ~/.pi/agent/settings.json: configs/pi/settings.json
-    ~/.pi/agent/keybindings.json: configs/pi/keybindings.json
-    ~/.pi/agent/APPEND_SYSTEM.md: configs/pi/APPEND_SYSTEM.md
-    ~/.pi/web-search.json: configs/pi/web-search.json
-    ~/.pi/agent/extensions: configs/pi/extensions
-    ~/.pi/agent/themes: configs/pi/themes
-    ~/.pi/agent/npm/package.json: configs/pi/npm/package.json
-    ~/.pi/agent/npm/package-lock.json: configs/pi/npm/package-lock.json
-    ~/.pi/agent/damage-control.yaml: configs/pi/damage-control.yaml
-    ~/.pi/agent/damage-control-rules.yaml: configs/pi/damage-control-rules.yaml
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
     # Agent skills: single source of truth for all coding agents

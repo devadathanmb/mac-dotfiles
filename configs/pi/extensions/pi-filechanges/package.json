@@ -1,7 +1,0 @@
-{
-  "name": "pi-filechanges-local",
-  "type": "module",
-  "dependencies": {
-    "diff": "^5.2.0"
-  }
-}
