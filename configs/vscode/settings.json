@@ -9,9 +9,9 @@
       "font-feature-settings": "'calt', 'cv01', 'zero', 'cv61' !important",
       "-webkit-font-smoothing": "antialiased"
     },
-    // -8% of Maple's 0.6em advance; scales with each UI element's font size.
+    // Match Ghostty's -3.5% of Maple's 0.6em advance at each UI font size.
     "body *:not(.monaco-editor *):not(.monaco-editor), .find-widget .monaco-inputbox .input, .mdc-editor, .mdc-editor *, .composer-code-block-container, .composer-code-block-container *, .composer-message-codeblock, .composer-message-codeblock *, .suggest-input-container *, .simple-code-render *": {
-      "letter-spacing": "-0.048em !important"
+      "letter-spacing": "-0.021em !important"
     }
   },
   "custom-ui-style.webview.enable": true,
@@ -34,7 +34,7 @@
       "-webkit-font-smoothing": "antialiased"
     },
     "html, body, body *": {
-      "letter-spacing": "-0.048em !important"
+      "letter-spacing": "-0.021em !important"
     },
     "input, textarea, [contenteditable='true']": {
       "font-family": "var(--cus-monospace-font) !important"
@@ -52,8 +52,8 @@
   "editor.fontWeight": "500",
   "editor.fontLigatures": "'calt', 'cv01', 'zero', 'cv61'",
   "editor.fontVariations": false,
-  // At zoomLevel 1 (1.2x): 14px -> 16.8; 0.6em advance * -8% -> -0.672px.
-  "editor.letterSpacing": -0.67,
+  // At zoomLevel 1 (1.2x): 14px -> 16.8; 0.6em advance * -3.5% -> -0.294px.
+  "editor.letterSpacing": -0.29,
   "editor.bracketPairColorization.enabled": true,
   "editor.fontSize": 14,
   // Maple's 1.32em line box * Ghostty's 1.14 cell-height adjustment, rounded.
@@ -291,7 +291,7 @@
   "terminal.integrated.fontWeight": "500",
   "terminal.integrated.lineHeight": 1.14,
   "terminal.integrated.fontRendering": "grayscale",
-  "terminal.integrated.letterSpacing": -0.67,
+  "terminal.integrated.letterSpacing": -0.29,
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontLigatures.enabled": true,
   "terminal.integrated.shellIntegration.enabled": false,

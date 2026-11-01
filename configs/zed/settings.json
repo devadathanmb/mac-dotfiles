@@ -26,17 +26,16 @@
     },
     "auto_update": true,
     "agent_ui_font_size": 16,
-    "agent_buffer_font_size": 15.5,
+    "agent_buffer_font_size": 16.2,
     "buffer_font_family": "Maple Mono NF",
-    // Visually compensate for Zed lacking VS Code's tightened letter spacing.
-    "buffer_font_size": 15.5,
-    "buffer_font_weight": 500,
+    // Visually compensate for VS Code's slightly tightened letter spacing.
+    "buffer_font_size": 16.2,
+    "buffer_font_weight": 400,
     // Preserve VS Code's effective 25.2px line height independently of glyph size.
-    "buffer_line_height": { "custom": 1.62580645 },
-    // Zed has no equivalent to VS Code's editor.letterSpacing (-0.67px).
+    "buffer_line_height": { "custom": 1.55555556 },
     "ui_font_family": "Maple Mono NF",
     "ui_font_size": 16,
-    "ui_font_weight": 500,
+    "ui_font_weight": 400,
     "ui_font_features": {
         "calt": true,
         "cv01": true,
@@ -363,15 +362,15 @@
         "working_directory": "current_project_directory",
         "max_scroll_history_lines": 5000,
         "font_family": "Maple Mono NF",
-        "font_size": 15.5,
-        "font_weight": 500,
+        "font_size": 16.2,
+        "font_weight": 400,
         "font_features": {
             "calt": true,
             "cv01": true,
             "zero": true,
             "cv61": true,
         },
-        "line_height": { "custom": 1.63100903 },
+        "line_height": { "custom": 1.56053333 },
         "shell": {
             "program": "fish",
         },
