@@ -7,6 +7,10 @@ untracked/*
 **/log
 **/log/
 **/history
+**/history.*
+**/*_history
+**/.*_history
+**/*.history
 *.log
 .ruff_cache/
 .cursor/*
@@ -20,8 +24,9 @@ configs/mpv/watch_later/
 # Zed's local prompt library database and lock files are application state.
 configs/zed/prompts/
 
-# Private agent skills (local only; name them private-<name>)
-configs/agents/skills/private-*/
+# Private agent skills (local only; name them private-<name>). No trailing slash: that would only
+# match directories, so a skill symlinked in from a local repo would show up untracked.
+configs/agents/skills/private-*
 
 # Obsidian third-party code is downloaded into the vault; only settings belong here.
 configs/obsidian/plugins/*/*

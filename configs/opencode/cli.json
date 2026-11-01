@@ -31,7 +31,7 @@
   "tabs": {
     "layout": "vertical",
     "indicators": "status",
-    "enabled": false
+    "mode": "off"
   },
   "attention": {
     "enabled": true,

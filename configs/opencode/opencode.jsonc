@@ -3,7 +3,6 @@
   "model": "openai/gpt-6.1-sol",
   "update": "notify",
   "share": "disabled",
-  "disabled_providers": [],
   "tool_output": {
     "max_lines": 500,
     "max_bytes": 20000
@@ -19,12 +18,9 @@
       "model": "openai/gpt-6-luna#high"
     }
   },
-  "experimental": {
-    "disable_paste_summary": true
-  },
   "compaction": {
     "auto": true,
-    "buffer": 10000
+    "buffer": "15%"
   },
   "formatter": false,
   "lsp": false,
@@ -101,17 +97,13 @@
       "effect": "ask"
     }
   ],
-  // OpenCode Quota: tuiCommandDisplay chooses whether native TUI command output appears in the session transcript or a local popup dialog.
   // OpenCode Quota: loads the server plugin for slash commands and quota checks.
   "plugins": [
-    // "@slkiser/opencode-quota@latest",
+    "@slkiser/opencode-quota@latest"
     // "@mohak34/opencode-notifier@0.2.8"
   ],
   "providers": {
     // Detected openai authentication; opencode-quota added this global provider declaration.
     "openai": {}
-  },
-  "plugin": [
-    "@slkiser/opencode-quota@latest"
-  ]
+  }
 }
