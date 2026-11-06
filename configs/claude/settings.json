@@ -94,10 +94,14 @@
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
+  "voice": {
+    "enabled": false,
+    "mode": "hold"
+  },
   "autoMemoryEnabled": false,
   "autoDreamEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "verbose": false,
-  "voiceEnabled": true
+  "voiceEnabled": false
 }

@@ -5,7 +5,7 @@
 # the harness) and prints a two-line status line. Preview and test changes with
 # the tools beside this file; see README.md.
 #
-#   ◆ Opus 5.5 · medium ⏐ ━━━━──────── 34%  340k/1M ⏐ cache 92% 4m      5h ━━━━━─────  35%      3h12m
+#   ◆ Opus 5.5 · medium ⏐ ━━━━──────── 34%  340k/1M ⏐ cache 92% 4m      5h ━━━━━─────  35%      3h 12m
 #   ~/repos/revue ⏐ 󰘬 main* ↑1 ⏐ +120 −30 ⏐ #42 ✓                     7d ━━━━──────  12% Fri 6:45am
 #
 # Design: everything sits on a neutral grey scale and lavender is the only
@@ -121,7 +121,7 @@ NBSP=$(printf '\302\240')
 
 # --- helpers -------------------------------------------------------------------
 
-# Reset epoch → countdown within a day ("42m", "3h12m"), else "Tue 2:30am"
+# Reset epoch → countdown within a day ("42m", "3h 12m"), else "Tue 2:30am"
 _fmt_reset() {
     local secs=$(($1 - now)) day
     if [ "$secs" -le 0 ]; then
@@ -129,7 +129,7 @@ _fmt_reset() {
     elif [ "$secs" -lt 3600 ]; then
         printf '%dm' "$((secs / 60))"
     elif [ "$secs" -lt 86400 ]; then
-        printf '%dh%02dm' "$((secs / 3600))" "$((secs % 3600 / 60))"
+        printf '%dh%s%02dm' "$((secs / 3600))" "$NBSP" "$((secs % 3600 / 60))"
     else
         day=$(date -r "$1" +"%a %-I:%M%p" 2> /dev/null || date -d "@$1" +"%a %-I:%M%p")
         day=${day/%AM/am}

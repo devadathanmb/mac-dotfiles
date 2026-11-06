@@ -13,14 +13,14 @@ adjust-cell-width = "-3.5%"
 adjust-cell-height = 14%
 
 # Window
-window-padding-x = 20
-window-padding-y = 6
+window-padding-x = 10
+window-padding-y = 5
 window-padding-balance = true
 window-padding-color = extend
 window-save-state = always
 quit-after-last-window-closed = true
 confirm-close-surface = false
-macos-titlebar-style = transparent
+macos-titlebar-style = tabs
 resize-overlay = never
 
 # Cursor
