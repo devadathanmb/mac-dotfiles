@@ -3,6 +3,7 @@
   "syncClaudeAiSkills": false,
   "syncClaudeAiPlugins": false,
   "env": {
+    "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
     "CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS": "1",
     "CLAUDE_CODE_DISABLE_ADVISOR_TOOL": "1",
     "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
@@ -68,6 +69,7 @@
       "/tmp/agent-gh"
     ]
   },
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "disableArtifact": true,

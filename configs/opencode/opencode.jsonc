@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "shell": "/opt/homebrew/bin/bash",
   "model": "openai/gpt-6.1-sol",
   "update": "notify",
   "share": "disabled",
