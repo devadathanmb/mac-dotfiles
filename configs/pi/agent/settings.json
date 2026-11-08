@@ -6,8 +6,20 @@
   "showHardwareCursor": true,
   "editorPaddingX": 1,
   "outputPad": 1,
-  "terminal": {
-    "showTerminalProgress": true
-  },
-  "enableInstallTelemetry": false
+  "autocompleteMaxVisible": 10,
+  "quietStartup": "header",
+  "collapseChangelog": true,
+  "doubleEscapeAction": "none",
+  "treeFilterMode": "no-tools",
+  "fullscreenScrollbar": "always",
+  "fullscreenExitOutput": "resume-hint",
+  "enableInstallTelemetry": false,
+  "packages": [
+    "npm:@aliou/pi-guardrails@0.23.0",
+    "npm:@juicesharp/rpiv-ask-user-question@2.15.0"
+  ],
+  "hideThinkingBlock": false,
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:@aliou/pi-guardrails@0.23.0\",\"scope\":\"user\"}": "0.23.0"
+  }
 }
