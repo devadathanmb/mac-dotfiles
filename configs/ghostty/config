@@ -20,7 +20,7 @@ window-padding-color = extend
 window-save-state = always
 quit-after-last-window-closed = true
 confirm-close-surface = false
-macos-titlebar-style = tabs
+macos-titlebar-style = transparent
 resize-overlay = never
 
 # Cursor
