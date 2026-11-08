@@ -1,0 +1,9 @@
+---
+- name: Neovim Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: false
+
+  roles:
+    - role: neovim

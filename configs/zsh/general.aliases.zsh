@@ -11,4 +11,3 @@ alias mv="mv -i"
 
 # Vim Aliases
 alias vim="nvim"
-alias lvim="NVIM_APPNAME=lvim nvim"

@@ -1,0 +1,4 @@
+---
+neovim_config_repo: "https://github.com/devadathanmb/neovim-config.git"
+neovim_config_version: "v2"
+neovim_config_dir: "{{ home_dir }}/.config/nvim"

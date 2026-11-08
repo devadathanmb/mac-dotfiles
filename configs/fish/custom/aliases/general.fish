@@ -17,4 +17,3 @@ alias brewup="echo 'Brewing...' && brew update && brew upgrade --no-ask && brew 
 
 # Vim Aliases
 alias vim="nvim"
-alias lvim="env NVIM_APPNAME=lvim nvim"

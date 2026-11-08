@@ -1,0 +1,30 @@
+---
+- name: Inspect Neovim config path
+  ansible.builtin.stat:
+    path: "{{ neovim_config_dir }}"
+    follow: false
+  register: neovim_config_path
+
+- name: Inspect Neovim config checkout
+  ansible.builtin.stat:
+    path: "{{ neovim_config_dir }}/.git"
+  register: neovim_config_git
+  when: neovim_config_path.stat.exists
+
+- name: Refuse to replace a non-checkout Neovim config
+  ansible.builtin.fail:
+    msg: >-
+      {{ neovim_config_dir }} exists but is not a git checkout (it may be an old
+      symlink or local config). Move it aside, then rerun to clone
+      {{ neovim_config_repo }}.
+  when:
+    - neovim_config_path.stat.exists
+    - neovim_config_path.stat.islnk or not neovim_config_git.stat.exists
+
+# Clone only: an existing checkout holds local work and is never updated here.
+- name: Clone Neovim config
+  ansible.builtin.git:
+    repo: "{{ neovim_config_repo }}"
+    dest: "{{ neovim_config_dir }}"
+    version: "{{ neovim_config_version }}"
+    update: false
