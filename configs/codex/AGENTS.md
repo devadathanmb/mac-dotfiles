@@ -6,5 +6,5 @@
 - Read only relevant files (and specific line ranges in large files); re-read a file only if it changed
 - Check local code and docs before searching the web
 - Use `agent-python` (uv-managed Python for agents, not `python`/`python3`) for one-off data processing, HTTP requests, or multi-step parsing and conditional logic—not for tasks handled by a single tool call or simple shell command. Prefer its installed libraries where applicable: `pandas`, `numpy`, `ruamel.yaml` (not `yaml`), `httpx2`, `beautifulsoup4`, `plotly`, `pymupdf`, `Pillow`
-- Ask only when ambiguity would materially change the result; otherwise proceed and finish the task
+- Treat feasibility questions as requests for information. Explain what is possible and what it requires, then wait for the user to request implementation before changing files or installing tools.
 - Run commands in the foreground with a sufficient `yield_time_ms` rather than backgrounding with `&`; use background processes only for long-running servers or daemons
