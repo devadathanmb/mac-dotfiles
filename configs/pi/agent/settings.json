@@ -1,0 +1,13 @@
+{
+  "lastChangelogVersion": "1.5.0",
+  "shellPath": "/opt/homebrew/bin/bash",
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-6.1-terra",
+  "showHardwareCursor": true,
+  "editorPaddingX": 1,
+  "outputPad": 1,
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "enableInstallTelemetry": false
+}

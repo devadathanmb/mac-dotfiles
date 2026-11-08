@@ -66,7 +66,8 @@
     ~/repos/notes/.obsidian/plugins/global-vim-navigation: configs/obsidian/plugins/global-vim-navigation
     ~/repos/notes/.obsidian/plugins/document-comments/data.json: configs/obsidian/plugins/document-comments/data.json
 
-    # Pi Coding Agent
+    # Pi Coding Agent: authentication and sessions are ignored by Git.
+    ~/.pi/agent: configs/pi/agent
     ~/.config/mcp/mcp.json: configs/mcp/mcp.json
 
     # Agent skills: single source of truth for all coding agents
