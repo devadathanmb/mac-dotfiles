@@ -24,6 +24,17 @@ configs/mpv/watch_later/
 # Zed's local prompt library database and lock files are application state.
 configs/zed/prompts/
 
+# Pi authentication, generated state, and local backups stay on this machine.
+/configs/pi/agent/auth.json
+/configs/pi/agent/models-store.json
+/configs/pi/agent/sessions/
+/configs/pi/agent/*.pre-dotfiles-backup
+/configs/pi/agent/**/*.pre-dotfiles-backup
+/configs/pi/agent/**/auth.json
+/configs/pi/agent/**/.env*
+/configs/pi/agent/**/*.key
+/configs/pi/agent/**/*.pem
+
 # Private agent skills (local only; name them private-<name>). No trailing slash: that would only
 # match directories, so a skill symlinked in from a local repo would show up untracked.
 configs/agents/skills/private-*
