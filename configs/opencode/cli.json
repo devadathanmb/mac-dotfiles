@@ -17,13 +17,13 @@
     "timeout": 1000
   },
   "session": {
+    "verbosity": "high",
     "sidebar": "hide",
     "scrollbar": false,
     "thinking": "show",
     "image_preview": true,
-    "terminal": true,
     "markdown": "rendered",
-    "grouping": "auto",
+    "grouping": "none",
     "tps": true,
     "permissions": "prompt"
   },
@@ -34,7 +34,6 @@
     "mode": "off"
   },
   "attention": {
-    "enabled": true,
     "notifications": false,
     "sound": true
   },
