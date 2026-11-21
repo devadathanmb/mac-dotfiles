@@ -45,6 +45,7 @@ reef
 ripgrep-all
 rsync
 shuffledns
+tealdeer
 tgpt
 tmux
 uv
