@@ -30,26 +30,26 @@
     type: bool
     value: true
 
-- name: Trackpad | Enable three-finger drag
+- name: Trackpad | Disable three-finger drag
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadThreeFingerDrag
     type: bool
-    value: true
+    value: false
 
-- name: Trackpad | Enable three-finger drag on Bluetooth trackpads
+- name: Trackpad | Disable three-finger drag on Bluetooth trackpads
   community.general.osx_defaults:
     domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
     key: TrackpadThreeFingerDrag
     type: bool
-    value: true
+    value: false
 
-- name: Trackpad | Enable three-finger drag for the current host
+- name: Trackpad | Disable three-finger drag for the current host
   community.general.osx_defaults:
     domain: NSGlobalDomain
     key: com.apple.trackpad.threeFingerDragGesture
     type: bool
-    value: true
+    value: false
     host: currentHost
 
 - name: Trackpad | Set click pressure (medium)
@@ -185,12 +185,27 @@
     type: int
     value: 0
 
-- name: Trackpad | Set three-finger vertical swipe gesture
+- name: Trackpad | Enable three-finger vertical swipes
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadThreeFingerVertSwipeGesture
     type: int
     value: 2
+
+- name: Trackpad | Enable three-finger vertical swipes on Bluetooth trackpads
+  community.general.osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+    key: TrackpadThreeFingerVertSwipeGesture
+    type: int
+    value: 2
+
+- name: Trackpad | Enable three-finger vertical swipes for the current host
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.threeFingerVertSwipeGesture
+    type: int
+    value: 2
+    host: currentHost
 
 - name: Trackpad | Enable two-finger double-tap gesture
   community.general.osx_defaults:
