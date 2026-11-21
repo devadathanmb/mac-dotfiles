@@ -230,10 +230,11 @@
     "vscodevim.vim": 1,
     "vspacecode.whichkey": 2,
     "eamodio.gitlens": 3,
+    // Keep Python tools in one host: splitting them breaks Pylance discovery and interpreter selection.
     "ms-python.python": 4,
-    "ms-python.vscode-pylance": 5,
-    "ms-python.flake8": 6,
-    "ms-python.black-formatter": 7,
+    "ms-python.vscode-pylance": 4,
+    "ms-python.flake8": 4,
+    "ms-python.black-formatter": 4,
     "christian-kohler.path-intellisense": 8,
     "GitHub.copilot-chat": 9,
     "kevinrose.vsc-python-indent": 10
@@ -518,7 +519,7 @@
     "reportOptionalMemberAccess": "none",
     "reportOptionalSubscript": "none"
   },
-  "python.languageServer": "Default",
+  "python.languageServer": "Pylance",
   // SQLFluff
   "sqlfluff.dialect": "postgres",
   "sqlfluff.suppressNotifications": true,
