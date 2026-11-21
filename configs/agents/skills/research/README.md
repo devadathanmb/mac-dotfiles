@@ -7,10 +7,14 @@ A research skill and CLI for AI agents: library docs, web search, page reading, 
 Requires Python 3.14. Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run from this directory:
 
 ```sh
-uv tool install --python 3.14 --editable .
+uv tool install --managed-python --python 3.14 --editable .
 ```
 
 This makes `research` available globally; source changes take effect immediately. If the command isn't found, run `uv tool update-shell` and restart your shell.
+
+Use uv-managed Python so the CLI does not depend on a Homebrew or mise interpreter
+that may be removed or replaced independently. This repository's global uv config
+also enforces managed Python; mise remains responsible for development runtimes.
 
 Search providers may need API keys, read from the environment or from a file of the same name in `~/.secrets`: `EXA_API_KEY` (`exa-api-key`), `PARALLEL_API_KEY`, `BRAVE_API_KEY`, `TAVILY_API_KEY`, `CONTEXT7_API_KEY`, `FIRECRAWL_API_KEY`, and optionally `STACKEXCHANGE_KEY` (raises the Stack Exchange quota from 300 to 10,000 requests a day). GitHub requests use `GITHUB_TOKEN`, `GH_TOKEN`, or `gh auth token`. Page fetching works without keys.
 
@@ -66,5 +70,5 @@ After changing dependencies in `pyproject.toml`, run:
 
 ```sh
 uv lock
-uv tool install --python 3.14 --editable . --reinstall
+uv tool install --managed-python --python 3.14 --editable . --reinstall
 ```
