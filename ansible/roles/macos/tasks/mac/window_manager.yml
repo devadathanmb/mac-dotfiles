@@ -1,6 +1,13 @@
 ---
 # WINDOW MANAGER SETTINGS
 
+- name: Window Manager | Always prefer tabs when opening documents
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleWindowTabbingMode
+    type: string
+    value: always
+
 - name: Window Manager | Disable click wallpaper to show desktop (Sonoma+)
   community.general.osx_defaults:
     domain: com.apple.WindowManager

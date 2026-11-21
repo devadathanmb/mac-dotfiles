@@ -30,12 +30,27 @@
     type: bool
     value: true
 
-- name: Trackpad | Disable three-finger drag
+- name: Trackpad | Enable three-finger drag
   community.general.osx_defaults:
     domain: com.apple.AppleMultitouchTrackpad
     key: TrackpadThreeFingerDrag
     type: bool
-    value: false
+    value: true
+
+- name: Trackpad | Enable three-finger drag on Bluetooth trackpads
+  community.general.osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+    key: TrackpadThreeFingerDrag
+    type: bool
+    value: true
+
+- name: Trackpad | Enable three-finger drag for the current host
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.trackpad.threeFingerDragGesture
+    type: bool
+    value: true
+    host: currentHost
 
 - name: Trackpad | Set click pressure (medium)
   community.general.osx_defaults:

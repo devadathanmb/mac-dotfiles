@@ -35,13 +35,15 @@
     key: FXDefaultSearchScope
     type: string
     value: SCcf
+  notify: Restart Finder
 
 - name: Finder | Show status bar
   community.general.osx_defaults:
     domain: com.apple.finder
     key: ShowStatusBar
     type: bool
-    value: false
+    value: true
+  notify: Restart Finder
 
 - name: Finder | Show path bar
   community.general.osx_defaults:
