@@ -43,7 +43,8 @@ clipboard-paste-protection = false
 theme = GitHub Dark High Contrast
 background = "#000000"
 foreground = "#D6DBE0"
-minimum-contrast = 1.2
+# Preserve application colors, including dim whitespace inside selections.
+minimum-contrast = 1
 
 # Make selection visible but subtle
 selection-foreground = "#0D1117"
